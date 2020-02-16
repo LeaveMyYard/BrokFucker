@@ -23,6 +23,15 @@ def verify_password(email, password):
     database = DatadaseHandler()
     return database.check_password(email, password)
 
+@app.route('/api/v1/ping', methods=['GET'])
+def ping():
+    return jsonify({}), 200
+
+@app.route('/api/v1/testUser', methods=['GET'])
+@auth.login_required
+def check_user():
+    return jsonify({'msg': 'Successful'}), 200
+
 @app.route('/api/v1/register', methods=['POST'])
 def create_task():
     if not request.json or not 'email' in request.json or not 'password' in request.json:
@@ -42,11 +51,6 @@ def create_task():
         return jsonify({'error': e.error_id, 'msg': e.args[0]}), 409
 
     return jsonify({'msg': 'New user created'}), 201
-
-@app.route('/api/v1/test', methods=['GET'])
-@auth.login_required
-def test():
-    return jsonify({'msg': 'Successful'}), 201
 
 if __name__ == '__main__':
     app.run(debug=True)
