@@ -63,10 +63,13 @@ class DatadaseHandler:
         '''
 
         if self.check_user_exists(email):
-            raise RegistrationError(1, 'Email sent is already in use.')
+            raise RegistrationError(-1200, 'Email is already in use.')
 
         if len(password) < 8:
-            raise RegistrationError(0, 'Password is too small.')
+            raise RegistrationError(-1201, 'A password size is less than 8.')
+
+        if len(password) > 32:
+            raise RegistrationError(-1201, 'A password size is bigger than 32.')
 
         password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
         reg_date = datetime.now()
