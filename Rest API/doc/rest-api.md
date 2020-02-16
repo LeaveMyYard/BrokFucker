@@ -1,78 +1,7 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
-
-  - [General API Information](#general-api-information)
-  - [HTTP Return Codes](#http-return-codes)
-  - [Error Codes](#error-codes)
-  - [General Information on Endpoints](#general-information-on-endpoints)
-- [LIMITS](#limits)
-  - [General Info on Limits](#general-info-on-limits)
-  - [IP Limits](#ip-limits)
-  - [Order Rate Limits](#order-rate-limits)
-- [Endpoint security type](#endpoint-security-type)
-- [SIGNED (TRADE and USER_DATA) Endpoint security](#signed-trade-and-user_data-endpoint-security)
-  - [Timing security](#timing-security)
-  - [SIGNED Endpoint Examples for POST /api/v3/order](#signed-endpoint-examples-for-post-apiv3order)
-    - [Example 1: As a request body](#example-1-as-a-request-body)
-    - [Example 2: As a query string](#example-2-as-a-query-string)
-    - [Example 3: Mixed query string and request body](#example-3-mixed-query-string-and-request-body)
-- [Public API Endpoints](#public-api-endpoints)
-  - [Terminology](#terminology)
-  - [ENUM definitions](#enum-definitions)
-  - [General endpoints](#general-endpoints)
-    - [Test connectivity](#test-connectivity)
-    - [Check server time](#check-server-time)
-    - [Exchange information](#exchange-information)
-  - [Market Data endpoints](#market-data-endpoints)
-    - [Order book](#order-book)
-    - [Recent trades list](#recent-trades-list)
-    - [Old trade lookup (MARKET_DATA)](#old-trade-lookup-market_data)
-    - [Compressed/Aggregate trades list](#compressedaggregate-trades-list)
-    - [Kline/Candlestick data](#klinecandlestick-data)
-    - [Current average price](#current-average-price)
-    - [24hr ticker price change statistics](#24hr-ticker-price-change-statistics)
-    - [Symbol price ticker](#symbol-price-ticker)
-    - [Symbol order book ticker](#symbol-order-book-ticker)
-  - [Account endpoints](#account-endpoints)
-    - [New order  (TRADE)](#new-order--trade)
-    - [Test new order (TRADE)](#test-new-order-trade)
-    - [Query order (USER_DATA)](#query-order-user_data)
-    - [Cancel order (TRADE)](#cancel-order-trade)
-    - [Current open orders (USER_DATA)](#current-open-orders-user_data)
-    - [All orders (USER_DATA)](#all-orders-user_data)
-    - [New OCO (TRADE)](#new-oco-trade)
-    - [Cancel OCO (TRADE)](#cancel-oco-trade)
-    - [Query OCO (USER_DATA)](#query-oco-user_data)
-    - [Query all OCO (USER_DATA)](#query-all-oco-user_data)
-    - [Query Open OCO (USER_DATA)](#query-open-oco-user_data)
-    - [Account information (USER_DATA)](#account-information-user_data)
-    - [Account trade list (USER_DATA)](#account-trade-list-user_data)
-  - [User data stream endpoints](#user-data-stream-endpoints)
-    - [Start user data stream (USER_STREAM)](#start-user-data-stream-user_stream)
-    - [Keepalive user data stream (USER_STREAM)](#keepalive-user-data-stream-user_stream)
-    - [Close user data stream (USER_STREAM)](#close-user-data-stream-user_stream)
-- [Filters](#filters)
-  - [Symbol filters](#symbol-filters)
-    - [PRICE_FILTER](#price_filter)
-    - [PERCENT_PRICE](#percent_price)
-    - [LOT_SIZE](#lot_size)
-    - [MIN_NOTIONAL](#min_notional)
-    - [ICEBERG_PARTS](#iceberg_parts)
-    - [MARKET_LOT_SIZE](#market_lot_size)
-    - [MAX_NUM_ORDERS](#max_num_orders)
-    - [MAX_NUM_ALGO_ORDERS](#max_num_algo_orders)
-    - [MAX_NUM_ICEBERG_ORDERS](#max_num_iceberg_orders)
-  - [Exchange Filters](#exchange-filters)
-    - [EXCHANGE_MAX_NUM_ORDERS](#exchange_max_num_orders)
-    - [EXCHANGE_MAX_NUM_ALGO_ORDERS](#exchange_max_num_algo_orders)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
-# Public Rest API for Binance (2019-11-13)
+# Public Rest API for BrokFucker (16.02.2020)
 
 ## General API Information
-* The base endpoint is: **https://api.binance.com**
+* The base endpoint is: **https://api.brokfucker.com**
 * All endpoints return either a JSON object or array.
 * Data is returned in **ascending** order. Oldest first, newest last.
 * All time and timestamp related fields are in **milliseconds**.
@@ -85,7 +14,7 @@
 * HTTP `429` return code is used when breaking a request rate limit.
 * HTTP `418` return code is used when an IP has been auto-banned for continuing to send requests after receiving `429` codes.
 * HTTP `5XX` return codes are used for internal errors; the issue is on
-  Binance's side.
+  server's side.
   It is important to **NOT** treat this as a failure operation; the execution status is
   **UNKNOWN** and could have been a success.
 

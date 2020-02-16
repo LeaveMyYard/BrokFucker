@@ -8,15 +8,15 @@ auth = HTTPBasicAuth()
 
 @app.errorhandler(404)
 def not_found(error):
-    return make_response(jsonify({'error': 'Not found'}), 404)
+    return make_response(jsonify({'code': 0, 'error': 'Not found'}), 404)
 
 @app.errorhandler(400)
 def bad_request(error):
-    return make_response(jsonify({'error': 'Bad request'}), 400)
+    return make_response(jsonify({'code': 0, 'error': 'Bad request'}), 400)
 
 @auth.error_handler
 def unauthorized():
-    return make_response(jsonify({'error': 'Unauthorized access'}), 403)
+    return make_response(jsonify({'code': 0, 'error': 'Unauthorized access'}), 403)
 
 @auth.verify_password
 def verify_password(email, password):
