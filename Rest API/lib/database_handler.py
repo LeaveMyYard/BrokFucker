@@ -55,6 +55,16 @@ class DatadaseHandler:
         
         return res[2] == hashlib.sha256(password.encode('utf-8')).hexdigest()
 
+    def is_moderator(self, email: str) -> bool:
+        if not self.check_user_exists(email):
+            return False
+
+        self.cursor.execute(
+            f"SELECT * FROM Users WHERE `email` = '{email}'"
+        )
+        res = self.cursor.fetchone()
+
+        return res[3] == 1
 
     def create_user(self, email: str, password: str) -> bool:
         '''
@@ -74,7 +84,7 @@ class DatadaseHandler:
         password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
         reg_date = datetime.now()
         self.cursor.execute(
-            f"INSERT INTO Users (`email`, `password`, `reg_date`)"
-            f"VALUES ('{email}', '{password_hash}', '{reg_date}')"
+            f"INSERT INTO Users (`email`, `password`, `type`, `reg_date`)"
+            f"VALUES ('{email}', '{password_hash}', '0', '{reg_date}')"
         )
         self.conn.commit()

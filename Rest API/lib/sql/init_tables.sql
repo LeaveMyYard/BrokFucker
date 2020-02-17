@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS Users (
     `type` INTEGER NOT NULL,
     `reg_date` DATETIME NOT NULL,
     `name` TEXT,
-    `phone_number` TEXT,
+    `phone_number` TEXT
 );
