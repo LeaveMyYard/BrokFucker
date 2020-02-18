@@ -136,3 +136,322 @@ User
   'phone_number': null
 }
 ```
+
+### Create new lot
+```
+POST /api/v1/lots/createNew
+```
+The new lot will be by default unapproved and will wait for moderator to approve.
+
+**Level:**
+User
+
+**Parameters:**
+* name: string
+* amount: int
+* currency: string
+* term: int
+* return_way: int
+* security: string
+* percentage: double
+* form: int
+
+**Response:**
+```javascript
+{
+  'msg': 'New lot created'
+}
+```
+
+### Get list of approved lots
+```
+GET /api/v1/lots/approved
+```
+The list of dictionaries will return.
+
+**Level:**
+User
+
+**Parameters:**
+* NONE
+
+**Response:**
+```javascript
+[
+  {
+    'id': 1,
+    'date': 'date',
+    'name': 'testname',
+    'user': 'test@gmail.com',
+    'amount': 12345,
+    'currency': 'USD',
+    'term': 0,
+    'return_way': 2,
+    'security': 'house',
+    'percentage': 0',
+    'form': 1,
+    'security_checked': false,
+    'guarantee_percentage': 90
+  },
+  {
+    'id': 2,
+    'date': 'date',
+    'name': 'testname',
+    'user': 'test@gmail.com',
+    'amount': 12345,
+    'currency': 'USD',
+    'term': 0,
+    'return_way': 2,
+    'security': 'house',
+    'percentage': 0',
+    'form': 1,
+    'security_checked': false,
+    'guarantee_percentage': 90
+  },
+  ...,
+  {
+    'id': 3000,
+    'date': 'date',
+    'name': 'testname',
+    'user': 'test@gmail.com',
+    'amount': 12345,
+    'currency': 'USD',
+    'term': 0,
+    'return_way': 2,
+    'security': 'house',
+    'percentage': 0',
+    'form': 1,
+    'security_checked': false,
+    'guarantee_percentage': 90
+  },
+]
+```
+
+### Get favirite lots list
+```
+GET /api/v1/lots/favorites
+```
+Returns the list of all user's favorite lots.
+
+**Level:**
+User
+
+**Parameters:**
+* NONE
+
+**Response:**
+```javascript
+[
+  {
+    'id': 1,
+    'date': 'date',
+    'name': 'testname',
+    'user': 'test@gmail.com',
+    'amount': 12345,
+    'currency': 'USD',
+    'term': 0,
+    'return_way': 2,
+    'security': 'house',
+    'percentage': 0',
+    'form': 1,
+    'security_checked': false,
+    'guarantee_percentage': 90
+  },
+  {
+    'id': 2,
+    'date': 'date',
+    'name': 'testname',
+    'user': 'test@gmail.com',
+    'amount': 12345,
+    'currency': 'USD',
+    'term': 0,
+    'return_way': 2,
+    'security': 'house',
+    'percentage': 0',
+    'form': 1,
+    'security_checked': false,
+    'guarantee_percentage': 90
+  },
+  ...,
+  {
+    'id': 3000,
+    'date': 'date',
+    'name': 'testname',
+    'user': 'test@gmail.com',
+    'amount': 12345,
+    'currency': 'USD',
+    'term': 0,
+    'return_way': 2,
+    'security': 'house',
+    'percentage': 0',
+    'form': 1,
+    'security_checked': false,
+    'guarantee_percentage': 90
+  },
+]
+```
+
+### Add lot to favorites
+```
+POST /api/v1/lots/favorites/<lot_id>
+
+or
+
+PUT /api/v1/lots/favorites/<lot_id>
+```
+A lot id parametr should me passed at `<lot_id>` place.
+
+**Level:**
+User
+
+**Parameters:**
+* NONE
+
+**Response:**
+```javascript
+{
+  'msg': 'A lot is added to favorites'
+}
+```
+
+### Remove lot from favorites
+```
+DELETE /api/v1/lots/favorites/<lot_id>
+```
+A lot id parametr should me passed at `<lot_id>` place.
+
+**Level:**
+User
+
+**Parameters:**
+* NONE
+
+**Response:**
+```javascript
+{
+  'msg': 'A lot is removed from favorites'
+}
+```
+
+## Moderator endpoints
+
+### Approve a lot
+```
+PUT /api/v1/lots/<int:lot_id>/approve
+```
+A lot id parametr should me passed at `<lot_id>` place.
+
+**Level:**
+Moderator
+
+**Parameters:**
+* NONE
+
+**Response:**
+```javascript
+{
+  'msg': 'A lot is now approved'
+}
+```
+
+### Set lot's security checked
+```
+PUT /api/v1/lots/<int:lot_id>/setSecurityChecked
+```
+A lot id parametr should me passed at `<lot_id>` place.
+
+**Level:**
+Moderator
+
+**Parameters:**
+* NONE
+
+**Response:**
+```javascript
+{
+  'msg': 'Lot\'s security is now checked'
+}
+```
+
+### Set lot's security unchecked
+```
+PUT /api/v1/lots/<int:lot_id>/setSecurityUnchecked
+```
+A lot id parametr should me passed at `<lot_id>` place.
+
+**Level:**
+Moderator
+
+**Parameters:**
+* NONE
+
+**Response:**
+```javascript
+{
+  'msg': 'Lot\'s security is no more checked'
+}
+```
+
+### Set lot's security unchecked
+```
+GET /api/v1/lots/unapproved
+```
+Returns the list of unapproved lots.
+
+**Level:**
+Moderator
+
+**Parameters:**
+* NONE
+
+**Response:**
+```javascript
+[
+  {
+    'id': 1,
+    'date': 'date',
+    'name': 'testname',
+    'user': 'test@gmail.com',
+    'amount': 12345,
+    'currency': 'USD',
+    'term': 0,
+    'return_way': 2,
+    'security': 'house',
+    'percentage': 0',
+    'form': 1,
+    'security_checked': false,
+    'guarantee_percentage': 90
+  },
+  {
+    'id': 2,
+    'date': 'date',
+    'name': 'testname',
+    'user': 'test@gmail.com',
+    'amount': 12345,
+    'currency': 'USD',
+    'term': 0,
+    'return_way': 2,
+    'security': 'house',
+    'percentage': 0',
+    'form': 1,
+    'security_checked': false,
+    'guarantee_percentage': 90
+  },
+  ...,
+  {
+    'id': 3000,
+    'date': 'date',
+    'name': 'testname',
+    'user': 'test@gmail.com',
+    'amount': 12345,
+    'currency': 'USD',
+    'term': 0,
+    'return_way': 2,
+    'security': 'house',
+    'percentage': 0',
+    'form': 1,
+    'security_checked': false,
+    'guarantee_percentage': 90
+  },
+]
+```
