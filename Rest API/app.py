@@ -68,7 +68,7 @@ class RestServer:
         return jsonify({'msg': 'New user created'}), 201
 
     @staticmethod
-    @route('createLot', methods=['POST'])
+    @route('lots/createNew', methods=['POST'])
     @user.login_required
     def create_lot():
         if not request.json:
@@ -94,50 +94,51 @@ class RestServer:
         return jsonify({'msg': 'New lot created'}), 201
 
     @staticmethod
-    @route('lot/<int:lot_id>/approve', methods=['PUT'])
+    @route('lots/<int:lot_id>/approve', methods=['PUT'])
     @moderator.login_required
     def approve_lot(lot_id):
         Lot.approve(lot_id)
-        return jsonify({}), 201
+        return jsonify({'msg': 'A lot is now approved'}), 201
 
     @staticmethod
-    @route('lot/<int:lot_id>/setSecurityChecked', methods=['PUT'])
+    @route('lots/<int:lot_id>/setSecurityChecked', methods=['PUT'])
     @moderator.login_required
     def set_security_checked(lot_id):
         Lot.set_security_checked(lot_id, True)
-        return jsonify({}), 201
+        return jsonify({'msg': 'Lot\'s security is now checked'}), 201
 
     @staticmethod
-    @route('lot/<int:lot_id>/setSecurityUnchecked', methods=['PUT'])
+    @route('lots/<int:lot_id>/setSecurityUnchecked', methods=['PUT'])
     @moderator.login_required
     def set_security_unchecked(lot_id):
         Lot.set_security_checked(lot_id, False)
-        return jsonify({}), 201
+        return jsonify({'msg': 'Lot\'s security is no more checked'}), 201
 
     @staticmethod
-    @route('getApprovedLots', methods=['GET'])
+    @route('lots/approved', methods=['GET'])
     @user.login_required
     def get_approved_lots():
         return jsonify(Lot.get_all_approved_lots()), 200
 
     @staticmethod
-    @route('getUnapprovedLots', methods=['GET'])
+    @route('lots/unapproved', methods=['GET'])
     @moderator.login_required
     def get_unapproved_lots():
         return jsonify(Lot.get_all_unapproved_lots()), 200
 
     @staticmethod
-    @route('favoriteLots/<int:lot_id>', methods=['POST', 'PUT', 'DELETE'])
+    @route('lots/favorites/<int:lot_id>', methods=['POST', 'PUT', 'DELETE'])
     @user.login_required
     def updateFavoriteLots(lot_id):
         if request.method == 'POST' or request.method == 'POST':
             user.add_lot_to_favorites(lot_id)
+            return jsonify({'msg': 'A lot is added to favorites'}), 201
         if request.method == 'DELETE':
             user.remove_lot_from_favorites(lot_id)
-        return jsonify({}), 201
+            return jsonify({'msg': 'A lot is removed from favorites'}), 201
 
     @staticmethod
-    @route('favoriteLots', methods=['GET'])
+    @route('lots/favorites', methods=['GET'])
     @user.login_required
     def getFavoriteLots():
         return jsonify(user.get_favorites()), 200
