@@ -79,7 +79,7 @@ Test connectivity to the Rest API.
 Public
 
 **Parameters:**
-NONE
+* NONE
 
 **Response:**
 ```javascript
@@ -96,8 +96,8 @@ Registrate a new account.
 Public
 
 **Parameters:**
-email: string
-password: string
+* email: string
+* password: string
 
 **Response:**
 ```javascript
@@ -118,7 +118,7 @@ Load all main user data.
 User
 
 **Parameters:**
-NONE
+* NONE
 
 **Response:**
 ```javascript
