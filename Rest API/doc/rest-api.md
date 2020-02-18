@@ -52,9 +52,9 @@ Also, double bracket symbol inside double brackets should be called as two brack
 
 So, "{""email"":""test@gmail.com"", ""password"":""qwerty1312""}" would be '{"email":"test@gmail.com", "password":"qwerty1312"}'
 
-### Example for GET /api/v1/getUserData with autentification
+### Example for GET /api/v1/getUserData with authentification
 
-Some endpoints are protected and only accessed with user/moderator autentification.
+Some endpoints are protected and only accessed with user/moderator authentification.
 
 It requires you to provide username(email) and password in request.
 
