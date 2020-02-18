@@ -392,7 +392,7 @@ Moderator
 }
 ```
 
-### Set lot's security unchecked
+### Get all unapproved lots
 ```
 GET /api/v1/lots/unapproved
 ```
