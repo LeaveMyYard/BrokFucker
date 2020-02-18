@@ -46,17 +46,23 @@ Sample Payload below:
     [windows] curl -i -H "Content-Type: application/json" -X POST -d "{""email"":""test@gmail.com"", ""password"":""qwerty1312""}"  http://127.0.0.1:5000/api/v1/register
     ```
 
-* Notice that standart Windows console support only "" brackets.
-* Also, double bracket symbol inside double brackets should be called as two brackets.
-* So, "{""email"":""test@gmail.com"", ""password"":""qwerty1312""}" would be '{"email":"test@gmail.com", "password":"qwerty1312"}'
+Notice that standart Windows console support only "" brackets.
+
+Also, double bracket symbol inside double brackets should be called as two brackets.
+
+So, "{""email"":""test@gmail.com"", ""password"":""qwerty1312""}" would be '{"email":"test@gmail.com", "password":"qwerty1312"}'
 
 ### Example for GET /api/v1/getUserData with autentification
 
-* Some endpoints are protected and only accessed with user/moderator autentification.
-* It requires you to provide username(email) and password in request.
-* Users are all the registered accounts, but moderator is a specific account type.
-* From now, all the Endpoints will be described with **Level**, that could be **Public**, **User** and **Moderator**.
-* If you don't provide account data (if needed), it is not correct or it has not enough privileges, you will recieve an error.
+Some endpoints are protected and only accessed with user/moderator autentification.
+
+It requires you to provide username(email) and password in request.
+
+Users are all the registered accounts, but moderator is a specific account type.
+
+From now, all the Endpoints will be described with **Level**, that could be **Public**, **User** and **Moderator**.
+
+If you don't provide account data (if needed), it is not correct or it has not enough privileges, you will recieve an error.
 
 * **request json:** NONE
 
