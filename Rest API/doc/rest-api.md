@@ -227,7 +227,7 @@ User
 ]
 ```
 
-### Get favirite lots list
+### Get favorite lots list
 ```
 GET /api/v1/lots/favorites
 ```
