@@ -1,9 +1,19 @@
+from flask_httpauth import HTTPBasicAuth
 from lib.database_handler import DatadaseHandler
-from lib.user import User
+from flask import Flask, abort, jsonify, request, make_response
 
-class Moderator(User):
+class Moderator:
+    auth = HTTPBasicAuth()
+    login_required = auth.login_required
+    email = auth.username
+
     @staticmethod
-    @User.auth.verify_password
+    @auth.verify_password
     def verify_password(email, password):
         database = DatadaseHandler()
         return database.check_password(email, password) and database.is_moderator(email)
+
+    @staticmethod
+    @auth.error_handler
+    def unauthorized():
+        return make_response(jsonify({'code': -1002, 'msg': 'You are not authorized to execute this request.'}), 403)

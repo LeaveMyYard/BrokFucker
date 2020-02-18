@@ -23,7 +23,7 @@ class DatadaseHandler:
 
         #Load tables init sql request from 'lib/sql/init_tables.sql' and execute it. 
         request_file = open('lib/sql/init_tables.sql', mode='r')
-        self.cursor.execute(request_file.read())
+        self.cursor.executescript(request_file.read())
         self.conn.commit()
 
     def check_user_exists(self, email: str) -> bool:
@@ -49,22 +49,22 @@ class DatadaseHandler:
             return False
 
         self.cursor.execute(
-            f"SELECT * FROM Users WHERE `email` = '{email}'"
+            f"SELECT `password` FROM Users WHERE `email` = '{email}'"
         )
         res = self.cursor.fetchone()
         
-        return res[2] == hashlib.sha256(password.encode('utf-8')).hexdigest()
+        return res[0] == hashlib.sha256(password.encode('utf-8')).hexdigest()
 
     def is_moderator(self, email: str) -> bool:
         if not self.check_user_exists(email):
             return False
 
         self.cursor.execute(
-            f"SELECT * FROM Users WHERE `email` = '{email}'"
+            f"SELECT `type` FROM Users WHERE `email` = '{email}'"
         )
         res = self.cursor.fetchone()
 
-        return res[3] == 1
+        return res[0] == 1
 
     def create_user(self, email: str, password: str) -> bool:
         '''
@@ -88,3 +88,158 @@ class DatadaseHandler:
             f"VALUES ('{email}', '{password_hash}', '0', '{reg_date}')"
         )
         self.conn.commit()
+
+    def get_user_data(self, email) -> bool:
+        if not self.check_user_exists(email):
+            raise ValueError
+
+        self.cursor.execute(
+            f"SELECT * FROM Users WHERE `email` = '{email}'"
+        )
+        res = self.cursor.fetchone()
+
+        return {
+            'email': res[0],
+            'type': 'moderator' if res[2] == 1 else 'user',
+            'registration_date': res[3],
+            'name': res[4],
+            'phone_number': res[5]
+        }
+
+    def create_new_lot(
+        self, 
+        user,
+        name,
+        amount,
+        currency,
+        term,
+        return_way,
+        security,
+        percentage,
+        form
+    ):
+        date = datetime.now()
+        self.cursor.execute(
+            f"INSERT INTO Lots (`date`, `name`, `user`, `amount`, `currency`, `term`, `return_way`, `security`, `percentage`, `form`, `security_checked`, `guarantee_percentage`, `confirmed`)"
+            f"VALUES ('{date}', '{name}', '{user}', '{amount}', '{currency}', '{term}', '{return_way}', '{security}', '{percentage}', '{form}', 'False', '0', 'False')"
+        )
+        self.conn.commit()
+
+    def approve_lot(self, lot_id):
+        self.cursor.execute(
+            f"UPDATE Lots SET `confirmed` = 'True' WHERE `id` = '{lot_id}'"
+        )
+        self.conn.commit()
+
+    def get_lot(self, lot_id):
+        self.cursor.execute(
+            f"SELECT * FROM Lots WHERE `id` = '{lot_id}'"
+        )
+        lot = self.cursor.fetchone()
+
+        return {
+            'id': lot[0],
+            'date': lot[1],
+            'name': lot[2],
+            'user': lot[3],
+            'amount': lot[4],
+            'currency': lot[5],
+            'term': lot[6],
+            'return_way': lot[7],
+            'security': lot[8],
+            'percentage': lot[9],
+            'form': lot[10],
+            'security_checked': eval(lot[11]),
+            'guarantee_percentage': lot[12]
+        }
+
+    def get_all_approved_lots(self):
+        self.cursor.execute(
+            f"SELECT * FROM Lots WHERE `confirmed` = 'True'"
+        )
+
+        return [
+            {
+                'id': lot[0],
+                'date': lot[1],
+                'name': lot[2],
+                'user': lot[3],
+                'amount': lot[4],
+                'currency': lot[5],
+                'term': lot[6],
+                'return_way': lot[7],
+                'security': lot[8],
+                'percentage': lot[9],
+                'form': lot[10],
+                'security_checked': eval(lot[11]),
+                'guarantee_percentage': lot[12]
+            }
+            for lot in self.cursor.fetchall()
+        ]
+
+    def get_all_unapproved_lots(self):
+        self.cursor.execute(
+            f"SELECT * FROM Lots WHERE `confirmed` = 'False'"
+        )
+
+        return [
+            {
+                'id': lot[0],
+                'date': lot[1],
+                'name': lot[2],
+                'user': lot[3],
+                'amount': lot[4],
+                'currency': lot[5],
+                'term': lot[6],
+                'return_way': lot[7],
+                'security': lot[8],
+                'percentage': lot[9],
+                'form': lot[10],
+                'security_checked': eval(lot[11]),
+                'guarantee_percentage': lot[12]
+            }
+            for lot in self.cursor.fetchall()
+        ]
+
+    def set_security_checked(self, lot_id, checked):
+        self.cursor.execute(
+            f"UPDATE Lots SET `security_checked` = '{checked}' WHERE `id` = '{lot_id}'"
+        )
+        self.conn.commit()
+
+    def add_lot_to_favorites(self, email, lot_id):
+        self.cursor.execute(
+            f"SELECT `LotIdsList` FROM UsersFavoriteLots WHERE `email` = '{email}'"
+        )
+
+        res: list = eval(self.cursor.fetchone()[0])
+        if lot_id not in res:
+            res.append(lot_id)
+
+        self.cursor.execute(
+            f"UPDATE UsersFavoriteLots SET `LotIdsList` = '{res}' WHERE `email` = '{email}'"
+        )
+        self.conn.commit()
+
+    def remove_lot_from_favorites(self, email, lot_id):
+        self.cursor.execute(
+            f"SELECT `LotIdsList` FROM UsersFavoriteLots WHERE `email` = '{email}'"
+        )
+        
+        res: list = eval(self.cursor.fetchone()[0])
+        if lot_id in res:
+            res.remove(lot_id)
+
+        self.cursor.execute(
+            f"UPDATE UsersFavoriteLots SET `LotIdsList` = '{res}' WHERE `email` = '{email}'"
+        )
+        self.conn.commit()
+
+    def get_favorites(self, email):
+        self.cursor.execute(
+            f"SELECT `LotIdsList` FROM UsersFavoriteLots WHERE `email` = '{email}'"
+        )
+        
+        res: list = eval(self.cursor.fetchone()[0])
+
+        return [self.get_lot(lot_id) for lot_id in reversed(res)]
