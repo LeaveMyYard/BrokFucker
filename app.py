@@ -130,7 +130,7 @@ class RestServer:
     @route('lots/favorites/<int:lot_id>', methods=['POST', 'PUT', 'DELETE'])
     @user.login_required
     def updateFavoriteLots(lot_id):
-        if request.method == 'POST' or request.method == 'POST':
+        if request.method == 'POST' or request.method == 'PUT':
             user.add_lot_to_favorites(lot_id)
             return jsonify({'msg': 'A lot is added to favorites'}), 201
         if request.method == 'DELETE':

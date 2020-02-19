@@ -123,6 +123,24 @@ class DatadaseHandler:
             f"INSERT INTO Lots (`date`, `name`, `user`, `amount`, `currency`, `term`, `return_way`, `security`, `percentage`, `form`, `security_checked`, `guarantee_percentage`, `confirmed`)"
             f"VALUES ('{date}', '{name}', '{user}', '{amount}', '{currency}', '{term}', '{return_way}', '{security}', '{percentage}', '{form}', 'False', '0', 'False')"
         )
+
+        self.cursor.execute(
+            f"SELECT `id` FROM Lots WHERE `date` = '{date}'"
+        )
+        lot_id = self.cursor.fetchone()[0]
+
+        self.cursor.execute(
+            f"SELECT `user_lots` FROM UsersLots WHERE `email` = '{user}'"
+        )
+        
+        res: list = eval(self.cursor.fetchone()[0])
+        if lot_id in res:
+            res.add(lot_id)
+
+        self.cursor.execute(
+            f"UPDATE UsersLots SET `user_lots` = '{res}' WHERE `email` = '{user}'"
+        )
+
         self.conn.commit()
 
     def approve_lot(self, lot_id):
@@ -209,7 +227,7 @@ class DatadaseHandler:
 
     def add_lot_to_favorites(self, email, lot_id):
         self.cursor.execute(
-            f"SELECT `LotIdsList` FROM UsersFavoriteLots WHERE `email` = '{email}'"
+            f"SELECT `favorite_lots` FROM UsersLots WHERE `email` = '{email}'"
         )
 
         res: list = eval(self.cursor.fetchone()[0])
@@ -217,13 +235,13 @@ class DatadaseHandler:
             res.append(lot_id)
 
         self.cursor.execute(
-            f"UPDATE UsersFavoriteLots SET `LotIdsList` = '{res}' WHERE `email` = '{email}'"
+            f"UPDATE UsersLots SET `favorite_lots` = '{res}' WHERE `email` = '{email}'"
         )
         self.conn.commit()
 
     def remove_lot_from_favorites(self, email, lot_id):
         self.cursor.execute(
-            f"SELECT `LotIdsList` FROM UsersFavoriteLots WHERE `email` = '{email}'"
+            f"SELECT `favorite_lots` FROM UsersLots WHERE `email` = '{email}'"
         )
         
         res: list = eval(self.cursor.fetchone()[0])
@@ -231,13 +249,13 @@ class DatadaseHandler:
             res.remove(lot_id)
 
         self.cursor.execute(
-            f"UPDATE UsersFavoriteLots SET `LotIdsList` = '{res}' WHERE `email` = '{email}'"
+            f"UPDATE UsersLots SET `favorite_lots` = '{res}' WHERE `email` = '{email}'"
         )
         self.conn.commit()
 
     def get_favorites(self, email):
         self.cursor.execute(
-            f"SELECT `LotIdsList` FROM UsersFavoriteLots WHERE `email` = '{email}'"
+            f"SELECT `favorite_lots` FROM UsersLots WHERE `email` = '{email}'"
         )
         
         res: list = eval(self.cursor.fetchone()[0])
