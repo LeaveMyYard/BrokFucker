@@ -1,5 +1,5 @@
 from flask_httpauth import HTTPBasicAuth
-from lib.database_handler import DatadaseHandler
+from lib.database_handler import DatabaseHandler
 from flask import Flask, abort, jsonify, request, make_response
 
 class Moderator:
@@ -10,7 +10,7 @@ class Moderator:
     @staticmethod
     @auth.verify_password
     def verify_password(email, password):
-        database = DatadaseHandler()
+        database = DatabaseHandler()
         return database.check_password(email, password) and database.is_moderator(email)
 
     @staticmethod

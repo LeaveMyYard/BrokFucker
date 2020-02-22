@@ -8,3 +8,8 @@ class IndexedException(Exception):
 
 class RegistrationError(IndexedException):
     pass
+
+class EmailValidationError(RegistrationError):
+    def __init__(self, id: int, message: str, link: str = None):
+        self.link = link
+        super().__init__(id, message)

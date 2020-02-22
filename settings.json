@@ -1,0 +1,12 @@
+{
+    "email_verification_events": {
+        "on_valid": "web/verification_successful",
+        "on_failed": "web/verification_failed"
+    },
+    "smtp_settings": {
+        "host": "smtp.gmail.com",
+        "port": 465,
+        "username": "brokfcker.noreply@gmail.com",
+        "password": "testpassword!14"
+    }
+}

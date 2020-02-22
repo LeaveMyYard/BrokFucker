@@ -1,10 +1,14 @@
 import sqlite3
 import os
 import hashlib
-from datetime import datetime
-from lib.util.exceptions import RegistrationError
+import base64
+from typing import Union
+from datetime import datetime, timedelta
+from lib.util.exceptions import RegistrationError, EmailValidationError
+from lib.settings import Settings
+from lib.email_sender import EmailSender
 
-class DatadaseHandler:
+class DatabaseHandler:
     def __init__(self, file_name: str = 'database.db'):
         
         #Test if 'data' folder exists. If not, create it.
@@ -17,14 +21,25 @@ class DatadaseHandler:
         #All database files will be located at data folder
         self.conn = sqlite3.connect(f'{directory}/{file_name}')
         self.cursor = self.conn.cursor()
-        self.__init_tables()
 
-    def __init_tables(self):
+    @staticmethod
+    def init_tables():
+        handler = DatabaseHandler()
 
         #Load tables init sql request from 'lib/sql/init_tables.sql' and execute it. 
         request_file = open('lib/sql/init_tables.sql', mode='r')
-        self.cursor.executescript(request_file.read())
-        self.conn.commit()
+        handler.cursor.executescript(request_file.read())
+        handler.conn.commit()
+
+    @staticmethod
+    def generage_new_random_hash() -> str:
+        return base64.b32encode(
+            hashlib.sha256(
+                (
+                    'random_words' + str(datetime.now())
+                ).encode('utf-8')
+            ).digest()
+        ).decode('utf-8')
 
     def check_user_exists(self, email: str) -> bool:
         '''
@@ -66,10 +81,9 @@ class DatadaseHandler:
 
         return res[0] == 1
 
-    def create_user(self, email: str, password: str) -> bool:
+    def create_email_confirmation_request(self, email: str, password: str):
         '''
-            This method will add a new user using email or password.
-            If something is wrong, it will raise RegistrationError with the message of an error.
+            Create new email verification request, generage new link for verification and send it via email.
         '''
 
         if self.check_user_exists(email):
@@ -82,10 +96,62 @@ class DatadaseHandler:
             raise RegistrationError(-1201, 'A password size is bigger than 32.')
 
         password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        random_hash = self.generage_new_random_hash()
+        reg_date = datetime.now()
+
+        self.cursor.execute(
+            f"INSERT INTO EmailVerification (`email`, `password`, `verification_hash`, `request_date`)"
+            f"VALUES ('{email}', '{password_hash}', '{random_hash}', '{reg_date}')"
+        )
+        
+        self.conn.commit()
+
+        EmailSender.send_email_verification(email, random_hash)
+
+    def verify_email_confirmation(self, code: str) -> Union[str, None]:
+        '''
+            If the corresponding email verification exist, create such user.
+            If not - throws an exception
+        '''
+
+        self.cursor.execute(
+            f"SELECT * FROM EmailVerification WHERE `verification_hash` = '{code}'"
+        )
+
+        on_failed = Settings.failed_email_verification_link()
+        on_valid = Settings.vaild_email_verification_link()
+
+        try:
+            (_, email, password, date) = self.cursor.fetchone()
+        except TypeError:
+            raise EmailValidationError(-1204, 'No such verification code exists or it was already used.', on_failed)
+        
+        if (datetime.now() - datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")) > timedelta(hours=24):
+            raise EmailValidationError(-1203, 'Email verification time has passed.', on_failed)
+
+        if self.check_user_exists(email):
+            raise EmailValidationError(-1200, 'Email is already in use.', on_failed)
+
+        self.create_user(email, password)
+
+        return on_valid
+
+    def delete_email_confirmation_code(self, code):
+        self.cursor.execute(
+            f"DELETE FROM EmailVerification WHERE `verification_hash` = '{code}'"
+        )
+        self.conn.commit()
+
+    def create_user(self, email: str, password: str) -> bool:
+        '''
+            This method will add a new user using email or password.
+            If something is wrong, it will raise RegistrationError with the message of an error.
+        '''
+
         reg_date = datetime.now()
         self.cursor.execute(
             f"INSERT INTO Users (`email`, `password`, `type`, `reg_date`)"
-            f"VALUES ('{email}', '{password_hash}', '0', '{reg_date}')"
+            f"VALUES ('{email}', '{password}', '0', '{reg_date}')"
         )
         self.conn.commit()
 

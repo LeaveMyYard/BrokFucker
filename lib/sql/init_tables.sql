@@ -21,6 +21,13 @@ AFTER INSERT ON Users
         VALUES (NEW.email);
     END;
 
+CREATE TABLE IF NOT EXISTS EmailVerification (
+    `verification_hash` TEXT PRIMARY KEY,
+    `email` TEXT NOT NULL,
+    `password` TEXT NOT NULL,
+    `request_date` DATETIME NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS Lots (
     `id` INTEGER PRIMARY KEY AUTOINCREMENT,
     `date` DATETIME NOT NULL,

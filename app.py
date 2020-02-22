@@ -1,14 +1,16 @@
 from flask import Flask, abort, jsonify, request, make_response
 from flask_httpauth import HTTPBasicAuth
-from lib.database_handler import DatadaseHandler
+from lib.database_handler import DatabaseHandler
 from lib.user import User as user
 from lib.moderator import Moderator as moderator
 from lib.lot import Lot
-from lib.util.exceptions import RegistrationError
+from lib.util.exceptions import IndexedException
 
 app = Flask(__name__)
 
 class RestServer:
+    # Initialize database
+    DatabaseHandler.init_tables()
 
     # Creating our own route decorator. 
     # It will be almost the same as app.route except it will always be on '/api/v1/'
@@ -23,7 +25,7 @@ class RestServer:
             lambda error: make_response(jsonify({'code': -1000, 'msg': 'An unknown error occured while processing the request.'}), 400),
         404: 
             lambda error: make_response(jsonify({'code': -1001, 'msg': 'The stuff you requested for is not found.'}), 404),
-        RegistrationError:
+        IndexedException:
             lambda error: make_response(jsonify({'code': error.error_id, 'msg': error.args[0]}), 409)
     }
 
@@ -35,9 +37,17 @@ class RestServer:
         )
 
     @staticmethod
+    def message(msg) -> str:
+        return jsonify(
+            {
+                'msg': msg
+            }
+        )
+
+    @staticmethod
     @route('ping', methods=['GET'])
     def ping():
-        return jsonify({}), 200
+        return RestServer.message('pong'), 200
 
     @staticmethod
     @route('getUserData', methods=['GET'])
@@ -60,12 +70,17 @@ class RestServer:
             if data not in request.json:
                 abort(400)
 
-        user.create(
+        user.begin_email_verification(
             request.json['email'],
-            request.json['password']
+            request.json['password'],
         )
 
-        return jsonify({'msg': 'New user created'}), 201
+        return RestServer.message(f"Verification is sent to {request.json['email']}"), 201
+
+    @staticmethod
+    @route('register/verify/<string:verification_hash>')
+    def confirm_verification(verification_hash):
+        return user.verify_email_from_code(verification_hash), 201
 
     @staticmethod
     @route('lots/createNew', methods=['POST'])
@@ -91,28 +106,28 @@ class RestServer:
 
         user.create_lot(*[request.json[data] for data in data_required])
 
-        return jsonify({'msg': 'New lot created'}), 201
+        return RestServer.message('New lot created'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/approve', methods=['PUT'])
     @moderator.login_required
     def approve_lot(lot_id):
         Lot.approve(lot_id)
-        return jsonify({'msg': 'A lot is now approved'}), 201
+        return RestServer.message('A lot is now approved'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/setSecurityChecked', methods=['PUT'])
     @moderator.login_required
     def set_security_checked(lot_id):
         Lot.set_security_checked(lot_id, True)
-        return jsonify({'msg': 'Lot\'s security is now checked'}), 201
+        return RestServer.message('Lot\'s security is now checked'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/setSecurityUnchecked', methods=['PUT'])
     @moderator.login_required
     def set_security_unchecked(lot_id):
         Lot.set_security_checked(lot_id, False)
-        return jsonify({'msg': 'Lot\'s security is no more checked'}), 201
+        return RestServer.message('Lot\'s security is no more checked'), 201
 
     @staticmethod
     @route('lots/approved', methods=['GET'])
@@ -132,10 +147,10 @@ class RestServer:
     def updateFavoriteLots(lot_id):
         if request.method == 'POST' or request.method == 'PUT':
             user.add_lot_to_favorites(lot_id)
-            return jsonify({'msg': 'A lot is added to favorites'}), 201
+            return RestServer.message('A lot is added to favorites'), 201
         if request.method == 'DELETE':
             user.remove_lot_from_favorites(lot_id)
-            return jsonify({'msg': 'A lot is removed from favorites'}), 201
+            return RestServer.message('A lot is removed from favorites'), 201
 
     @staticmethod
     @route('lots/favorites', methods=['GET'])
