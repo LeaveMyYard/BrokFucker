@@ -29,7 +29,7 @@ class RestServer:
             lambda error: make_response(jsonify({'code': error.error_id, 'msg': error.args[0]}), 409)
     }
 
-    # Then, looping through all that dictionary we will call decorator
+    # Then, looping through all that dictionary we will call a decorator
     # as a normal function, creating all the error handlers
     for ex in exceptions_dict:
         app.errorhandler(ex)(
