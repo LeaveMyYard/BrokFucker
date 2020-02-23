@@ -1,4 +1,4 @@
-from flask import Flask, abort, jsonify, request, make_response, send_from_directory
+from flask import Flask, abort, jsonify, request, make_response, send_from_directory, send_file
 from flask_httpauth import HTTPBasicAuth
 from lib.database_handler import DatabaseHandler
 from lib.user import User as user
@@ -11,16 +11,18 @@ app = Flask(__name__)
 
 class WebApp:
     @staticmethod
-    @app.route('/<path:path>')
-    def send_js(path):
-        return send_from_directory('src', path)
-
-    @staticmethod
     @app.route('/')
     def root():
-        return app.send_static_file('index.html')
+        return send_file('src/index.html')
 
-class RestServer:
+    @staticmethod
+    @app.route('/<path:path>')
+    def send_web(path):
+        if not path.endswith('.html'):
+            return send_from_directory('src', path + '.html')
+        return send_from_directory('src', path)
+
+class RestAPI:
     # Initialize database
     DatabaseHandler.init_tables()
     DatabaseHandler.run_verification_code_clearer(
