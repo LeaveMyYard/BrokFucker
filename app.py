@@ -65,7 +65,7 @@ class RestAPI:
     @staticmethod
     @route('ping', methods=['GET'])
     def ping():
-        return RestServer.message('pong'), 200
+        return RestAPI.message('pong'), 200
 
     @staticmethod
     @route('getUserData', methods=['GET'])
@@ -93,7 +93,7 @@ class RestAPI:
             request.json['password'],
         )
 
-        return RestServer.message(f"Verification is sent to {request.json['email']}"), 201
+        return RestAPI.message(f"Verification is sent to {request.json['email']}"), 201
 
     @staticmethod
     @route('register/verify/<string:verification_hash>')
@@ -124,28 +124,28 @@ class RestAPI:
 
         user.create_lot(*[request.json[data] for data in data_required])
 
-        return RestServer.message('New lot created'), 201
+        return RestAPI.message('New lot created'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/approve', methods=['PUT'])
     @moderator.login_required
     def approve_lot(lot_id):
         Lot.approve(lot_id)
-        return RestServer.message('A lot is now approved'), 201
+        return RestAPI.message('A lot is now approved'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/setSecurityChecked', methods=['PUT'])
     @moderator.login_required
     def set_security_checked(lot_id):
         Lot.set_security_checked(lot_id, True)
-        return RestServer.message('Lot\'s security is now checked'), 201
+        return RestAPI.message('Lot\'s security is now checked'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/setSecurityUnchecked', methods=['PUT'])
     @moderator.login_required
     def set_security_unchecked(lot_id):
         Lot.set_security_checked(lot_id, False)
-        return RestServer.message('Lot\'s security is no more checked'), 201
+        return RestAPI.message('Lot\'s security is no more checked'), 201
 
     @staticmethod
     @route('lots/approved', methods=['GET'])
@@ -165,10 +165,10 @@ class RestAPI:
     def updateFavoriteLots(lot_id):
         if request.method == 'POST' or request.method == 'PUT':
             user.add_lot_to_favorites(lot_id)
-            return RestServer.message('A lot is added to favorites'), 201
+            return RestAPI.message('A lot is added to favorites'), 201
         if request.method == 'DELETE':
             user.remove_lot_from_favorites(lot_id)
-            return RestServer.message('A lot is removed from favorites'), 201
+            return RestAPI.message('A lot is removed from favorites'), 201
 
     @staticmethod
     @route('lots/favorites', methods=['GET'])
