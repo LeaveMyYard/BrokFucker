@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>BrockFucker</title>
+  </head>
+  <body>
+    <form action="/action_page.php">
+      <div class="container">
+        <h1 class="titleReg">Вход</h1>
+
+        <label class="label label_email" for="email"
+          ><span>E-Mail: </span></label
+        >
+        <input class="inputEmail" type="text" name="email" required />
+        <br />
+        <label class="label label_psw" for="psw"><span>Password: </span></label>
+        <input class="inputPsw" type="password" name="psw" required />
+        <br />
+        <div class="checkTerms">
+          <input class="inputTerms" type="checkbox" id="terms" name="terms" />
+          <label class="label label_terms" for="terms"
+            >Оставаться в системе</label
+          >
+        </div>
+        <div>
+          <button type="submit" class="registerBtn active">
+            Войти
+          </button>
+          <a class="regLink" href="registration.html">Зарегистрироваться</a>
+        </div>
+      </div>
+    </form>
+
+    <!-- <script src="js/registration.js"></script> -->
+  </body>
+</html>
