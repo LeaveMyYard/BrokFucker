@@ -1,4 +1,4 @@
-from flask import Flask, abort, jsonify, request, make_response
+from flask import Flask, abort, jsonify, request, make_response, send_from_directory
 from flask_httpauth import HTTPBasicAuth
 from lib.database_handler import DatabaseHandler
 from lib.user import User as user
@@ -8,6 +8,17 @@ from lib.util.exceptions import IndexedException
 from datetime import timedelta
 
 app = Flask(__name__)
+
+class WebApp:
+    @staticmethod
+    @app.route('/<path:path>')
+    def send_js(path):
+        return send_from_directory('src', path)
+
+    @staticmethod
+    @app.route('/')
+    def root():
+        return app.send_static_file('index.html')
 
 class RestServer:
     # Initialize database
