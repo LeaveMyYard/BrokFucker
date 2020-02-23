@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from lib.util.exceptions import RegistrationError, EmailValidationError
 from lib.settings import Settings
 from lib.email_sender import EmailSender
+from threading import Timer
 
 class DatabaseHandler:
     def __init__(self, file_name: str = 'database.db'):
@@ -32,6 +33,20 @@ class DatabaseHandler:
         handler.conn.commit()
 
     @staticmethod
+    def run_verification_code_clearer(run_each: timedelta, duration_to_delete: timedelta):
+        print('Starting verification codes clearer.')
+        print(f'Will run each {run_each} and remove codes that exist more then {duration_to_delete}')
+        last_time_cleared = datetime.now()
+        database = DatabaseHandler()
+
+        def __run_timer():
+            database.clear_unused_codes(duration_to_delete)
+            t = Timer(run_each.total_seconds(), __run_timer)
+            t.start()
+
+        __run_timer()
+
+    @staticmethod
     def generage_new_random_hash() -> str:
         return base64.b32encode(
             hashlib.sha256(
@@ -40,6 +55,24 @@ class DatabaseHandler:
                 ).encode('utf-8')
             ).digest()
         ).decode('utf-8')
+
+    def clear_unused_codes(self, duration_to_delete: timedelta):
+        print('Clearing unused verification codes...')
+        self.cursor.execute(
+            f"SELECT `verification_hash`, `request_date` FROM EmailVerification"
+        )
+
+        codes = 0
+        for code, date in self.cursor.fetchall():
+            date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")
+            if (datetime.now() - date) > duration_to_delete:
+                codes += 1
+                self.cursor.execute(
+                    f"DELETE FROM EmailVerification WHERE `verification_hash` = '{code}'"
+                )
+        
+        print(f'Clearing complete. Removed {codes} unused codes.')
+        self.conn.commit()
 
     def check_user_exists(self, email: str) -> bool:
         '''
