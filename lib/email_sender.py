@@ -1,26 +1,26 @@
 import smtplib
-from flask import request
+from flask import request, render_template
 from lib.settings import Settings
 
-class EmailSender:
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
+class EmailSender:
     @staticmethod
     def send(to: str, subject: str, body: str):
         host, port, user, password = Settings.get_smtp_data()
-        sent_from = user
 
-        email_text = (
-            f"From: {sent_from}\n"
-            f"To: {to}\n"
-            f"Subject: {subject}\n"
-            f"\n"
-            f"{body}"
-        )
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From'] = user
+        msg['To'] = to
+
+        msg.attach(MIMEText(body, 'html'))
 
         server = smtplib.SMTP_SSL(host, port)
         server.ehlo()
         server.login(user, password)
-        server.sendmail(sent_from, to, email_text)
+        server.sendmail(user, to, msg.as_string())
         server.close()
 
     @staticmethod
@@ -28,5 +28,8 @@ class EmailSender:
         EmailSender.send(
             email,
             "Email confirmation",
-            f"{request.host_url}api/v1/register/verify/{code}"
+            render_template(
+                'email_verification.html',
+                action_url = f"{request.host_url}api/v1/register/verify/{code}"
+            )
         )
