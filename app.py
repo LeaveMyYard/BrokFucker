@@ -5,12 +5,17 @@ from lib.user import User as user
 from lib.moderator import Moderator as moderator
 from lib.lot import Lot
 from lib.util.exceptions import IndexedException
+from datetime import timedelta
 
 app = Flask(__name__)
 
 class RestServer:
     # Initialize database
     DatabaseHandler.init_tables()
+    DatabaseHandler.run_verification_code_clearer(
+        timedelta(hours=12),
+        timedelta(days=7)
+    )
 
     # Creating our own route decorator. 
     # It will be almost the same as app.route except it will always be on '/api/v1/'
