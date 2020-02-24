@@ -6,6 +6,7 @@ from lib.moderator import Moderator as moderator
 from lib.lot import Lot
 from lib.util.exceptions import IndexedException
 from datetime import timedelta
+from typing import Union, Dict, Callable
 
 app = Flask(__name__)
 
@@ -18,9 +19,14 @@ class WebApp:
     @staticmethod
     @app.route('/<path:path>')
     def send_web(path):
-        if not path.endswith('.html'):
+        if '.' not in path:
             return send_from_directory('src', path + '.html')
         return send_from_directory('src', path)
+
+    exceptions_responses = {
+        404:
+            lambda: send_file('src/404.html')
+    }
 
 class RestAPI:
     # Initialize database
@@ -38,21 +44,14 @@ class RestAPI:
     # Rather than definging a function for each error or code by hands we will
     # store all the possible ints and Exceptions as keys and
     # corresponding lambda functions as values.
-    exceptions_dict = {
+    exceptions_responses = {
         400: 
-            lambda error: make_response(jsonify({'code': -1000, 'msg': 'An unknown error occured while processing the request.'}), 400),
+            lambda error: {'code': -1000, 'msg': 'An unknown error occured while processing the request.'},
         404: 
-            lambda error: make_response(jsonify({'code': -1001, 'msg': 'The stuff you requested for is not found.'}), 404),
+            lambda error: {'code': -1001, 'msg': 'The stuff you requested for is not found.'},
         IndexedException:
-            lambda error: make_response(jsonify({'code': error.error_id, 'msg': error.args[0]}), 409)
+            lambda error: {'code': error.error_id, 'msg': error.args[0]},
     }
-
-    # Then, looping through all that dictionary we will call a decorator
-    # as a normal function, creating all the error handlers
-    for ex in exceptions_dict:
-        app.errorhandler(ex)(
-            exceptions_dict[ex]
-        )
 
     @staticmethod
     def message(msg) -> str:
@@ -175,6 +174,29 @@ class RestAPI:
     @user.login_required
     def getFavoriteLots():
         return jsonify(user.get_favorites()), 200
+
+
+class Server:
+    # This function processes exceptions.
+    # If the request is for api, will respond as it is an api responce
+    # Otherwise, will respond as a Web App 
+    @staticmethod
+    def process_exception(ex):
+        if not request.path.startswith('/api/') and ex in WebApp.exceptions_responses:
+            return WebApp.exceptions_responses[ex]()
+        elif ex in RestAPI.exceptions_responses:
+            return make_response(jsonify(RestAPI.exceptions_responses[ex]()), ex)
+            
+
+    # Then, looping through all that dictionary we will call a decorator
+    # as a normal function, creating all the error handlers
+    exceptions = list(set(WebApp.exceptions_responses) & set(RestAPI.exceptions_responses))
+    
+    for ex in exceptions:
+        @staticmethod
+        @app.errorhandler(ex)
+        def error_handler():
+            return Server.process_exception(ex)
 
 if __name__ == '__main__':
     app.run(debug=True)
