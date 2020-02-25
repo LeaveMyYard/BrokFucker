@@ -1,4 +1,5 @@
 from flask import Flask, abort, jsonify, request, make_response, send_from_directory, send_file
+from flask_cors import CORS
 from flask_httpauth import HTTPBasicAuth
 from lib.database_handler import DatabaseHandler
 from lib.user import User as user
@@ -9,6 +10,7 @@ from datetime import timedelta
 from typing import Union, Dict, Callable
 
 app = Flask(__name__)
+CORS(app)
 
 class WebApp:
     @staticmethod
