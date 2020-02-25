@@ -1,4 +1,5 @@
-from flask import Flask, abort, jsonify, request, make_response
+from flask import Flask, abort, jsonify, request, make_response, send_from_directory, send_file
+from flask_cors import CORS
 from flask_httpauth import HTTPBasicAuth
 from lib.database_handler import DatabaseHandler
 from lib.user import User as user
@@ -6,10 +7,30 @@ from lib.moderator import Moderator as moderator
 from lib.lot import Lot
 from lib.util.exceptions import IndexedException
 from datetime import timedelta
+from typing import Union, Dict, Callable
 
 app = Flask(__name__)
+CORS(app)
 
-class RestServer:
+class WebApp:
+    @staticmethod
+    @app.route('/')
+    def root():
+        return send_file('src/index.html')
+
+    @staticmethod
+    @app.route('/<path:path>')
+    def send_web(path):
+        if '.' not in path:
+            return send_from_directory('src', path + '.html')
+        return send_from_directory('src', path)
+
+    exceptions_responses = {
+        404:
+            lambda: send_file('src/404.html')
+    }
+
+class RestAPI:
     # Initialize database
     DatabaseHandler.init_tables()
     DatabaseHandler.run_verification_code_clearer(
@@ -25,21 +46,14 @@ class RestServer:
     # Rather than definging a function for each error or code by hands we will
     # store all the possible ints and Exceptions as keys and
     # corresponding lambda functions as values.
-    exceptions_dict = {
+    exceptions_responses = {
         400: 
-            lambda error: make_response(jsonify({'code': -1000, 'msg': 'An unknown error occured while processing the request.'}), 400),
+            lambda error: {'code': -1000, 'msg': 'An unknown error occured while processing the request.'},
         404: 
-            lambda error: make_response(jsonify({'code': -1001, 'msg': 'The stuff you requested for is not found.'}), 404),
+            lambda error: {'code': -1001, 'msg': 'The stuff you requested for is not found.'},
         IndexedException:
-            lambda error: make_response(jsonify({'code': error.error_id, 'msg': error.args[0]}), 409)
+            lambda error: {'code': error.error_id, 'msg': error.args[0]},
     }
-
-    # Then, looping through all that dictionary we will call a decorator
-    # as a normal function, creating all the error handlers
-    for ex in exceptions_dict:
-        app.errorhandler(ex)(
-            exceptions_dict[ex]
-        )
 
     @staticmethod
     def message(msg) -> str:
@@ -52,7 +66,7 @@ class RestServer:
     @staticmethod
     @route('ping', methods=['GET'])
     def ping():
-        return RestServer.message('pong'), 200
+        return RestAPI.message('pong'), 200
 
     @staticmethod
     @route('getUserData', methods=['GET'])
@@ -80,7 +94,7 @@ class RestServer:
             request.json['password'],
         )
 
-        return RestServer.message(f"Verification is sent to {request.json['email']}"), 201
+        return RestAPI.message(f"Verification is sent to {request.json['email']}"), 201
 
     @staticmethod
     @route('register/verify/<string:verification_hash>')
@@ -111,28 +125,28 @@ class RestServer:
 
         user.create_lot(*[request.json[data] for data in data_required])
 
-        return RestServer.message('New lot created'), 201
+        return RestAPI.message('New lot created'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/approve', methods=['PUT'])
     @moderator.login_required
     def approve_lot(lot_id):
         Lot.approve(lot_id)
-        return RestServer.message('A lot is now approved'), 201
+        return RestAPI.message('A lot is now approved'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/setSecurityChecked', methods=['PUT'])
     @moderator.login_required
     def set_security_checked(lot_id):
         Lot.set_security_checked(lot_id, True)
-        return RestServer.message('Lot\'s security is now checked'), 201
+        return RestAPI.message('Lot\'s security is now checked'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/setSecurityUnchecked', methods=['PUT'])
     @moderator.login_required
     def set_security_unchecked(lot_id):
         Lot.set_security_checked(lot_id, False)
-        return RestServer.message('Lot\'s security is no more checked'), 201
+        return RestAPI.message('Lot\'s security is no more checked'), 201
 
     @staticmethod
     @route('lots/approved', methods=['GET'])
@@ -152,16 +166,39 @@ class RestServer:
     def updateFavoriteLots(lot_id):
         if request.method == 'POST' or request.method == 'PUT':
             user.add_lot_to_favorites(lot_id)
-            return RestServer.message('A lot is added to favorites'), 201
+            return RestAPI.message('A lot is added to favorites'), 201
         if request.method == 'DELETE':
             user.remove_lot_from_favorites(lot_id)
-            return RestServer.message('A lot is removed from favorites'), 201
+            return RestAPI.message('A lot is removed from favorites'), 201
 
     @staticmethod
     @route('lots/favorites', methods=['GET'])
     @user.login_required
     def getFavoriteLots():
         return jsonify(user.get_favorites()), 200
+
+
+class Server:
+    # This function processes exceptions.
+    # If the request is for api, will respond as it is an api responce
+    # Otherwise, will respond as a Web App 
+    @staticmethod
+    def process_exception(ex):
+        if not request.path.startswith('/api/') and ex in WebApp.exceptions_responses:
+            return WebApp.exceptions_responses[ex]()
+        elif ex in RestAPI.exceptions_responses:
+            return make_response(jsonify(RestAPI.exceptions_responses[ex]()), ex)
+            
+
+    # Then, looping through all that dictionary we will call a decorator
+    # as a normal function, creating all the error handlers
+    exceptions = list(set(WebApp.exceptions_responses) & set(RestAPI.exceptions_responses))
+    
+    for ex in exceptions:
+        @staticmethod
+        @app.errorhandler(ex)
+        def error_handler():
+            return Server.process_exception(ex)
 
 if __name__ == '__main__':
     app.run(debug=True)

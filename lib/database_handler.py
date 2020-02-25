@@ -8,6 +8,7 @@ from lib.util.exceptions import RegistrationError, EmailValidationError
 from lib.settings import Settings
 from lib.email_sender import EmailSender
 from threading import Timer
+from lib.util.logger import init_logger
 
 class DatabaseHandler:
     def __init__(self, file_name: str = 'database.db'):
@@ -22,22 +23,24 @@ class DatabaseHandler:
         #All database files will be located at data folder
         self.conn = sqlite3.connect(f'{directory}/{file_name}')
         self.cursor = self.conn.cursor()
+        self.logger = init_logger(self.__class__.__name__)
 
     @staticmethod
     def init_tables():
-        handler = DatabaseHandler()
+        database = DatabaseHandler()
+        script = 'lib/sql/init_tables.sql'
+        database.logger.debug(f'Initializing database from `{script}` file...')
 
         #Load tables init sql request from 'lib/sql/init_tables.sql' and execute it. 
-        request_file = open('lib/sql/init_tables.sql', mode='r')
-        handler.cursor.executescript(request_file.read())
-        handler.conn.commit()
+        request_file = open(script, mode='r')
+        database.cursor.executescript(request_file.read())
+        database.conn.commit()
 
     @staticmethod
     def run_verification_code_clearer(run_each: timedelta, duration_to_delete: timedelta):
-        print('Starting verification codes clearer.')
-        print(f'Will run each {run_each} and remove codes that exist more then {duration_to_delete}')
-        last_time_cleared = datetime.now()
         database = DatabaseHandler()
+        database.logger.debug('Starting verification codes clearer.')
+        database.logger.debug(f'Will run each {run_each} and remove codes that exist more then {duration_to_delete}')
 
         def __run_timer():
             database.clear_unused_codes(duration_to_delete)
@@ -57,7 +60,7 @@ class DatabaseHandler:
         ).decode('utf-8')
 
     def clear_unused_codes(self, duration_to_delete: timedelta):
-        print('Clearing unused verification codes...')
+        self.logger.info('Clearing unused verification codes...')
         self.cursor.execute(
             f"SELECT `verification_hash`, `request_date` FROM EmailVerification"
         )
@@ -71,7 +74,7 @@ class DatabaseHandler:
                     f"DELETE FROM EmailVerification WHERE `verification_hash` = '{code}'"
                 )
         
-        print(f'Clearing complete. Removed {codes} unused codes.')
+        self.logger.info(f'Clearing complete. Removed {codes} unused codes.')
         self.conn.commit()
 
     def check_user_exists(self, email: str) -> bool:
@@ -135,11 +138,11 @@ class DatabaseHandler:
         self.cursor.execute(
             f"INSERT INTO EmailVerification (`email`, `password`, `verification_hash`, `request_date`)"
             f"VALUES ('{email}', '{password_hash}', '{random_hash}', '{reg_date}')"
-        )
-        
+        )        
         self.conn.commit()
 
         EmailSender.send_email_verification(email, random_hash)
+        self.logger.debug(f'New email with confirmation code `{random_hash}` was sent to `{email}`')
 
     def verify_email_confirmation(self, code: str) -> Union[str, None]:
         '''
@@ -164,7 +167,8 @@ class DatabaseHandler:
 
         if self.check_user_exists(email):
             raise EmailValidationError(-1200, 'Email is already in use.', on_failed)
-
+        
+        self.logger.debug(f'New user `{email}` has successfuly confirmed his email and created an account')
         self.create_user(email, password)
 
         return on_valid
@@ -187,6 +191,8 @@ class DatabaseHandler:
             f"VALUES ('{email}', '{password}', '0', '{reg_date}')"
         )
         self.conn.commit()
+
+        self.logger.info(f'New user `{email}` was added.')
 
     def get_user_data(self, email) -> bool:
         if not self.check_user_exists(email):
@@ -242,11 +248,14 @@ class DatabaseHandler:
 
         self.conn.commit()
 
+        self.logger.info(f'New lot with id `{lot_id}` was created')
+
     def approve_lot(self, lot_id):
         self.cursor.execute(
             f"UPDATE Lots SET `confirmed` = 'True' WHERE `id` = '{lot_id}'"
         )
         self.conn.commit()
+        self.logger.info(f'New lot with id `{lot_id}` was approved')
 
     def get_lot(self, lot_id):
         self.cursor.execute(
@@ -323,6 +332,7 @@ class DatabaseHandler:
             f"UPDATE Lots SET `security_checked` = '{checked}' WHERE `id` = '{lot_id}'"
         )
         self.conn.commit()
+        self.logger.debug(f'`Security checked` flag on lot with id `{lot_id}` is set to `{checked}`')
 
     def add_lot_to_favorites(self, email, lot_id):
         self.cursor.execute(
