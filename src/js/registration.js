@@ -33,12 +33,10 @@ function handleShowPsw() {
   }
 }
 
-console.log(pswInput[0].value);
-
-registerBtn.addEventListener("click", function() {
-  if (pswInput[0].value != pswRepeatInput[0].value) {
-    pswRepeatInput.setCustomValidity("Пароли не совпадают");
-  } else {
-    pswRepeatInput.setCustomValidity("");
-  }
-});
+// registerBtn.addEventListener("click", function() {
+//   if (pswInput[0].value != pswRepeatInput[0].value) {
+//     pswRepeatInput.setCustomValidity("Пароли не совпадают");
+//   } else {
+//     pswRepeatInput.setCustomValidity("");
+//   }
+// });
