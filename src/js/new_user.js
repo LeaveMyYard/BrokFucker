@@ -1,6 +1,5 @@
 const URL = "http://localhost:5000/api/v1/";
-// const Http = new XMLHttpRequest();
-// const registerBtn = document.querySelector(".registerBtn");
+
 const regForm = document.getElementById("regForm");
 const inputEmail = document.querySelector(".inputEmail");
 const inputPsw = document.querySelector(".inputPsw");
@@ -15,7 +14,7 @@ regForm.addEventListener("submit", async function(e) {
     const response = await fetch(URL + "register", {
       // credentials: 'include',  // cookies
       method: "POST", // или 'PUT'
-      body: JSON.stringify(value), // данные могут быть 'строкой' или {объектом}!
+      body: JSON.stringify(value),
       headers: {
         "Content-Type": "application/json"
       }

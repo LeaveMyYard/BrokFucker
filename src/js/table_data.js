@@ -1,4 +1,5 @@
 const URL = "http://localhost:5000/api/v1/";
+
 const lotTable = document.getElementById("lotTable");
 
 function dateFix(date) {
@@ -47,18 +48,3 @@ const myFunc = async () => {
 };
 
 myFunc();
-// function queryApi(endpoint) {
-//   return fetch(URL + endpoint).then(response => {
-//     return response.ok
-//       ? response.json()
-//       : Promise.reject(Error(`Unsuccessfull response`));
-//   });
-// }
-// Promise.all([queryApi("films"), queryApi("planets")])
-//   .then(([{ results: films }, { results: planets }]) => {
-//     output.textContent = `${films.length} films, ${planets.length} planets`;
-//   })
-//   .catch(error => {
-//     console.log(error);
-//     output.innerHTML = ":)";
-//   })
