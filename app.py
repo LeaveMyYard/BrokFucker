@@ -150,7 +150,6 @@ class RestAPI:
 
     @staticmethod
     @route('lots/approved', methods=['GET'])
-    @user.login_required
     def get_approved_lots():
         return jsonify(Lot.get_all_approved_lots()), 200
 
