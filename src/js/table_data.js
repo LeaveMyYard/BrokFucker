@@ -19,13 +19,12 @@ const myFunc = async () => {
     }
 
     const result = await response.json();
-    console.log(result);
     const lotArr = [];
     result.forEach(item => {
       item = `
       <tr>
       <td>${dateFix(item.date)}</td>
-      <td>${item.name}</td>
+      <td><a href="${"lot" + item.id}">${item.name}</a></td>
       <td>${item.user}</td>
       <td>${item.amount}</td>
       <td>${item.currency}</td>
@@ -39,7 +38,6 @@ const myFunc = async () => {
       </tr>`;
       lotArr.push(item);
     });
-    console.log(lotArr);
 
     lotTable.innerHTML += lotArr.join("");
   } catch (error) {
