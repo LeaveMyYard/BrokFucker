@@ -1,4 +1,5 @@
-// const loginBtn = document.querySelector(".loginBtn");
+const loginBtn = document.querySelector(".loginBtn");
+const loginForm = document.querySelector("#loginForm");
 const showPswButton = document.querySelector(".showPswIcon");
 const pswInput = document.getElementsByName("psw");
 
@@ -11,3 +12,11 @@ function handleShowPsw() {
     pswInput[0].type = "password";
   }
 }
+
+loginForm.addEventListener("click", function(e) {
+  e.preventDefault();
+});
+
+loginBtn.addEventListener("click", function() {
+  location.href = "index.html";
+});
