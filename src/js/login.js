@@ -13,10 +13,6 @@ function handleShowPsw() {
   }
 }
 
-loginForm.addEventListener("click", function(e) {
-  e.preventDefault();
-});
-
 loginBtn.addEventListener("click", function() {
   location.href = "index.html";
 });

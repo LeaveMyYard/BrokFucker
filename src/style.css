@@ -82,6 +82,14 @@ body {
   background-color: #000;
   cursor: pointer;
 }
+
+#spinner {
+  display: none;
+  position: absolute;
+  margin-top: 5px;
+  margin-left: 10px;
+  width: 32px;
+}
 /* main page */
 
 .container_main-page {
