@@ -13,11 +13,14 @@ app = Flask(__name__)
 CORS(app)
 
 class WebApp:
+    # This one redirects main page to index.html
     @staticmethod
     @app.route('/')
     def root():
         return send_file('src/index.html')
 
+    # Here all the data for WebApp is redirected to src folder.
+    # So, the actual web pages should be in that folder
     @staticmethod
     @app.route('/<path:path>')
     def send_web(path):
@@ -25,9 +28,13 @@ class WebApp:
             return send_from_directory('src', path + '.html')
         return send_from_directory('src', path)
 
+    # Simplify the exceptions handlers.
+    # Rather than definging a function for each error or code by hands we will
+    # store all the possible ints and Exceptions as keys and
+    # corresponding lambda functions as values.
+
     exceptions_responses = {
-        404:
-            lambda: send_file('src/404.html')
+        404: lambda error: send_file('src/404.html')
     }
 
 class RestAPI:
@@ -47,12 +54,9 @@ class RestAPI:
     # store all the possible ints and Exceptions as keys and
     # corresponding lambda functions as values.
     exceptions_responses = {
-        400: 
-            lambda error: {'code': -1000, 'msg': 'An unknown error occured while processing the request.'},
-        404: 
-            lambda error: {'code': -1001, 'msg': 'The stuff you requested for is not found.'},
-        IndexedException:
-            lambda error: {'code': error.error_id, 'msg': error.args[0]},
+        400: lambda error: {'code': -1000, 'msg': 'An unknown error occured while processing the request.'},
+        404: lambda error: {'code': -1001, 'msg': 'The stuff you requested for is not found.'},
+        IndexedException: lambda error: {'code': error.error_id, 'msg': error.args[0]},
     }
 
     @staticmethod
@@ -184,20 +188,25 @@ class Server:
     @staticmethod
     def process_exception(ex):
         if not request.path.startswith('/api/') and ex in WebApp.exceptions_responses:
-            return WebApp.exceptions_responses[ex]()
+            return WebApp.exceptions_responses[ex](ex)
         elif ex in RestAPI.exceptions_responses:
-            return make_response(jsonify(RestAPI.exceptions_responses[ex]()), ex)
+            return make_response(jsonify(RestAPI.exceptions_responses[ex](ex)), ex)
             
 
-    # Then, looping through all that dictionary we will call a decorator
-    # as a normal function, creating all the error handlers
-    exceptions = list(set(WebApp.exceptions_responses) & set(RestAPI.exceptions_responses))
+    # Then, looping through all that exceptions from WebApp and RestAPI
+    # Creates functions with corresponding flask decorator to process
+    # an error for that case
+    exceptions = set(WebApp.exceptions_responses) & set(RestAPI.exceptions_responses)
+
+    # This one is just to prevent errors appearing in VSCode
+    # Actually there is no error, just IDE being buged
+    ex = None
     
     for ex in exceptions:
         @staticmethod
         @app.errorhandler(ex)
-        def error_handler():
-            return Server.process_exception(ex)
+        def error_handler(error, exception = ex):
+            return Server.process_exception(exception)
 
 if __name__ == '__main__':
     app.run(debug=True)
