@@ -370,3 +370,27 @@ class DatabaseHandler:
         res: list = eval(self.cursor.fetchone()[0])
 
         return [self.get_lot(lot_id) for lot_id in reversed(res)]
+
+    def get_personal(self, email):
+        self.cursor.execute(
+            f"SELECT * FROM Lots WHERE `user` = '{email}'"
+        )
+
+        return [
+            {
+                'id': lot[0],
+                'date': lot[1],
+                'name': lot[2],
+                'user': lot[3],
+                'amount': lot[4],
+                'currency': lot[5],
+                'term': lot[6],
+                'return_way': lot[7],
+                'security': lot[8],
+                'percentage': lot[9],
+                'form': lot[10],
+                'security_checked': eval(lot[11]),
+                'guarantee_percentage': lot[12]
+            }
+            for lot in self.cursor.fetchall()
+        ]

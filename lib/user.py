@@ -90,3 +90,8 @@ class User:
     def get_favorites():
         database = DatabaseHandler()
         return database.get_favorites(User.email())
+
+    @staticmethod
+    def get_personal():
+        database = DatabaseHandler()
+        return database.get_personal(User.email())

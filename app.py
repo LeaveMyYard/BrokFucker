@@ -66,7 +66,7 @@ class RestAPI:
                 'msg': msg
             }
         )
-
+    
     @staticmethod
     @route('ping', methods=['GET'])
     def ping():
@@ -154,6 +154,7 @@ class RestAPI:
 
     @staticmethod
     @route('lots/approved', methods=['GET'])
+    @route('lots', methods=['GET'])
     def get_approved_lots():
         return jsonify(Lot.get_all_approved_lots()), 200
 
@@ -166,7 +167,7 @@ class RestAPI:
     @staticmethod
     @route('lots/favorites/<int:lot_id>', methods=['POST', 'PUT', 'DELETE'])
     @user.login_required
-    def updateFavoriteLots(lot_id):
+    def update_favorite_lots(lot_id):
         if request.method == 'POST' or request.method == 'PUT':
             user.add_lot_to_favorites(lot_id)
             return RestAPI.message('A lot is added to favorites'), 201
@@ -177,8 +178,14 @@ class RestAPI:
     @staticmethod
     @route('lots/favorites', methods=['GET'])
     @user.login_required
-    def getFavoriteLots():
+    def get_favorite_lots():
         return jsonify(user.get_favorites()), 200
+
+    @staticmethod
+    @route('lots/personal', methods=['GET'])
+    @user.login_required
+    def get_personal_lots():
+        return jsonify(user.get_personal()), 200
 
 
 class Server:
