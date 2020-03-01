@@ -71,6 +71,32 @@ If you don't provide account data (if needed), it is not correct or it has not e
     ```
     [windows] curl -u test@gmail.com:qwerty1312 -i http://localhost:5000/api/v1/getUserData
     ```
+# List of all endpoints
+## Public stuff
+GET /api/v1/ping
+
+## Registration stuff
+POST /api/v1/register
+GET /api/v1/register/verify/<string:verification_hash>
+
+## User stuff
+GET /api/v1/user
+GET /api/v1/user/avatar
+POST /api/v1/user/avatar
+DELETE /api/v1/user/avatar
+POST /api/v1/lots/createNew
+GET /api/v1/lots
+GET /api/v1/lots/approved
+PUT /api/v1/lots/favorites/<int:lot_id>
+DELETE /api/v1/lots/favorites/<int:lot_id>
+GET /api/v1/lots/favorites
+GET /api/v1/lots/personal
+
+## Moderator stuff
+PUT /api/v1/lots/<int:lot_id>/approve
+PUT /api/v1/lots/<int:lot_id>/setSecurityChecked
+PUT /api/v1/lots/<int:lot_id>/setSecurityUnchecked
+GET /api/v1/lots/unapproved
 
 # API Endpoints
 ## Public endpoints
