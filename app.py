@@ -166,6 +166,7 @@ class RestAPI:
             'security',
             'percentage',
             'form',
+            'commentary'
         ]
 
         for data in data_required:
@@ -217,18 +218,15 @@ class RestAPI:
         return RestAPI.message('A lot is now approved'), 201
 
     @staticmethod
-    @route('lots/<int:lot_id>/setSecurityChecked', methods=['PUT'])
+    @route('lots/<int:lot_id>/security', methods=['PUT', 'DELETE'])
     @moderator.login_required
     def set_security_checked(lot_id):
-        Lot.set_security_checked(lot_id, True)
-        return RestAPI.message('Lot\'s security is now checked'), 201
-
-    @staticmethod
-    @route('lots/<int:lot_id>/setSecurityUnchecked', methods=['PUT'])
-    @moderator.login_required
-    def set_security_unchecked(lot_id):
-        Lot.set_security_checked(lot_id, False)
-        return RestAPI.message('Lot\'s security is no more checked'), 201
+        if request.type == 'PUT':
+            Lot.set_security_checked(lot_id, True)
+            return RestAPI.message('Lot\'s security is now checked'), 201
+        if request.type == 'DELETE':
+            Lot.set_security_checked(lot_id, False)
+            return RestAPI.message('Lot\'s security is no more checked'), 201
 
     @staticmethod
     @route('lots/unapproved', methods=['GET'])
