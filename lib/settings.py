@@ -19,3 +19,7 @@ class Settings:
     def get_smtp_data() -> Tuple[str, int, str, str]:
         d = Settings.__load_settings()['smtp_settings']
         return d['host'], d['port'], d['username'], d['password']
+
+    @staticmethod
+    def get_maximum_image_size() -> int:
+        return Settings.__load_settings()['server_settings']['maximum_upload_file_size']

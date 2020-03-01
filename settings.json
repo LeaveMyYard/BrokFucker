@@ -8,5 +8,8 @@
         "port": 465,
         "username": "brokfcker.noreply@gmail.com",
         "password": "testpassword!14"
+    },
+    "server_settings": {
+        "maximum_upload_file_size": 262144
     }
 }

@@ -2,6 +2,11 @@ from flask_httpauth import HTTPBasicAuth
 from lib.database_handler import DatabaseHandler
 from flask import Flask, abort, jsonify, request, make_response
 from lib.util.exceptions import EmailValidationError
+from lib.util.hash import sha256
+from lib.settings import Settings
+from werkzeug.utils import secure_filename
+from PIL import Image
+from os import path, remove
 
 class User:
     auth = HTTPBasicAuth()
@@ -95,3 +100,29 @@ class User:
     def get_personal():
         database = DatabaseHandler()
         return database.get_personal(User.email())
+
+    @staticmethod
+    def add_avatar(image):
+        temporary_file_location = f'data/images/temp/{secure_filename(image.filename)}'
+        image.save(temporary_file_location)
+
+        im = Image.open(temporary_file_location)
+        file_location = f'data/images/user/{sha256(User.email())}.jpg'
+        im = im.convert("RGB")
+        im.save(file_location)
+
+        remove(temporary_file_location)
+
+    @staticmethod
+    def get_avatar_link():
+        file_location = f'data/images/user/{sha256(User.email())}.jpg'
+        try:
+            f = open(file_location)
+            return f'{request.host_url}image/user/{sha256(User.email())}.jpg'
+        except:
+            return f'{request.host_url}image/user/default.jpg'
+
+    @staticmethod
+    def delete_avatar():
+        file_location = f'data/images/user/{sha256(User.email())}.jpg'
+        remove(file_location)

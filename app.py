@@ -5,12 +5,16 @@ from lib.database_handler import DatabaseHandler
 from lib.user import User as user
 from lib.moderator import Moderator as moderator
 from lib.lot import Lot
+from lib.settings import Settings
 from lib.util.exceptions import IndexedException
 from datetime import timedelta
 from typing import Union, Dict, Callable
 
 app = Flask(__name__)
 CORS(app)
+
+app.config['UPLOAD_FOLDER'] = 'data/images/upload'
+app.config['MAX_CONTENT_PATH'] = Settings.get_maximum_image_size()
 
 class WebApp:
     # This one redirects main page to index.html
@@ -28,6 +32,12 @@ class WebApp:
             return send_from_directory('src', path + '.html')
         return send_from_directory('src', path)
 
+    # Also redirect all /image requests to data/images
+    @staticmethod
+    @app.route('/image/<path:path>')
+    def send_image(path):
+        return send_from_directory('data/images', path)
+
     # Simplify the exceptions handlers.
     # Rather than definging a function for each error or code by hands we will
     # store all the possible ints and Exceptions as keys and
@@ -38,6 +48,11 @@ class WebApp:
     }
 
 class RestAPI:
+
+    # -------------------------------------------------------------------------
+    # Private stuff
+    # -------------------------------------------------------------------------
+
     # Initialize database
     DatabaseHandler.init_tables()
     DatabaseHandler.run_verification_code_clearer(
@@ -66,17 +81,19 @@ class RestAPI:
                 'msg': msg
             }
         )
-    
+
+    # -------------------------------------------------------------------------
+    # Public stuff
+    # -------------------------------------------------------------------------
+
     @staticmethod
     @route('ping', methods=['GET'])
     def ping():
         return RestAPI.message('pong'), 200
 
-    @staticmethod
-    @route('getUserData', methods=['GET'])
-    @user.login_required
-    def check_user():
-        return jsonify(user().get_data()), 200
+    # -------------------------------------------------------------------------
+    # Registration stuff
+    # -------------------------------------------------------------------------
 
     @staticmethod
     @route('register', methods=['POST'])
@@ -105,6 +122,34 @@ class RestAPI:
     def confirm_verification(verification_hash):
         return user.verify_email_from_code(verification_hash), 201
 
+    # -------------------------------------------------------------------------
+    # User stuff
+    # -------------------------------------------------------------------------
+
+    @staticmethod
+    @route('user', methods=['GET'])
+    @user.login_required
+    def check_user():
+        return jsonify(user.get_data()), 200
+
+    @staticmethod
+    @route('user/avatar', methods=['GET', 'POST', 'DELETE'])
+    @user.login_required
+    def edit_avatar():
+        if request.method == 'GET':
+            user.get_avatar_link()
+            return jsonify({'link': user.get_avatar_link()}), 200
+        if request.method == 'POST':
+            user.add_avatar(request.files['file'])
+            return RestAPI.message('New avatar is saved'), 201
+        if request.method == 'DELETE':
+            user.delete_avatar()
+            return RestAPI.message('Your avatar is now deleted'), 201
+
+    # -------------------------------------------------------------------------
+    # Lots stuff
+    # -------------------------------------------------------------------------
+
     @staticmethod
     @route('lots/createNew', methods=['POST'])
     @user.login_required
@@ -132,6 +177,39 @@ class RestAPI:
         return RestAPI.message('New lot created'), 201
 
     @staticmethod
+    @route('lots/approved', methods=['GET'])
+    @route('lots', methods=['GET'])
+    def get_approved_lots():
+        return jsonify(Lot.get_all_approved_lots()), 200
+
+    @staticmethod
+    @route('lots/favorites/<int:lot_id>', methods=['PUT', 'DELETE'])
+    @user.login_required
+    def update_favorite_lots(lot_id):
+        if request.method == 'PUT':
+            user.add_lot_to_favorites(lot_id)
+            return RestAPI.message('A lot is added to favorites'), 201
+        if request.method == 'DELETE':
+            user.remove_lot_from_favorites(lot_id)
+            return RestAPI.message('A lot is removed from favorites'), 201
+
+    @staticmethod
+    @route('lots/favorites', methods=['GET'])
+    @user.login_required
+    def get_favorite_lots():
+        return jsonify(user.get_favorites()), 200
+
+    @staticmethod
+    @route('lots/personal', methods=['GET'])
+    @user.login_required
+    def get_personal_lots():
+        return jsonify(user.get_personal()), 200
+
+    # -------------------------------------------------------------------------
+    # Moderator stuff
+    # -------------------------------------------------------------------------
+
+    @staticmethod
     @route('lots/<int:lot_id>/approve', methods=['PUT'])
     @moderator.login_required
     def approve_lot(lot_id):
@@ -153,39 +231,14 @@ class RestAPI:
         return RestAPI.message('Lot\'s security is no more checked'), 201
 
     @staticmethod
-    @route('lots/approved', methods=['GET'])
-    @route('lots', methods=['GET'])
-    def get_approved_lots():
-        return jsonify(Lot.get_all_approved_lots()), 200
-
-    @staticmethod
     @route('lots/unapproved', methods=['GET'])
     @moderator.login_required
     def get_unapproved_lots():
         return jsonify(Lot.get_all_unapproved_lots()), 200
 
-    @staticmethod
-    @route('lots/favorites/<int:lot_id>', methods=['POST', 'PUT', 'DELETE'])
-    @user.login_required
-    def update_favorite_lots(lot_id):
-        if request.method == 'POST' or request.method == 'PUT':
-            user.add_lot_to_favorites(lot_id)
-            return RestAPI.message('A lot is added to favorites'), 201
-        if request.method == 'DELETE':
-            user.remove_lot_from_favorites(lot_id)
-            return RestAPI.message('A lot is removed from favorites'), 201
-
-    @staticmethod
-    @route('lots/favorites', methods=['GET'])
-    @user.login_required
-    def get_favorite_lots():
-        return jsonify(user.get_favorites()), 200
-
-    @staticmethod
-    @route('lots/personal', methods=['GET'])
-    @user.login_required
-    def get_personal_lots():
-        return jsonify(user.get_personal()), 200
+    # -------------------------------------------------------------------------
+    # Admin stuff
+    # -------------------------------------------------------------------------
 
 
 class Server:
@@ -197,7 +250,7 @@ class Server:
         if not request.path.startswith('/api/') and ex in WebApp.exceptions_responses:
             return WebApp.exceptions_responses[ex](ex)
         elif ex in RestAPI.exceptions_responses:
-            return make_response(jsonify(RestAPI.exceptions_responses[ex](ex)), ex)
+            return make_response(jsonify(RestAPI.exceptions_responses[ex](ex)), ex if isinstance(ex, int) else 403)
             
 
     # Then, looping through all that exceptions from WebApp and RestAPI

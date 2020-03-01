@@ -2,3 +2,4 @@ flask>=1.1.1
 flask-httpauth>=3.3.0
 flask-cors
 colorlog
+Pillow
