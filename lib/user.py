@@ -55,7 +55,9 @@ class User:
     @staticmethod
     def get_data():
         database = DatabaseHandler()
-        return database.get_user_data(User.email())
+        res = database.get_user_data(User.email())
+        res['avatar'] = User.get_avatar_link()
+        return res
 
     @staticmethod
     def create_lot(
