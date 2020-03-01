@@ -72,6 +72,15 @@ body {
 .inputPsw {
   position: absolute;
 }
+
+.error {
+  box-shadow: 0px 1px 1px rgba(255, 0, 0, 0.8);
+}
+
+.valid {
+  box-shadow: 0px 1px 1px rgba(0, 255, 0, 0.8);
+}
+
 .showPswIcon {
   display: inline-block;
   position: relative;
