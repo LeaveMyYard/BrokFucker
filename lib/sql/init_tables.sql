@@ -23,7 +23,7 @@ AFTER INSERT ON Users
 
 INSERT OR IGNORE INTO Users VALUES (
     'admin',
-    'admin',
+    '4e5587b9d3b8d5cd826883235ea4dbd43ff4551041b998b68c148fd5b85e5dc3',
     '2',
     '2020-02-24 00:50:24.262170',
     'Head Admin',
