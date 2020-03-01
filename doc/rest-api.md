@@ -77,27 +77,46 @@ If you don't provide account data (if needed), it is not correct or it has not e
   * Tests the connectivity to the api server.
 
 ## Registration stuff
-* POST /api/v1/register
-* GET /api/v1/register/verify/<string:verification_hash>
+* ```POST /api/v1/register```
+  * Starts the registration for the user.
+* ```GET /api/v1/register/verify/<string:verification_hash>```
+  * Confirms the registration, is send on mail.
 
 ## User stuff
-* GET /api/v1/user
-* GET /api/v1/user/avatar
-* POST /api/v1/user/avatar
-* DELETE /api/v1/user/avatar
-* POST /api/v1/lots/createNew
-* GET /api/v1/lots
-* GET /api/v1/lots/approved
-* PUT /api/v1/lots/favorites/<int:lot_id>
-* DELETE /api/v1/lots/favorites/<int:lot_id>
-* GET /api/v1/lots/favorites
-* GET /api/v1/lots/personal
+* ```GET /api/v1/user```
+  * Get current user's info.
+* ```GET /api/v1/user/avatar```
+  * Get the link to current user's avatar
+* ```POST /api/v1/user/avatar```
+  * Upload new avatar
+* ```DELETE /api/v1/user/avatar```
+  * Delete current avatar
+  
+## Lots
+* ```POST /api/v1/lots/createNew```
+  * Create new lot
+* ```GET /api/v1/lots```
+  * Get all public lots
+* ```GET /api/v1/lots/approved```
+  * The same as above
+* ```PUT /api/v1/lots/favorites/<int:lot_id>```
+  * Add lot to favorites list
+* ```DELETE /api/v1/lots/favorites/<int:lot_id>```
+  * Remove lot from favorites list
+* ```GET /api/v1/lots/favorites```
+  * Get your list of favorites
+* ```GET /api/v1/lots/personal```
+  * Get your lots
 
 ## Moderator stuff
-* PUT /api/v1/lots/<int:lot_id>/approve
-* PUT /api/v1/lots/<int:lot_id>/setSecurityChecked
-* PUT /api/v1/lots/<int:lot_id>/setSecurityUnchecked
-* GET /api/v1/lots/unapproved
+* ```PUT /api/v1/lots/<int:lot_id>/approve```
+  * Approve a lot
+* ```PUT /api/v1/lots/<int:lot_id>/setSecurityChecked```
+  * Set lot's security flag to checked
+* ```PUT /api/v1/lots/<int:lot_id>/setSecurityUnchecked```
+  * Set lot's security flag to unchecked
+* ```GET /api/v1/lots/unapproved```
+  * Get a list of unapproved lots
 
 # API Endpoints
 ## Public endpoints
