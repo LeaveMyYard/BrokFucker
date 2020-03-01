@@ -162,7 +162,7 @@ Public
 
 ### Get user data
 ```
-GET /api/v1/ping
+GET /api/v1/user
 ```
 Load all main user data.
 
@@ -179,7 +179,8 @@ User
   'type': 'user',
   'registration_date': '',
   'name': null,
-  'phone_number': null
+  'phone_number': null,
+  'avatar': 'http://127.0.0.1:5000/image/user/diawyd8i1u82dy182hdh.png'
 }
 ```
 
