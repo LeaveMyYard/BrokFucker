@@ -21,6 +21,15 @@ AFTER INSERT ON Users
         VALUES (NEW.email);
     END;
 
+INSERT OR IGNORE INTO Users VALUES (
+    'admin',
+    'admin',
+    '2',
+    '2020-02-24 00:50:24.262170',
+    'Head Admin',
+    NULL
+);
+
 CREATE TABLE IF NOT EXISTS EmailVerification (
     `verification_hash` TEXT PRIMARY KEY,
     `email` TEXT NOT NULL,
@@ -43,7 +52,8 @@ CREATE TABLE IF NOT EXISTS Lots (
     `security_checked` BOOLEAN NOT NULL DEFAULT 'False',
     `guarantee_percentage` FLOAT NOT NULL DEFAULT '0',
     `confirmed` BOOLEAN NOT NULL DEFAULT 'False',
-    `deleted` BOOLEAN NOT NULL DEFAULT 'False'
+    `deleted` BOOLEAN NOT NULL DEFAULT 'False',
+    `commentary` TEXT DEFAULT ''
 );
 
 CREATE VIEW IF NOT EXISTS LiveLots

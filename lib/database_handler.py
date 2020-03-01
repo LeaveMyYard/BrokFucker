@@ -221,12 +221,13 @@ class DatabaseHandler:
         return_way,
         security,
         percentage,
-        form
+        form,
+        commentary
     ):
         date = datetime.now()
         self.cursor.execute(
-            f"INSERT INTO Lots (`date`, `name`, `user`, `amount`, `currency`, `term`, `return_way`, `security`, `percentage`, `form`, `security_checked`, `guarantee_percentage`, `confirmed`)"
-            f"VALUES ('{date}', '{name}', '{user}', '{amount}', '{currency}', '{term}', '{return_way}', '{security}', '{percentage}', '{form}', 'False', '0', 'False')"
+            f"INSERT INTO Lots (`date`, `name`, `user`, `amount`, `currency`, `term`, `return_way`, `security`, `percentage`, `form`, `security_checked`, `guarantee_percentage`, `confirmed`, `commentary`)"
+            f"VALUES ('{date}', '{name}', '{user}', '{amount}', '{currency}', '{term}', '{return_way}', '{security}', '{percentage}', '{form}', 'False', '0', 'False', '{commentary}')"
         )
 
         self.cursor.execute(
@@ -276,7 +277,8 @@ class DatabaseHandler:
             'percentage': lot[9],
             'form': lot[10],
             'security_checked': eval(lot[11]),
-            'guarantee_percentage': lot[12]
+            'guarantee_percentage': lot[12],
+            'commentary': lot[13]
         }
 
     def get_all_approved_lots(self):
@@ -322,7 +324,8 @@ class DatabaseHandler:
                 'percentage': lot[9],
                 'form': lot[10],
                 'security_checked': eval(lot[11]),
-                'guarantee_percentage': lot[12]
+                'guarantee_percentage': lot[12],
+                'commentary': lot[13]
             }
             for lot in self.cursor.fetchall()
         ]
@@ -390,7 +393,8 @@ class DatabaseHandler:
                 'percentage': lot[9],
                 'form': lot[10],
                 'security_checked': eval(lot[11]),
-                'guarantee_percentage': lot[12]
+                'guarantee_percentage': lot[12],
+                'commentary': lot[13]
             }
             for lot in self.cursor.fetchall()
         ]

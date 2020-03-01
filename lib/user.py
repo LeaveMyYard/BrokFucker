@@ -68,7 +68,8 @@ class User:
         return_way,
         security,
         percentage,
-        form
+        form,
+        commentary
     ):
         database = DatabaseHandler()
         database.create_new_lot(
@@ -80,7 +81,8 @@ class User:
             return_way,
             security,
             percentage,
-            form
+            form,
+            commentary
         )
 
     @staticmethod
