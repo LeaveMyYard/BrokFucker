@@ -73,7 +73,8 @@ If you don't provide account data (if needed), it is not correct or it has not e
     ```
 # List of all endpoints
 ## Public stuff
-GET /api/v1/ping
+* GET /api/v1/ping
+  * Tests the connectivity to the api server.
 
 ## Registration stuff
 * POST /api/v1/register
