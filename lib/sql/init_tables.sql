@@ -71,7 +71,8 @@ AS
         `percentage`,
         `form`,
         `security_checked`,
-        `guarantee_percentage`
+        `guarantee_percentage`,
+        `commentary`
     FROM
         Lots
     WHERE
@@ -92,33 +93,9 @@ AS
         `percentage`,
         `form`,
         `security_checked`,
-        `guarantee_percentage`
+        `guarantee_percentage`,
+        `commentary`
     FROM
         Lots
     WHERE
         `confirmed` = 'False' AND `deleted` = 'False';
-
-CREATE VIEW IF NOT EXISTS DeletedLots
-AS
-    SELECT
-        `id`,
-        `date`,
-        `name`,
-        `user`,
-        `amount`,
-        `currency`,
-        `term`,
-        `return_way`,
-        `security`,
-        `percentage`,
-        `form`,
-        `security_checked`,
-        `guarantee_percentage`
-    FROM
-        Lots
-    WHERE
-        `deleted` = 'True';
-
-CREATE INDEX IF NOT EXISTS UserLotsIndex ON Lots (
-    `user`, `confirmed`, `deleted`, `date`
-);

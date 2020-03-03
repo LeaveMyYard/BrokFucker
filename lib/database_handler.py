@@ -283,7 +283,7 @@ class DatabaseHandler:
 
     def get_all_approved_lots(self):
         self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `confirmed` = 'True'"
+            f"SELECT * FROM LiveLots"
         )
 
         return [
@@ -300,14 +300,15 @@ class DatabaseHandler:
                 'percentage': lot[9],
                 'form': lot[10],
                 'security_checked': eval(lot[11]),
-                'guarantee_percentage': lot[12]
+                'guarantee_percentage': lot[12],
+                'commentary': lot[13]
             }
             for lot in self.cursor.fetchall()
         ]
 
     def get_all_unapproved_lots(self):
         self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `confirmed` = 'False'"
+            f"SELECT * FROM LiveUnacceptedLots"
         )
 
         return [
@@ -398,3 +399,28 @@ class DatabaseHandler:
             }
             for lot in self.cursor.fetchall()
         ]
+
+    def get_lot_creator(self, lot_id):
+        self.cursor.execute(
+            f"SELECT `user` FROM Lots WHERE `id` = '{lot_id}'"
+        )
+
+        return self.cursor.fetchone()[0]
+
+    def delete_lot(self, lot_id):
+        self.cursor.execute(
+            f"UPDATE Lots SET `deleted` = 'True' WHERE `id` = '{lot_id}'"
+        )
+        self.conn.commit()
+
+    def restore_lot(self, lot_id):
+        self.cursor.execute(
+            f"UPDATE Lots SET `deleted` = 'False' WHERE `id` = '{lot_id}'"
+        )
+        self.conn.commit()
+
+    def update_data(self, lot_id, field, value):
+        self.cursor.execute(
+            f"UPDATE Lots SET `{field}` = '{value}' WHERE `id` = '{lot_id}'"
+        )
+        self.conn.commit()
