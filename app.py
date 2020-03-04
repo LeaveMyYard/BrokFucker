@@ -247,9 +247,27 @@ class RestAPI:
         return RestAPI.message('A lot is restored'), 201
 
     @staticmethod
-    @route('lots/<int:lot_id>/photo/<int:photo_id>', methods=['GET'])
-    def get_lot_photo(lot_id, photo_id):
-        return jsonify({'link': Lot.get_photo(lot_id, photo_id)}), 200
+    @route('lots/<int:lot_id>/photos', methods=['GET'])
+    def get_lot_photo(lot_id):
+        return jsonify({'link': Lot.get_photos(lot_id)}), 200
+
+    @staticmethod
+    @route('lots/<int:lot_id>/photos', methods=['POST'])
+    @user.login_required
+    def add_lot_photo(lot_id):
+        if not Lot.can_user_edit(user.email(), lot_id):
+            raise NoPermissionError()
+
+        return jsonify(Lot.add_photo(request.files['file'], lot_id)), 201
+
+    @staticmethod
+    @route('lots/<int:lot_id>/photos/<int:photo_id>', methods=['DELETE'])
+    @user.login_required
+    def remove_lot_photo(lot_id, photo_id):
+        if not Lot.can_user_edit(user.email(), lot_id):
+            raise NoPermissionError()
+        
+        return jsonify(Lot.remove_photo(lot_id, photo_id)), 201
 
     @staticmethod
     @route('lots/favorites/<int:lot_id>', methods=['PUT', 'DELETE'])

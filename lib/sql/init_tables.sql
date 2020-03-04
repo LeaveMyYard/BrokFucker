@@ -53,7 +53,8 @@ CREATE TABLE IF NOT EXISTS Lots (
     `guarantee_percentage` FLOAT NOT NULL DEFAULT '0',
     `confirmed` BOOLEAN NOT NULL DEFAULT 'False',
     `deleted` BOOLEAN NOT NULL DEFAULT 'False',
-    `commentary` TEXT DEFAULT ''
+    `commentary` TEXT DEFAULT '',
+    `photos` TEXT DEFAULT '[]'
 );
 
 CREATE VIEW IF NOT EXISTS LiveLots

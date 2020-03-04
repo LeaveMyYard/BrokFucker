@@ -49,7 +49,16 @@ class Lot:
         return database.get_lot_creator(lot_id) == user
 
     @staticmethod
-    def get_photo(lot_id, photo_id):
-        photo_hash = sha256(f'Lot_photo_id_{lot_id}_{photo_id}')
-        return f'{request.host_url}image/lot/{photo_hash}.jpg'
+    def get_photos(lot_id):
+        database = DatabaseHandler()
+        return database.get_lot_photos(lot_id)
         
+    @staticmethod
+    def add_photo(image, lot_id):
+        database = DatabaseHandler()
+        return database.add_photo(image, lot_id)
+
+    @staticmethod
+    def remove_photo(lot_id, photo_id):
+        database = DatabaseHandler()
+        return database.remove_photo(lot_id, photo_id)
