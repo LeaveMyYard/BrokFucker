@@ -2,6 +2,7 @@ const registerBtn = document.querySelector(".registerBtn");
 const inputTerms = document.querySelector("#terms");
 const showPswButtons = document.querySelectorAll(".showPswIcon");
 const pswInput = document.getElementsByName("psw");
+const mailInput = document.getElementsByName("email");
 const pswRepeatInput = document.getElementsByName("psw_repeat");
 
 inputTerms.addEventListener("click", function() {
@@ -59,4 +60,8 @@ const validateForm = $(function() {
   });
 });
 
-registerBtn.addEventListener("click", validateForm);
+registerBtn.addEventListener("change", handleReg);
+
+function handleReg() {
+  validateForm();
+}

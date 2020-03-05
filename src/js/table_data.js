@@ -24,7 +24,7 @@ const myFunc = async () => {
       item = `
       <tr>
       <td>${dateFix(item.date)}</td>
-      <td><a href="${"lot" + item.id}">${item.name}</a></td>
+      <td><a href="${"lot" + item.id + ".html"}">${item.name}</a></td>
       <td>${item.user}</td>
       <td>${item.amount}</td>
       <td>${item.currency}</td>
@@ -33,7 +33,7 @@ const myFunc = async () => {
       <td>${item.security}</td>
       <td>${item.percentage}</td>
       <td>${item.form}</td>
-      <td>${item.security_checked}</td>
+      <td>${item.security_checked ? "Да" : "Нет"}</td>
       <td>${item.guarantee_percentage}</td>
       </tr>`;
       lotArr.push(item);

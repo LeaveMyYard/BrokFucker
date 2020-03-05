@@ -11,10 +11,12 @@
     <div class="container container_my-profile">
       <div class="profile-pic">
         <div class="profile-pic_1">
-          <div class="profile-pic_2" id="profilePic"></div>
+          <label for="uploadProfPic">
+            <div class="profile-pic_2" id="profilePic"></div>
+            <input type="file" name="file" id="uploadProfPic" />
+          </label>
         </div>
       </div>
-      <input id="profPicForm" type="file" name="file" />
       <div class="profile-info">
         <p>
           <span>E-mail: </span>
@@ -22,27 +24,29 @@
         </p>
         <p>
           <span>Зарегистрирован: </span>
-          <span id="myprofRegDate">19.12.2019 </span>
+          <span id="myprofRegDate">19.12.2019</span>
         </p>
         <button id="myLotsBtn">Мои лоты</button>
         <br />
         <label class="label label_name" for="prof_name"
-          ><span id="myprofName">Имя: </span></label
+          ><span>Имя: </span></label
         >
         <input
           class="inputName"
           type="text"
+          id="myprofName"
           name="prof_name"
           placeholder="не заполнено"
           required
         />
         <br />
         <label class="label label_phone" for="prof_phone"
-          ><span id="myprofPhone">Телефон: </span></label
+          ><span>Телефон: </span></label
         >
         <input
-          class="inputName"
+          class="inputPhone"
           type="tel"
+          id="myprofPhone"
           name="prof_phone"
           placeholder="не заполнено"
           required
