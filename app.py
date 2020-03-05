@@ -292,6 +292,32 @@ class RestAPI:
     def get_personal_lots():
         return jsonify(user.get_personal()), 200
 
+    @staticmethod
+    @route('lots/subscription/<int:lot_id>', methods=['PUT'])
+    @user.login_required
+    def subscribe_to_lot(lot_id):
+        try:
+            user.subscribe_to_lot(lot_id)
+            return RestAPI.message(f'You are now subscribed to lot {lot_id}'), 201
+        except:
+            return RestAPI.message('You are already subscribed'), 200
+
+    @staticmethod
+    @route('lots/subscription/<int:lot_id>', methods=['DELETE'])
+    @user.login_required
+    def unsubscribe_from_lot(lot_id):
+        try:
+            user.unsubscribe_from_lot(lot_id)
+            return RestAPI.message(f'You are no longer subscribed to lot {lot_id}'), 201
+        except:
+            return RestAPI.message('You are not subscribed'), 200
+
+    @staticmethod
+    @route('lots/subscription', methods=['GET'])
+    @user.login_required
+    def get_subscribed_lots():
+        return jsonify({'lots': user.get_subscriptions()}), 200
+
     # -------------------------------------------------------------------------
     # Moderator stuff
     # -------------------------------------------------------------------------
@@ -319,6 +345,18 @@ class RestAPI:
     @moderator.login_required
     def get_unapproved_lots():
         return jsonify(Lot.get_all_unapproved_lots()), 200
+
+    @staticmethod
+    @route('lots/subscription/approved', methods=['GET'])
+    @moderator.login_required
+    def get_approved_subscriptions():
+        return jsonify({'lots': Lot.get_approved_subscriptions()}), 200
+
+    @staticmethod
+    @route('lots/subscription/unapproved', methods=['GET'])
+    @moderator.login_required
+    def get_unapproved_subscriptions():
+        return jsonify({'lots': Lot.get_unapproved_subscriptions()}), 200
 
     # -------------------------------------------------------------------------
     # Admin stuff

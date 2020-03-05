@@ -491,3 +491,35 @@ class DatabaseHandler:
         self.conn.commit()
 
         return self.jsonify_photos(lot_id, photos)
+
+    def subscribe_user_to_lot(self, user, lot_id):
+        id_hash = sha256(f'{user}_{lot_id}')
+        self.cursor.execute(
+            f"INSERT INTO SubscriptionRequests (`id`, `user`, `lot`) VALUES ('{id_hash}', '{user}', '{lot_id}')"
+        )
+        self.conn.commit()
+
+    def unsubscribe_user_from_lot(self, user, lot_id):
+        id_hash = sha256(f'{user}_{lot_id}')
+        self.cursor.execute(
+            f"DELETE FROM SubscriptionRequests WHERE `id` = '{id_hash}'"
+        )
+        self.conn.commit()
+
+    def get_user_subscriptions(self, user):
+        self.cursor.execute(
+            f"SELECT `lot`, `confirmed` FROM SubscriptionRequests WHERE `user` = '{user}'"
+        )
+        return [{'lot': lot, 'confirmed': eval(confirmed)} for lot, confirmed in self.cursor.fetchall()]
+
+    def get_approved_subscriptions(self):
+        self.cursor.execute(
+            f"SELECT * FROM ConfirmedSubscriptions"
+        )
+        return [{'id': id, 'user': user, 'lot': lot} for id, user, lot in self.cursor.fetchall()]
+
+    def get_unapproved_subscriptions(self):
+        self.cursor.execute(
+            f"SELECT * FROM UnconfirmedSubscriptions"
+        )
+        return [{'id': id, 'user': user, 'lot': lot} for id, user, lot in self.cursor.fetchall()]

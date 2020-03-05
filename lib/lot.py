@@ -62,3 +62,13 @@ class Lot:
     def remove_photo(lot_id, photo_id):
         database = DatabaseHandler()
         return database.remove_photo(lot_id, photo_id)
+
+    @staticmethod
+    def get_approved_subscriptions():
+        database = DatabaseHandler()
+        return database.get_approved_subscriptions()
+
+    @staticmethod
+    def get_unapproved_subscriptions():
+        database = DatabaseHandler()
+        return database.get_unapproved_subscriptions()

@@ -100,3 +100,30 @@ AS
         Lots
     WHERE
         `confirmed` = 'False' AND `deleted` = 'False';
+
+CREATE TABLE IF NOT EXISTS SubscriptionRequests (
+    `id` TEXT PRIMARY KEY,
+    `user` TEXT NOT NULL,
+    `lot` INTEGER NOT NULL,
+    `confirmed` BOOLEAN NOT NULL DEFAULT 'False'
+);
+
+CREATE VIEW IF NOT EXISTS ConfirmedSubscriptions
+AS
+    SELECT `id`, `user`, `lot`
+    FROM SubscriptionRequests
+    WHERE `confirmed` = 'True' AND `lot` IN (
+        SELECT `id` 
+        FROM Lots
+        WHERE `deleted` = 'False'
+    );
+    
+CREATE VIEW IF NOT EXISTS UnconfirmedSubscriptions
+AS
+    SELECT `id`, `user`, `lot`
+    FROM SubscriptionRequests
+    WHERE `confirmed` = 'False' AND `lot` IN (
+        SELECT `id` 
+        FROM Lots
+        WHERE `deleted` = 'False'
+    );
