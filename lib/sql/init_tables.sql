@@ -53,7 +53,8 @@ CREATE TABLE IF NOT EXISTS Lots (
     `guarantee_percentage` FLOAT NOT NULL DEFAULT '0',
     `confirmed` BOOLEAN NOT NULL DEFAULT 'False',
     `deleted` BOOLEAN NOT NULL DEFAULT 'False',
-    `commentary` TEXT DEFAULT ''
+    `commentary` TEXT DEFAULT '',
+    `photos` TEXT DEFAULT '[]'
 );
 
 CREATE VIEW IF NOT EXISTS LiveLots
@@ -71,7 +72,8 @@ AS
         `percentage`,
         `form`,
         `security_checked`,
-        `guarantee_percentage`
+        `guarantee_percentage`,
+        `commentary`
     FROM
         Lots
     WHERE
@@ -92,33 +94,36 @@ AS
         `percentage`,
         `form`,
         `security_checked`,
-        `guarantee_percentage`
+        `guarantee_percentage`,
+        `commentary`
     FROM
         Lots
     WHERE
         `confirmed` = 'False' AND `deleted` = 'False';
 
-CREATE VIEW IF NOT EXISTS DeletedLots
-AS
-    SELECT
-        `id`,
-        `date`,
-        `name`,
-        `user`,
-        `amount`,
-        `currency`,
-        `term`,
-        `return_way`,
-        `security`,
-        `percentage`,
-        `form`,
-        `security_checked`,
-        `guarantee_percentage`
-    FROM
-        Lots
-    WHERE
-        `deleted` = 'True';
-
-CREATE INDEX IF NOT EXISTS UserLotsIndex ON Lots (
-    `user`, `confirmed`, `deleted`, `date`
+CREATE TABLE IF NOT EXISTS SubscriptionRequests (
+    `id` TEXT PRIMARY KEY,
+    `user` TEXT NOT NULL,
+    `lot` INTEGER NOT NULL,
+    `confirmed` BOOLEAN NOT NULL DEFAULT 'False'
 );
+
+CREATE VIEW IF NOT EXISTS ConfirmedSubscriptions
+AS
+    SELECT `id`, `user`, `lot`
+    FROM SubscriptionRequests
+    WHERE `confirmed` = 'True' AND `lot` IN (
+        SELECT `id` 
+        FROM Lots
+        WHERE `deleted` = 'False'
+    );
+    
+CREATE VIEW IF NOT EXISTS UnconfirmedSubscriptions
+AS
+    SELECT `id`, `user`, `lot`
+    FROM SubscriptionRequests
+    WHERE `confirmed` = 'False' AND `lot` IN (
+        SELECT `id` 
+        FROM Lots
+        WHERE `deleted` = 'False'
+    );

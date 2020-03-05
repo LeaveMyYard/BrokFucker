@@ -3,12 +3,19 @@ import os
 import hashlib
 import base64
 from typing import Union
+from flask import request
 from datetime import datetime, timedelta
 from lib.util.exceptions import RegistrationError, EmailValidationError
 from lib.settings import Settings
 from lib.email_sender import EmailSender
 from threading import Timer
 from lib.util.logger import init_logger
+from lib.util.hash import sha256
+from lib.settings import Settings
+from werkzeug.utils import secure_filename
+from PIL import Image
+from os import path, remove
+from datetime import datetime
 
 class DatabaseHandler:
     def __init__(self, file_name: str = 'database.db'):
@@ -283,7 +290,7 @@ class DatabaseHandler:
 
     def get_all_approved_lots(self):
         self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `confirmed` = 'True'"
+            f"SELECT * FROM LiveLots"
         )
 
         return [
@@ -300,14 +307,15 @@ class DatabaseHandler:
                 'percentage': lot[9],
                 'form': lot[10],
                 'security_checked': eval(lot[11]),
-                'guarantee_percentage': lot[12]
+                'guarantee_percentage': lot[12],
+                'commentary': lot[13]
             }
             for lot in self.cursor.fetchall()
         ]
 
     def get_all_unapproved_lots(self):
         self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `confirmed` = 'False'"
+            f"SELECT * FROM LiveUnacceptedLots"
         )
 
         return [
@@ -398,3 +406,120 @@ class DatabaseHandler:
             }
             for lot in self.cursor.fetchall()
         ]
+
+    def get_lot_creator(self, lot_id):
+        self.cursor.execute(
+            f"SELECT `user` FROM Lots WHERE `id` = '{lot_id}'"
+        )
+
+        return self.cursor.fetchone()[0]
+
+    def delete_lot(self, lot_id):
+        self.cursor.execute(
+            f"UPDATE Lots SET `deleted` = 'True' WHERE `id` = '{lot_id}'"
+        )
+        self.conn.commit()
+
+    def restore_lot(self, lot_id):
+        self.cursor.execute(
+            f"UPDATE Lots SET `deleted` = 'False' WHERE `id` = '{lot_id}'"
+        )
+        self.conn.commit()
+
+    def update_data(self, lot_id, field, value):
+        self.cursor.execute(
+            f"UPDATE Lots SET `{field}` = '{value}' WHERE `id` = '{lot_id}'"
+        )
+        self.conn.commit()
+
+    @staticmethod
+    def jsonify_photos(lot_id, photos):
+        return {
+            'lot_id': lot_id,
+            'photos': [f'{request.host_url}image/lot/{photo}.jpg' for photo in photos]
+        }
+
+    def get_lot_photos(self, lot_id):
+        self.cursor.execute(
+            f"SELECT `photos` FROM Lots WHERE `id` = '{lot_id}'"
+        )
+
+        photos = eval(self.cursor.fetchone()[0])
+
+        return self.jsonify_photos(lot_id, photos)
+
+    def add_photo(self, image, lot_id):
+        temporary_file_location = f'data/images/temp/{secure_filename(image.filename)}'
+        image.save(temporary_file_location)
+
+        im = Image.open(temporary_file_location)
+        photo_hash = sha256(str(datetime.now()))
+        file_location = f'data/images/lots/{photo_hash}.jpg'
+        im = im.convert("RGB")
+        im.save(file_location)
+
+        remove(temporary_file_location)
+
+        self.cursor.execute(
+            f"SELECT `photos` FROM Lots WHERE `id` = '{lot_id}'"
+        )
+        photos = eval(self.cursor.fetchone()[0])
+        photos.append(photo_hash)
+
+        stringified_photos = str(photos).replace('\'', '"')
+
+        self.cursor.execute(
+            f"UPDATE Lots SET `photos` = '{stringified_photos}' WHERE `id` = '{lot_id}'"
+        )
+        self.conn.commit()
+
+        return self.jsonify_photos(lot_id, photos)
+
+    def remove_photo(self, lot_id, photo_id):
+        self.cursor.execute(
+            f"SELECT `photos` FROM Lots WHERE `id` = '{lot_id}'"
+        )
+        photos: list = eval(self.cursor.fetchone()[0])
+        photo_hash = photos.pop(photo_id)
+        stringified_photos = str(photos).replace('\'', '"')
+
+        remove(f'data/images/lots/{photo_hash}.jpg')
+
+        self.cursor.execute(
+            f"UPDATE Lots SET `photos` = '{stringified_photos}' WHERE `id` = '{lot_id}'"
+        )
+        self.conn.commit()
+
+        return self.jsonify_photos(lot_id, photos)
+
+    def subscribe_user_to_lot(self, user, lot_id):
+        id_hash = sha256(f'{user}_{lot_id}')
+        self.cursor.execute(
+            f"INSERT INTO SubscriptionRequests (`id`, `user`, `lot`) VALUES ('{id_hash}', '{user}', '{lot_id}')"
+        )
+        self.conn.commit()
+
+    def unsubscribe_user_from_lot(self, user, lot_id):
+        id_hash = sha256(f'{user}_{lot_id}')
+        self.cursor.execute(
+            f"DELETE FROM SubscriptionRequests WHERE `id` = '{id_hash}'"
+        )
+        self.conn.commit()
+
+    def get_user_subscriptions(self, user):
+        self.cursor.execute(
+            f"SELECT `lot`, `confirmed` FROM SubscriptionRequests WHERE `user` = '{user}'"
+        )
+        return [{'lot': lot, 'confirmed': eval(confirmed)} for lot, confirmed in self.cursor.fetchall()]
+
+    def get_approved_subscriptions(self):
+        self.cursor.execute(
+            f"SELECT * FROM ConfirmedSubscriptions"
+        )
+        return [{'id': id, 'user': user, 'lot': lot} for id, user, lot in self.cursor.fetchall()]
+
+    def get_unapproved_subscriptions(self):
+        self.cursor.execute(
+            f"SELECT * FROM UnconfirmedSubscriptions"
+        )
+        return [{'id': id, 'user': user, 'lot': lot} for id, user, lot in self.cursor.fetchall()]

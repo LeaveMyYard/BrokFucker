@@ -130,3 +130,18 @@ class User:
     def delete_avatar():
         file_location = f'data/images/user/{sha256(User.email())}.jpg'
         remove(file_location)
+
+    @staticmethod
+    def subscribe_to_lot(lot_id):
+        database = DatabaseHandler()
+        database.subscribe_user_to_lot(User.email(), lot_id)
+
+    @staticmethod
+    def unsubscribe_from_lot(lot_id):
+        database = DatabaseHandler()
+        database.unsubscribe_user_from_lot(User.email(), lot_id)
+
+    @staticmethod
+    def get_subscriptions():
+        database = DatabaseHandler()
+        return database.get_user_subscriptions(User.email())

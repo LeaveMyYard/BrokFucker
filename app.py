@@ -6,9 +6,13 @@ from lib.user import User as user
 from lib.moderator import Moderator as moderator
 from lib.lot import Lot
 from lib.settings import Settings
-from lib.util.exceptions import IndexedException
 from datetime import timedelta
 from typing import Union, Dict, Callable
+
+from lib.util.exceptions import (
+    IndexedException, NotAutorizedError, NoPermissionError, NoJsonError,
+    NotEnoughDataError,
+)
 
 app = Flask(__name__)
 CORS(app)
@@ -34,9 +38,14 @@ class WebApp:
 
     # Also redirect all /image requests to data/images
     @staticmethod
-    @app.route('/image/<path:path>')
-    def send_image(path):
-        return send_from_directory('data/images', path)
+    @app.route('/image/lot/<path:path>')
+    def send_lot_image(path):
+        return send_from_directory('data/images/lots', path)
+
+    @staticmethod
+    @app.route('/image/user/<path:path>')
+    def send_user_image(path):
+        return send_from_directory('data/images/user', path)
 
     # Simplify the exceptions handlers.
     # Rather than definging a function for each error or code by hands we will
@@ -72,6 +81,7 @@ class RestAPI:
         400: lambda error: {'code': -1000, 'msg': 'An unknown error occured while processing the request.'},
         404: lambda error: {'code': -1001, 'msg': 'The stuff you requested for is not found.'},
         IndexedException: lambda error: {'code': error.error_id, 'msg': error.args[0]},
+        NotEnoughDataError: lambda error: {'code': error.error_id, 'msg': error.args[0]},
     }
 
     @staticmethod
@@ -99,7 +109,7 @@ class RestAPI:
     @route('register', methods=['POST'])
     def register():
         if not request.json:
-            abort(400)
+            raise NoJsonError()
 
         data_required = [
             'email',
@@ -108,7 +118,7 @@ class RestAPI:
 
         for data in data_required:
             if data not in request.json:
-                abort(400)
+                raise NotEnoughDataError(data_required, request.json.keys())
 
         user.begin_email_verification(
             request.json['email'],
@@ -155,7 +165,7 @@ class RestAPI:
     @user.login_required
     def create_lot():
         if not request.json:
-            abort(400)
+            raise NoJsonError()
         
         data_required = [
             'name',
@@ -171,7 +181,7 @@ class RestAPI:
 
         for data in data_required:
             if data not in request.json:
-                abort(400)
+                raise NotEnoughDataError(data_required, request.json.keys())
 
         user.create_lot(*[request.json[data] for data in data_required])
 
@@ -182,6 +192,82 @@ class RestAPI:
     @route('lots', methods=['GET'])
     def get_approved_lots():
         return jsonify(Lot.get_all_approved_lots()), 200
+
+    @staticmethod
+    @route('lots/<int:lot_id>', methods=['GET'])
+    def get_lot(lot_id):
+        return jsonify(Lot.get_lot(lot_id)), 200
+
+    @staticmethod
+    @route('lots/<int:lot_id>', methods=['PUT'])
+    @user.login_required
+    def update_lot(lot_id):
+        if not Lot.can_user_edit(user.email(), lot_id):
+            raise NoPermissionError()
+
+        if not request.json:
+            raise NoJsonError()
+
+        data_available = [
+            'name',
+            'amount',
+            'currency',
+            'term',
+            'return_way',
+            'security',
+            'percentage',
+            'form',
+            'commentary'
+        ]
+
+        for data in data_available:
+            if data in request.json:
+                Lot.update_data(lot_id, data, request.json[data])
+
+        return RestAPI.message('A lot is changed'), 201
+
+    @staticmethod
+    @route('lots/<int:lot_id>', methods=['DELETE'])
+    @user.login_required
+    def delete_lot(lot_id):
+        if not Lot.can_user_edit(user.email(), lot_id):
+            raise NoPermissionError()
+        
+        Lot.delete_lot(lot_id)
+        return RestAPI.message('A lot is deleted'), 201
+
+    @staticmethod
+    @route('lots/<int:lot_id>', methods=['POST'])
+    @user.login_required
+    def restore_lot(lot_id):
+        if not Lot.can_user_edit(user.email(), lot_id):
+            raise NoPermissionError()
+
+        Lot.restore_lot(lot_id)
+        return RestAPI.message('A lot is restored'), 201
+
+    @staticmethod
+    @route('lots/<int:lot_id>/photos', methods=['GET'])
+    def get_lot_photo(lot_id):
+        return jsonify({'link': Lot.get_photos(lot_id)}), 200
+
+    @staticmethod
+    @route('lots/<int:lot_id>/photos', methods=['POST'])
+    @user.login_required
+    def add_lot_photo(lot_id):
+        if not Lot.can_user_edit(user.email(), lot_id):
+            raise NoPermissionError()
+
+        return jsonify(Lot.add_photo(request.files['file'], lot_id)), 201
+
+    @staticmethod
+    @route('lots/<int:lot_id>/photos/<int:photo_id>', methods=['DELETE'])
+    @user.login_required
+    def remove_lot_photo(lot_id, photo_id):
+        if not Lot.can_user_edit(user.email(), lot_id):
+            raise NoPermissionError()
+        
+        return jsonify(Lot.remove_photo(lot_id, photo_id)), 201
 
     @staticmethod
     @route('lots/favorites/<int:lot_id>', methods=['PUT', 'DELETE'])
@@ -205,6 +291,32 @@ class RestAPI:
     @user.login_required
     def get_personal_lots():
         return jsonify(user.get_personal()), 200
+
+    @staticmethod
+    @route('lots/subscription/<int:lot_id>', methods=['PUT'])
+    @user.login_required
+    def subscribe_to_lot(lot_id):
+        try:
+            user.subscribe_to_lot(lot_id)
+            return RestAPI.message(f'You are now subscribed to lot {lot_id}'), 201
+        except:
+            return RestAPI.message('You are already subscribed'), 200
+
+    @staticmethod
+    @route('lots/subscription/<int:lot_id>', methods=['DELETE'])
+    @user.login_required
+    def unsubscribe_from_lot(lot_id):
+        try:
+            user.unsubscribe_from_lot(lot_id)
+            return RestAPI.message(f'You are no longer subscribed to lot {lot_id}'), 201
+        except:
+            return RestAPI.message('You are not subscribed'), 200
+
+    @staticmethod
+    @route('lots/subscription', methods=['GET'])
+    @user.login_required
+    def get_subscribed_lots():
+        return jsonify({'lots': user.get_subscriptions()}), 200
 
     # -------------------------------------------------------------------------
     # Moderator stuff
@@ -233,6 +345,18 @@ class RestAPI:
     @moderator.login_required
     def get_unapproved_lots():
         return jsonify(Lot.get_all_unapproved_lots()), 200
+
+    @staticmethod
+    @route('lots/subscription/approved', methods=['GET'])
+    @moderator.login_required
+    def get_approved_subscriptions():
+        return jsonify({'lots': Lot.get_approved_subscriptions()}), 200
+
+    @staticmethod
+    @route('lots/subscription/unapproved', methods=['GET'])
+    @moderator.login_required
+    def get_unapproved_subscriptions():
+        return jsonify({'lots': Lot.get_unapproved_subscriptions()}), 200
 
     # -------------------------------------------------------------------------
     # Admin stuff
