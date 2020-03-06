@@ -31,6 +31,13 @@ const lotCurrency = document.getElementsByName("lot_currency")[0];
 const lotDescription = document.getElementsByName("lot_shortdesc")[0];
 const lotPercentage = document.getElementsByName("lot_percentage")[0];
 
+function onReady() {
+  if (!localStorage.getItem("email") && !sessionStorage.getItem("email")) {
+    location.href = "login.html";
+  }
+}
+onReady();
+
 lotProfilePic.addEventListener("click", function() {
   location.href = "my_profile.html";
 });

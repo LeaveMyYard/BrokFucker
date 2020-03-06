@@ -6,6 +6,13 @@ const myprofName = document.getElementById("myprofName");
 const myprofRegDate = document.getElementById("myprofRegDate");
 const profilePic = document.getElementById("profilePic");
 
+function onReady() {
+  if (!localStorage.getItem("email") && !sessionStorage.getItem("email")) {
+    location.href = "login.html";
+  }
+}
+onReady();
+
 const encData = function() {
   if (localStorage.getItem("email")) {
     return window.btoa(
@@ -56,25 +63,27 @@ profData();
 
 const updateProfData = async () => {
   const value = {
-    name: document.getElementById("myprofName").value,
-    phone: document.getElementById("myprofPhone").value
+    name: myprofName.value,
+    phone: myprofPhone.value
   };
   try {
     const response = await fetch(URL + "user", {
-      method: "POST",
+      method: "PUT",
       headers: { Authorization: `Basic ${encData()}` },
       body: JSON.stringify(value)
     });
 
     if (!response.ok) {
       throw new Error("Unsuccessfull response");
+    } else {
+      location.reload();
     }
-
-    const result = await response.json();
   } catch (error) {
     console.error(error);
   }
 };
+
+document.getElementById("updateData").addEventListener("click", updateProfData);
 
 const uploadProfPic = async () => {
   const formData = new FormData();
@@ -87,7 +96,6 @@ const uploadProfPic = async () => {
     const response = await fetch(URL + "user/avatar", {
       method: "POST",
       headers: { Authorization: `Basic ${encData()}` },
-      //   enctype: "multipart/form-data",
       body: formData
     });
 
