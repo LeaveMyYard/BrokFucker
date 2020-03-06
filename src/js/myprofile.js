@@ -46,11 +46,34 @@ const profData = async () => {
 };
 profData();
 
+const updateProfData = async () => {
+  const value = {
+    name: document.getElementById("myprofName").value,
+    phone: document.getElementById("myprofPhone").value
+  };
+  try {
+    const response = await fetch(URL + "user", {
+      method: "POST",
+      headers: { Authorization: `Basic ${encData}` },
+      body: JSON.stringify(value)
+    });
+
+    if (!response.ok) {
+      throw new Error("Unsuccessfull response");
+    }
+
+    const result = await response.json();
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const uploadProfPic = async () => {
   const formData = new FormData();
   const fileField = document.querySelector('input[type="file"]');
+  const file = fileField.files[0];
 
-  formData.append("avatar", fileField.files[0]);
+  formData.append("file", file);
 
   try {
     const response = await fetch(URL + "user/avatar", {
@@ -62,12 +85,35 @@ const uploadProfPic = async () => {
 
     const result = await response.json();
     console.log("Успех:", JSON.stringify(result));
+
+    location.reload();
   } catch (error) {
     console.error("Ошибка:", error);
   }
 };
 
-profilePic.addEventListener("click", uploadProfPic);
+const deleteProfPic = async () => {
+  try {
+    const response = await fetch(URL + "user/avatar", {
+      method: "DELETE",
+      headers: { Authorization: `Basic ${encData}` }
+    });
+
+    const result = await response.json();
+    console.log("Успех:", JSON.stringify(result));
+    location.reload();
+  } catch (error) {
+    console.error("Ошибка:", error);
+  }
+};
+
+document
+  .getElementById("deleteAvatar")
+  .addEventListener("click", deleteProfPic);
+
+document
+  .getElementById("uploadProfPic")
+  .addEventListener("change", uploadProfPic);
 
 document.querySelector(".inputPhone").addEventListener("input", e => {
   let x = e.target.value

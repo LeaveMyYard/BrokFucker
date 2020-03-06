@@ -172,6 +172,11 @@ body {
   display: flex;
 }
 
+#deleteAvatar {
+  position: absolute;
+  left: 36%;
+}
+
 #profPicForm {
   display: none;
 }
