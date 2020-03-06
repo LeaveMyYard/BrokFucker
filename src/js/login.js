@@ -6,6 +6,13 @@ const pswInput = document.getElementsByName("psw");
 const mailInput = document.getElementsByName("email");
 const termsCheckbox = document.getElementById("terms");
 
+function onReady() {
+  if (localStorage.getItem("email") || sessionStorage.getItem("email")) {
+    location.href = "index.html";
+  }
+}
+onReady();
+
 function storeLocalStorage() {
   localStorage.setItem("email", mailInput[0].value);
   localStorage.setItem("password", pswInput[0].value);

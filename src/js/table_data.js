@@ -2,6 +2,18 @@ const URL = "http://localhost:5000/api/v1/";
 
 const lotTable = document.getElementById("lotTable");
 
+const encData = function() {
+  if (localStorage.getItem("email")) {
+    return window.btoa(
+      localStorage.getItem("email") + ":" + localStorage.getItem("password")
+    );
+  } else {
+    return window.btoa(
+      sessionStorage.getItem("email") + ":" + sessionStorage.getItem("password")
+    );
+  }
+};
+
 function dateFix(date) {
   let lotDate = new Date(date);
   let day = lotDate.getDate();
@@ -12,16 +24,18 @@ function dateFix(date) {
 
 const myFunc = async () => {
   try {
-    const response = await fetch(URL + "lots/approved");
+    const response = await fetch(URL + "lots/approved", {
+      method: "GET"
+      // headers: { Authorization: `Basic ${encData()}` }
+    });
 
     if (!response.ok) {
       return new Error("Unsuccessfull response");
-    }
-
-    const result = await response.json();
-    const lotArr = [];
-    result.forEach(item => {
-      item = `
+    } else {
+      const result = await response.json();
+      const lotArr = [];
+      result.forEach(item => {
+        item = `
       <tr>
       <td>${dateFix(item.date)}</td>
       <td><a href="${"lot" + item.id + ".html"}">${item.name}</a></td>
@@ -36,10 +50,11 @@ const myFunc = async () => {
       <td>${item.security_checked ? "Да" : "Нет"}</td>
       <td>${item.guarantee_percentage}</td>
       </tr>`;
-      lotArr.push(item);
-    });
+        lotArr.push(item);
+      });
 
-    lotTable.innerHTML += lotArr.join("");
+      lotTable.innerHTML += lotArr.join("");
+    }
   } catch (error) {
     console.error(error);
   }
