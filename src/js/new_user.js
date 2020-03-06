@@ -5,11 +5,6 @@ const inputEmail = document.querySelector(".inputEmail");
 const inputPsw = document.querySelector(".inputPsw");
 const spinner = document.getElementById("spinner");
 
-function store() {
-  localStorage.setItem("email", mailInput[0].value);
-  localStorage.setItem("password", pswInput[0].value);
-}
-
 regForm.addEventListener("submit", async function(e) {
   e.preventDefault();
   const value = {
@@ -29,7 +24,6 @@ regForm.addEventListener("submit", async function(e) {
     if (response.ok) {
       alert(`Успех! Письмо с подтверждением отослано на ${inputEmail.value}`);
       spinner.style["display"] = "none";
-      store();
     } else throw new Error(error);
   } catch (error) {
     alert("Ошибка! Что-то пошло не так.");

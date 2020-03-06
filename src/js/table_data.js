@@ -15,7 +15,7 @@ const myFunc = async () => {
     const response = await fetch(URL + "lots/approved");
 
     if (!response.ok) {
-      return Promise.reject(Error("Unsuccessfull response"));
+      return new Error("Unsuccessfull response");
     }
 
     const result = await response.json();

@@ -49,9 +49,17 @@ window.onclick = function(e) {
   }
 };
 
-const encData = window.btoa(
-  localStorage.getItem("email") + ":" + localStorage.getItem("password")
-);
+const encData = function() {
+  if (localStorage.getItem("email")) {
+    return window.btoa(
+      localStorage.getItem("email") + ":" + localStorage.getItem("password")
+    );
+  } else {
+    return window.btoa(
+      sessionStorage.getItem("email") + ":" + sessionStorage.getItem("password")
+    );
+  }
+};
 
 function dateFix(date) {
   let givenDate = new Date(date);
@@ -69,7 +77,7 @@ const profData = async () => {
   try {
     const response = await fetch(URL + "user", {
       method: "GET",
-      headers: { Authorization: `Basic ${encData}` }
+      headers: { Authorization: `Basic ${encData()}` }
     });
 
     if (!response.ok) {
@@ -193,7 +201,7 @@ const createLotAndListeners = async (
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Basic ${encData}`
+            Authorization: `Basic ${encData()}`
           }
         });
         if (response.ok) {
@@ -221,17 +229,17 @@ const createLotAndListeners = async (
       };
       try {
         const response = await fetch(URL + `lots/${lot.id}`, {
-          method: "POST",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Basic ${encData}`
+            Authorization: `Basic ${encData()}`
           },
           body: JSON.stringify(value)
         });
         if (response.ok) {
           console.log(response);
 
-          // window.location.reload();
+          window.location.reload();
         } else throw new Error(error);
       } catch (error) {
         alert("Ошибка! Что-то пошло не так.");
@@ -278,7 +286,7 @@ const getMyLots = async () => {
   try {
     const response = await fetch(URL + "lots/personal", {
       method: "GET",
-      headers: { Authorization: `Basic ${encData}` }
+      headers: { Authorization: `Basic ${encData()}` }
     });
 
     if (!response.ok) {

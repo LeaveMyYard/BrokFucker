@@ -6,9 +6,17 @@ const myprofName = document.getElementById("myprofName");
 const myprofRegDate = document.getElementById("myprofRegDate");
 const profilePic = document.getElementById("profilePic");
 
-const encData = window.btoa(
-  localStorage.getItem("email") + ":" + localStorage.getItem("password")
-);
+const encData = function() {
+  if (localStorage.getItem("email")) {
+    return window.btoa(
+      localStorage.getItem("email") + ":" + localStorage.getItem("password")
+    );
+  } else {
+    return window.btoa(
+      sessionStorage.getItem("email") + ":" + sessionStorage.getItem("password")
+    );
+  }
+};
 
 function dateFix(date) {
   let givenDate = new Date(date);
@@ -26,7 +34,7 @@ const profData = async () => {
   try {
     const response = await fetch(URL + "user", {
       method: "GET",
-      headers: { Authorization: `Basic ${encData}` }
+      headers: { Authorization: `Basic ${encData()}` }
     });
 
     if (!response.ok) {
@@ -54,7 +62,7 @@ const updateProfData = async () => {
   try {
     const response = await fetch(URL + "user", {
       method: "POST",
-      headers: { Authorization: `Basic ${encData}` },
+      headers: { Authorization: `Basic ${encData()}` },
       body: JSON.stringify(value)
     });
 
@@ -78,7 +86,7 @@ const uploadProfPic = async () => {
   try {
     const response = await fetch(URL + "user/avatar", {
       method: "POST",
-      headers: { Authorization: `Basic ${encData}` },
+      headers: { Authorization: `Basic ${encData()}` },
       //   enctype: "multipart/form-data",
       body: formData
     });
@@ -96,7 +104,7 @@ const deleteProfPic = async () => {
   try {
     const response = await fetch(URL + "user/avatar", {
       method: "DELETE",
-      headers: { Authorization: `Basic ${encData}` }
+      headers: { Authorization: `Basic ${encData()}` }
     });
 
     const result = await response.json();
