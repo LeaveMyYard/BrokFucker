@@ -61,7 +61,7 @@ class User:
     @staticmethod
     def edit_data(data, value):
         database = DatabaseHandler()
-        database.edit_user_data(User.email(), data, value)
+        database.update_user_data(User.email(), data, value)
 
     @staticmethod
     def create_lot(

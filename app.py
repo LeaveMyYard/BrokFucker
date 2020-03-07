@@ -8,6 +8,7 @@ from lib.lot import Lot
 from lib.settings import Settings
 from datetime import timedelta
 from typing import Union, Dict, Callable
+import json
 
 from lib.util.exceptions import (
     IndexedException, NotAutorizedError, NoPermissionError, NoJsonError,
@@ -146,18 +147,21 @@ class RestAPI:
     @route('user', methods=['PUT'])
     @user.login_required
     def edit_user_data():
-        print(request.json)
-        if not request.json:
+        try:
+            request_json = json.loads(request.data)
+        except:
             raise NoJsonError()
 
-        data_required = [
-            'phone_number',
-            'name',
-        ]
+        print(request_json)
+
+        data_required = {
+            'phone': 'phone_number',
+            'name': 'name',
+        }
 
         for data in data_required:
-            if data in request.json:
-                user.edit_data(data, request.json[data])
+            if data in request_json:
+                user.edit_data(data_required[data], request_json[data])
 
         return RestAPI.message('Data is edited successful'), 201
 

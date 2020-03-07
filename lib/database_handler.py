@@ -224,7 +224,7 @@ class DatabaseHandler:
         }
 
     def update_user_data(self, user, data, value):
-        if not self.check_user_exists(email):
+        if not self.check_user_exists(user):
             raise ValueError
 
         self.cursor.execute(
