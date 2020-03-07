@@ -143,6 +143,25 @@ class RestAPI:
         return jsonify(user.get_data()), 200
 
     @staticmethod
+    @route('user', methods=['PUT'])
+    @user.login_required
+    def edit_user_data():
+        print(request.json)
+        if not request.json:
+            raise NoJsonError()
+
+        data_required = [
+            'phone_number',
+            'name',
+        ]
+
+        for data in data_required:
+            if data in request.json:
+                user.edit_data(data, request.json[data])
+
+        return RestAPI.message('Data is edited successful'), 201
+
+    @staticmethod
     @route('user/avatar', methods=['GET', 'POST', 'DELETE'])
     @user.login_required
     def edit_avatar():
