@@ -106,6 +106,11 @@ class User:
         return database.get_personal(User.email())
 
     @staticmethod
+    def get_personal_deleted():
+        database = DatabaseHandler()
+        return database.get_personal_deleted(User.email())
+
+    @staticmethod
     def add_avatar(image):
         temporary_file_location = f'data/images/temp/{secure_filename(image.filename)}'
         image.save(temporary_file_location)

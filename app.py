@@ -293,6 +293,12 @@ class RestAPI:
         return jsonify(user.get_personal()), 200
 
     @staticmethod
+    @route('lots/personal/deleted', methods=['GET'])
+    @user.login_required
+    def get_personal_deleted_lots():
+        return jsonify(user.get_personal_deleted()), 200
+
+    @staticmethod
     @route('lots/subscription/<int:lot_id>', methods=['PUT'])
     @user.login_required
     def subscribe_to_lot(lot_id):
