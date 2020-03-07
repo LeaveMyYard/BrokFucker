@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="style.css" />
+    <title>BrockFucker | Lot</title>
+  </head>
+  <body>
+    <div class="container container_my-lots">
+      <div class="profile">
+        <div class="profile-pic">
+          <div class="profile-pic_1">
+            <div class="profile-pic_2" id="lotProfilePic"></div>
+          </div>
+        </div>
+
+        <div class="profile-info">
+          <p>
+            <span id="myprofEmail"></span>
+          </p>
+          <p>
+            Зарегистрирован:
+            <span id="myprofRegDate"></span>
+          </p>
+          <button id="createLot">+ Создать лот</button>
+          <!-- createLot -->
+          <div class="modal">
+            <span id="modalCloseBtn" class="close">&times;</span>
+            <div class="modal-content">
+              <h2>Создать лот</h2>
+              <form id="createLotForm">
+                <label class="label lot_field" for="create_lot_name"
+                  ><span>Название лота: </span>
+                  <input
+                    class="inputName"
+                    type="text"
+                    name="create_lot_name"
+                    placeholder="не заполнено"
+                    required
+                  />
+                </label>
+                <label class="label lot_field" for="create_lot_reqsum"
+                  ><span>Необходимая сумма: </span>
+                  <input
+                    class="inputReqSum"
+                    type="text"
+                    name="create_lot_reqsum"
+                    placeholder="не заполнено"
+                    required
+                  />
+                </label>
+                <label class="label lot_field" for="create_lot_currency"
+                  ><span>Валюта: </span>
+                  <input type="text" name="create_lot_currency" required />
+                </label>
+                <label class="label lot_field" for="create_lot_reqmonths"
+                  ><span>Срок, месяцев: </span>
+                  <input
+                    class="inputReqMonths"
+                    type="text"
+                    name="create_lot_reqmonths"
+                    placeholder="не заполнено"
+                    required
+                  />
+                </label>
+                <label class="label lot_field" for="create_lot_percentage"
+                  ><span>Ставка, годовых: </span>
+                  <input
+                    class="inputReqMonths"
+                    type="text"
+                    name="create_lot_percentage"
+                    placeholder="не заполнено"
+                    required
+                  />
+                </label>
+                <label class="label lot_field" for="create_lot_method"
+                  ><span>Метод погашения: </span>
+                  <input
+                    class="inputReqSum"
+                    type="text"
+                    name="create_lot_method"
+                    placeholder="не заполнено"
+                    required
+                  />
+                </label>
+                <label class="label lot_field" for="create_lot_security"
+                  ><span>Обеспечение: </span>
+                  <input
+                    class="inputReqSum"
+                    type="text"
+                    name="create_lot_security"
+                    placeholder="не заполнено"
+                    required
+                  />
+                </label>
+                <label class="label lot_field" for="create_lot_cred"
+                  ><span>Форма кредитирования: </span>
+                  <input
+                    class="inputReqSum"
+                    type="text"
+                    name="create_lot_cred"
+                    placeholder="не заполнено"
+                    required
+                  />
+                </label>
+                <label class="label lot_field" for="lot_reqsum"
+                  ><span>Короткое описание: </span>
+                  <textarea name="create_lot_desc"> </textarea>
+                </label>
+              </form>
+              <button id="createLotPublish">Опубликовать</button>
+            </div>
+          </div>
+          <!-- endCreateLot -->
+          <br />
+        </div>
+      </div>
+      <div class="my-lots">
+        <p><strong>Мои лоты:</strong></p>
+      </div>
+    </div>
+
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/mylots.js"></script>
+  </body>
+</html>

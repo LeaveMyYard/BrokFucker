@@ -4,12 +4,14 @@ const lotTable = document.getElementById("lotTable");
 
 const encData = function() {
   if (localStorage.getItem("email")) {
-    return window.btoa(
-      localStorage.getItem("email") + ":" + localStorage.getItem("password")
+    return (
+      window.btoa(localStorage.getItem("email") + ":") +
+      localStorage.getItem("password")
     );
   } else {
-    return window.btoa(
-      sessionStorage.getItem("email") + ":" + sessionStorage.getItem("password")
+    return (
+      window.btoa(sessionStorage.getItem("email") + ":") +
+      sessionStorage.getItem("password")
     );
   }
 };
@@ -22,7 +24,7 @@ function dateFix(date) {
   return `${day}/${month + 1}/${year}`;
 }
 
-const myFunc = async () => {
+const getLots = async () => {
   try {
     const response = await fetch(URL + "lots/approved", {
       method: "GET"
@@ -38,7 +40,7 @@ const myFunc = async () => {
         item = `
       <tr>
       <td>${dateFix(item.date)}</td>
-      <td><a href="${"lot" + item.id + ".html"}">${item.name}</a></td>
+      <td><a href="${"lot.html?id=" + item.id}">${item.name}</a></td>
       <td>${item.user}</td>
       <td>${item.amount}</td>
       <td>${item.currency}</td>
@@ -60,4 +62,4 @@ const myFunc = async () => {
   }
 };
 
-myFunc();
+getLots();

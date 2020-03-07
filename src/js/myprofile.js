@@ -15,12 +15,14 @@ onReady();
 
 const encData = function() {
   if (localStorage.getItem("email")) {
-    return window.btoa(
-      localStorage.getItem("email") + ":" + localStorage.getItem("password")
+    return (
+      window.btoa(localStorage.getItem("email") + ":") +
+      localStorage.getItem("password")
     );
   } else {
-    return window.btoa(
-      sessionStorage.getItem("email") + ":" + sessionStorage.getItem("password")
+    return (
+      window.btoa(sessionStorage.getItem("email") + ":") +
+      sessionStorage.getItem("password")
     );
   }
 };
@@ -64,7 +66,7 @@ profData();
 const updateProfData = async () => {
   const value = {
     name: myprofName.value,
-    phone: myprofPhone.value
+    phone_number: myprofPhone.value
   };
   try {
     const response = await fetch(URL + "user", {

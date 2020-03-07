@@ -58,12 +58,14 @@ window.onclick = function(e) {
 
 const encData = function() {
   if (localStorage.getItem("email")) {
-    return window.btoa(
-      localStorage.getItem("email") + ":" + localStorage.getItem("password")
+    return (
+      window.btoa(localStorage.getItem("email") + ":") +
+      localStorage.getItem("password")
     );
   } else {
-    return window.btoa(
-      sessionStorage.getItem("email") + ":" + sessionStorage.getItem("password")
+    return (
+      window.btoa(sessionStorage.getItem("email") + ":") +
+      sessionStorage.getItem("password")
     );
   }
 };

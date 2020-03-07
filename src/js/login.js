@@ -15,12 +15,12 @@ onReady();
 
 function storeLocalStorage() {
   localStorage.setItem("email", mailInput[0].value);
-  localStorage.setItem("password", pswInput[0].value);
+  localStorage.setItem("password", window.btoa(pswInput[0].value));
 }
 
 function storeSessionStorage() {
   sessionStorage.setItem("email", mailInput[0].value);
-  sessionStorage.setItem("password", pswInput[0].value);
+  sessionStorage.setItem("password", window.btoa(pswInput[0].value));
 }
 
 showPswButton.addEventListener("click", handleShowPsw);
@@ -32,17 +32,6 @@ function handleShowPsw() {
     pswInput[0].type = "password";
   }
 }
-
-// function check() {
-//   let storedMail = localStorage.getItem("email");
-//   let storedPw = localStorage.getItem("password");
-
-//   if (mailInput[0].value != storedMail || pswInput[0].value != storedPw) {
-//     alert("Вы ввели неверные данные!");
-//   } else {
-//     location.href = "index.html";
-//   }
-// }
 
 const logIn = async () => {
   const userData = `${mailInput[0].value}:${pswInput[0].value}`;
