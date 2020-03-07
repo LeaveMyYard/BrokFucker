@@ -4,8 +4,9 @@ CREATE TABLE IF NOT EXISTS Users (
     `password` TEXT NOT NULL,
     `type` INTEGER NOT NULL DEFAULT '0',
     `reg_date` DATETIME NOT NULL,
-    `name` TEXT,
-    `phone_number` TEXT
+    `name` TEXT DEFAULT NULL,
+    `phone_number` TEXT DEFAULT NULL,
+    `avatar` TEXT DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS UsersLots (

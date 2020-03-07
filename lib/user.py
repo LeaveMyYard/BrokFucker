@@ -56,7 +56,6 @@ class User:
     def get_data():
         database = DatabaseHandler()
         res = database.get_user_data(User.email())
-        res['avatar'] = User.get_avatar_link()
         return res
 
     @staticmethod
@@ -112,29 +111,18 @@ class User:
 
     @staticmethod
     def add_avatar(image):
-        temporary_file_location = f'data/images/temp/{secure_filename(image.filename)}'
-        image.save(temporary_file_location)
-
-        im = Image.open(temporary_file_location)
-        file_location = f'data/images/user/{sha256(User.email())}.jpg'
-        im = im.convert("RGB")
-        im.save(file_location)
-
-        remove(temporary_file_location)
+        database = DatabaseHandler()
+        database.set_user_avatar(User.email(), image)
 
     @staticmethod
     def get_avatar_link():
-        file_location = f'data/images/user/{sha256(User.email())}.jpg'
-        try:
-            f = open(file_location)
-            return f'{request.host_url}image/user/{sha256(User.email())}.jpg'
-        except:
-            return f'{request.host_url}image/user/default.jpg'
+        database = DatabaseHandler()
+        return database.get_user_avatar_link(User.email())
 
     @staticmethod
     def delete_avatar():
-        file_location = f'data/images/user/{sha256(User.email())}.jpg'
-        remove(file_location)
+        database = DatabaseHandler()
+        database.delete_user_avatar(User.email())
 
     @staticmethod
     def subscribe_to_lot(lot_id):

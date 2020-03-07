@@ -22,15 +22,19 @@ class DatabaseHandler:
         
         #Test if 'data' folder exists. If not, create it.
         directory = 'data'
-        try:
-            os.stat(directory)
-        except:
-            os.mkdir(directory)
+        self.create_directory_if_not_exists(directory)
 
         #All database files will be located at data folder
         self.conn = sqlite3.connect(f'{directory}/{file_name}')
         self.cursor = self.conn.cursor()
         self.logger = init_logger(self.__class__.__name__)
+
+    @staticmethod
+    def create_directory_if_not_exists(directory):
+        try:
+            os.stat(directory)
+        except:
+            os.mkdir(directory)
 
     @staticmethod
     def init_tables():
@@ -215,7 +219,8 @@ class DatabaseHandler:
             'type': 'moderator' if res[2] == 1 else 'user',
             'registration_date': res[3],
             'name': res[4],
-            'phone_number': res[5]
+            'phone_number': res[5],
+            'avatar': self.get_user_avatar_link(email)
         }
 
     def create_new_lot(
@@ -265,12 +270,65 @@ class DatabaseHandler:
         self.conn.commit()
         self.logger.info(f'New lot with id `{lot_id}` was approved')
 
+    def get_user_display_name(self, user):
+        data = self.get_user_data(user)
+        return data['name'] or data['email']
+
+    def set_user_avatar(self, user, image):
+        self.create_directory_if_not_exists('data/images/temp')
+        self.create_directory_if_not_exists('data/images/user')
+
+        temporary_file_location = f'data/images/temp/{secure_filename(image.filename)}'
+        image.save(temporary_file_location)
+
+        im = Image.open(temporary_file_location)
+        photo_hash = sha256(str(datetime.now()))
+        file_location = f'data/images/user/{photo_hash}.jpg'
+        im = im.convert("RGB")
+        im.save(file_location)
+
+        self.cursor.execute(
+            f"UPDATE Users SET `avatar` = {photo_hash} WHERE `email` = '{user}'"
+        )
+        self.conn.commit()
+
+        remove(temporary_file_location)
+
+    def get_user_avatar_link(self, user):
+        self.cursor.execute(
+            f"SELECT `avatar` FROM Users WHERE `email` = '{user}'"
+        )
+        photo_hash = self.cursor.fetchone()[0]
+        file_location = f'data/images/user/{photo_hash}.jpg'
+
+        try:
+            f = open(file_location)
+            return f'{request.host_url}image/user/{photo_hash}.jpg'
+        except:
+            return f'{request.host_url}image/user/default.jpg'
+
+    def delete_user_avatar(self, user):
+        self.cursor.execute(
+            f"SELECT `avatar` FROM Users WHERE `email` = '{user}'"
+        )
+        photo_hash = self.cursor.fetchone()[0]
+        file_location = f'data/images/user/{photo_hash}.jpg'
+        remove(file_location)
+
+        self.cursor.execute(
+            f"UPDATE Users SET `avatar` = NULL WHERE `email` = '{user}'"
+        )
+        self.conn.commit()
+
     def serialize_lot(self, lot: Tuple):
+        from lib.user import User
         return {
             'id': lot[0],
             'date': lot[1],
             'name': lot[2],
             'user': lot[3],
+            'user_display_name': self.get_user_display_name(lot[3]),
+            'user_avatar': self.get_user_avatar_link(lot[3]),
             'amount': lot[4],
             'currency': lot[5],
             'term': lot[6],
@@ -406,6 +464,9 @@ class DatabaseHandler:
         return self.jsonify_photos(lot_id, photos)
 
     def add_photo(self, image, lot_id):
+        self.create_directory_if_not_exists('data/images/temp')
+        self.create_directory_if_not_exists('data/images/lots')
+
         temporary_file_location = f'data/images/temp/{secure_filename(image.filename)}'
         image.save(temporary_file_location)
 
