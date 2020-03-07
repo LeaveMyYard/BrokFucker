@@ -71,7 +71,10 @@ const updateProfData = async () => {
   try {
     const response = await fetch(URL + "user", {
       method: "PUT",
-      headers: { Authorization: `Basic ${encData()}` },
+      headers: {
+        Authorization: `Basic ${encData()}`,
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify(value)
     });
 
@@ -133,12 +136,12 @@ document
   .getElementById("uploadProfPic")
   .addEventListener("change", uploadProfPic);
 
-document.querySelector(".inputPhone").addEventListener("input", e => {
-  let x = e.target.value
-    .replace(/\D/g, "")
-    .match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+// document.querySelector(".inputPhone").addEventListener("input", e => {
+//   let x = e.target.value
+//     .replace(/\D/g, "")
+//     .match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
 
-  e.target.value = !x[2]
-    ? x[1]
-    : "( " + x[1] + " ) " + x[2] + (!x[3] ? "" : " - " + x[3]);
-});
+//   e.target.value = !x[2]
+//     ? x[1]
+//     : "( " + x[1] + " ) " + x[2] + (!x[3] ? "" : " - " + x[3]);
+// });
