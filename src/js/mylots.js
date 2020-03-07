@@ -1,5 +1,6 @@
 const URL = "http://localhost:5000/api/v1/";
 
+const myLotsHeading = document.getElementById("myLotsHeading");
 const lotProfilePic = document.getElementById("lotProfilePic");
 const myLotsContainer = document.querySelector(".my-lots");
 const modalCloseBtn = document.getElementById("modalCloseBtn");
@@ -303,9 +304,11 @@ const getMyLots = async () => {
     }
 
     const result = await response.json();
-    console.log(result);
-
-    manageLots(result);
+    if (result.length == 0) {
+      myLotsHeading.innerText = `Похоже, что у Вас ещё нет лотов!`;
+    } else {
+      manageLots(result);
+    }
   } catch (error) {
     console.error(error);
   }
@@ -323,6 +326,9 @@ async function clearLots() {
 
 createLotPublish.addEventListener("click", async function(e) {
   e.preventDefault();
+  if ($("#createLotForm").valid() == false) {
+    return;
+  }
   if (createLotDescription.value == undefined) {
     createLotDescription.value = "";
   }
@@ -343,12 +349,13 @@ createLotPublish.addEventListener("click", async function(e) {
       body: JSON.stringify(value),
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Basic ${encData}`
+        Authorization: `Basic ${encData()}`
       }
     });
     if (response.ok) {
       clearLots();
       getMyLots();
+      myLotsHeading.innerHTML = `<strong>Мои лоты:</strong>`;
       modalWindow.style.display = "none";
       createLotCurrency.value = "";
       createLotName.value = "";
@@ -365,3 +372,39 @@ createLotPublish.addEventListener("click", async function(e) {
     console.log(error);
   }
 });
+
+const validateForm = $(function() {
+  $("#createLotForm").validate({
+    rules: {
+      create_lot_name: {
+        required: true
+      },
+      create_lot_reqsum: {
+        required: true,
+        number: true
+      },
+      create_lot_currency: {
+        required: true
+      },
+      create_lot_reqmonths: {
+        required: true,
+        number: true
+      },
+      create_lot_percentage: {
+        required: true,
+        number: true
+      },
+      create_lot_method: {
+        required: true
+      },
+      create_lot_security: {
+        required: true
+      },
+      create_lot_cred: {
+        required: true
+      }
+    }
+  });
+});
+
+createLotPublish.addEventListener("change", validateForm);

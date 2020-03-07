@@ -13,6 +13,8 @@ html {
 
 body {
   background: linear-gradient(#e66465, #9198e5) no-repeat;
+  width: 98vw;
+  height: 98.3vh;
 }
 
 .container {
@@ -79,6 +81,10 @@ body {
 
 .valid {
   border: 1px solid green;
+}
+
+label.error {
+  display: none !important;
 }
 
 .showPswIcon {
