@@ -59,47 +59,15 @@ CREATE TABLE IF NOT EXISTS Lots (
 
 CREATE VIEW IF NOT EXISTS LiveLots
 AS
-    SELECT
-        `id`,
-        `date`,
-        `name`,
-        `user`,
-        `amount`,
-        `currency`,
-        `term`,
-        `return_way`,
-        `security`,
-        `percentage`,
-        `form`,
-        `security_checked`,
-        `guarantee_percentage`,
-        `commentary`
-    FROM
-        Lots
-    WHERE
-        `confirmed` = 'True' AND `deleted` = 'False';
+    SELECT *
+    FROM Lots
+    WHERE `confirmed` = 'True' AND `deleted` = 'False';
 
 CREATE VIEW IF NOT EXISTS LiveUnacceptedLots
 AS
-    SELECT
-        `id`,
-        `date`,
-        `name`,
-        `user`,
-        `amount`,
-        `currency`,
-        `term`,
-        `return_way`,
-        `security`,
-        `percentage`,
-        `form`,
-        `security_checked`,
-        `guarantee_percentage`,
-        `commentary`
-    FROM
-        Lots
-    WHERE
-        `confirmed` = 'False' AND `deleted` = 'False';
+    SELECT *
+    FROM Lots
+    WHERE `confirmed` = 'False' AND `deleted` = 'False';
 
 CREATE TABLE IF NOT EXISTS SubscriptionRequests (
     `id` TEXT PRIMARY KEY,

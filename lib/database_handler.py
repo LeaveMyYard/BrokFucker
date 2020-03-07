@@ -2,7 +2,7 @@ import sqlite3
 import os
 import hashlib
 import base64
-from typing import Union
+from typing import Union, Tuple
 from flask import request
 from datetime import datetime, timedelta
 from lib.util.exceptions import RegistrationError, EmailValidationError
@@ -265,12 +265,7 @@ class DatabaseHandler:
         self.conn.commit()
         self.logger.info(f'New lot with id `{lot_id}` was approved')
 
-    def get_lot(self, lot_id):
-        self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `id` = '{lot_id}'"
-        )
-        lot = self.cursor.fetchone()
-
+    def serialize_lot(self, lot: Tuple):
         return {
             'id': lot[0],
             'date': lot[1],
@@ -285,58 +280,31 @@ class DatabaseHandler:
             'form': lot[10],
             'security_checked': eval(lot[11]),
             'guarantee_percentage': lot[12],
-            'commentary': lot[13]
+            'commentary': lot[15],
+            'photos': self.get_lot_photos(lot[0])
         }
+
+    def get_lot(self, lot_id):
+        self.cursor.execute(
+            f"SELECT * FROM Lots WHERE `id` = '{lot_id}'"
+        )
+        lot = self.cursor.fetchone()
+
+        return self.serialize_lot(lot)
 
     def get_all_approved_lots(self):
         self.cursor.execute(
             f"SELECT * FROM LiveLots"
         )
 
-        return [
-            {
-                'id': lot[0],
-                'date': lot[1],
-                'name': lot[2],
-                'user': lot[3],
-                'amount': lot[4],
-                'currency': lot[5],
-                'term': lot[6],
-                'return_way': lot[7],
-                'security': lot[8],
-                'percentage': lot[9],
-                'form': lot[10],
-                'security_checked': eval(lot[11]),
-                'guarantee_percentage': lot[12],
-                'commentary': lot[13]
-            }
-            for lot in self.cursor.fetchall()
-        ]
+        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
 
     def get_all_unapproved_lots(self):
         self.cursor.execute(
             f"SELECT * FROM LiveUnacceptedLots"
         )
 
-        return [
-            {
-                'id': lot[0],
-                'date': lot[1],
-                'name': lot[2],
-                'user': lot[3],
-                'amount': lot[4],
-                'currency': lot[5],
-                'term': lot[6],
-                'return_way': lot[7],
-                'security': lot[8],
-                'percentage': lot[9],
-                'form': lot[10],
-                'security_checked': eval(lot[11]),
-                'guarantee_percentage': lot[12],
-                'commentary': lot[13]
-            }
-            for lot in self.cursor.fetchall()
-        ]
+        return [self.serialize_lot for lot in self.cursor.fetchall()]
 
     def set_security_checked(self, lot_id, checked):
         self.cursor.execute(
@@ -387,52 +355,14 @@ class DatabaseHandler:
             f"SELECT * FROM Lots WHERE `user` = '{email}' and `deleted` = 'False'"
         )
 
-        return [
-            {
-                'id': lot[0],
-                'date': lot[1],
-                'name': lot[2],
-                'user': lot[3],
-                'amount': lot[4],
-                'currency': lot[5],
-                'term': lot[6],
-                'return_way': lot[7],
-                'security': lot[8],
-                'percentage': lot[9],
-                'form': lot[10],
-                'security_checked': eval(lot[11]),
-                'guarantee_percentage': lot[12],
-                'commentary': lot[15],
-                'photos': self.get_lot_photos(lot[0])
-            }
-            for lot in self.cursor.fetchall()
-        ]
+        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
 
     def get_personal_deleted(self, email):
         self.cursor.execute(
             f"SELECT * FROM Lots WHERE `user` = '{email}' and `deleted` = 'True'"
         )
 
-        return [
-            {
-                'id': lot[0],
-                'date': lot[1],
-                'name': lot[2],
-                'user': lot[3],
-                'amount': lot[4],
-                'currency': lot[5],
-                'term': lot[6],
-                'return_way': lot[7],
-                'security': lot[8],
-                'percentage': lot[9],
-                'form': lot[10],
-                'security_checked': eval(lot[11]),
-                'guarantee_percentage': lot[12],
-                'commentary': lot[15],
-                'photos': self.get_lot_photos(lot[0])
-            }
-            for lot in self.cursor.fetchall()
-        ]
+        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
 
     def get_lot_creator(self, lot_id):
         self.cursor.execute(
