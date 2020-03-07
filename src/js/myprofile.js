@@ -64,7 +64,7 @@ profData();
 const updateProfData = async () => {
   const value = {
     name: myprofName.value,
-    phone: myprofPhone.value
+    phone_number: myprofPhone.value
   };
   try {
     const response = await fetch(URL + "user", {

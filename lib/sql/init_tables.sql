@@ -28,6 +28,7 @@ INSERT OR IGNORE INTO Users VALUES (
     '2',
     '2020-02-24 00:50:24.262170',
     'Head Admin',
+    NULL,
     NULL
 );
 

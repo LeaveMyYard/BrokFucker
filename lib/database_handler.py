@@ -223,6 +223,15 @@ class DatabaseHandler:
             'avatar': self.get_user_avatar_link(email)
         }
 
+    def update_user_data(self, user, data, value):
+        if not self.check_user_exists(email):
+            raise ValueError
+
+        self.cursor.execute(
+            f"UPDATE Users SET `{data}` = '{value}' WHERE `email` = '{user}'"
+        )
+        self.conn.commit()
+
     def create_new_lot(
         self, 
         user,
@@ -278,6 +287,8 @@ class DatabaseHandler:
         self.create_directory_if_not_exists('data/images/temp')
         self.create_directory_if_not_exists('data/images/user')
 
+        self.delete_user_avatar(user)
+
         temporary_file_location = f'data/images/temp/{secure_filename(image.filename)}'
         image.save(temporary_file_location)
 
@@ -288,7 +299,7 @@ class DatabaseHandler:
         im.save(file_location)
 
         self.cursor.execute(
-            f"UPDATE Users SET `avatar` = {photo_hash} WHERE `email` = '{user}'"
+            f"UPDATE Users SET `avatar` = '{photo_hash}' WHERE `email` = '{user}'"
         )
         self.conn.commit()
 
@@ -313,7 +324,11 @@ class DatabaseHandler:
         )
         photo_hash = self.cursor.fetchone()[0]
         file_location = f'data/images/user/{photo_hash}.jpg'
-        remove(file_location)
+
+        try:
+            remove(file_location)
+        except FileNotFoundError:
+            return
 
         self.cursor.execute(
             f"UPDATE Users SET `avatar` = NULL WHERE `email` = '{user}'"
