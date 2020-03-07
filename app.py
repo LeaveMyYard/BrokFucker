@@ -152,8 +152,6 @@ class RestAPI:
         except:
             raise NoJsonError()
 
-        print(request_json)
-
         data_required = {
             'phone': 'phone_number',
             'name': 'name',
