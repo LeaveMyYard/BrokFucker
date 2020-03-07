@@ -354,8 +354,15 @@ class DatabaseHandler:
             'security_checked': eval(lot[11]),
             'guarantee_percentage': lot[12],
             'commentary': lot[15],
-            'photos': self.get_lot_photos(lot[0])
+            'photos': self.get_lot_photos(lot[0]),
+            'taken': self.check_taken(lot[0])
         }
+
+    def check_taken(self, lot_id):
+        self.cursor.execute(
+            f"SELECT * FROM ConfirmedSubscriptions WHERE `lot` = '{lot_id}'"
+        )
+        return self.cursor.fetchall() != []
 
     def get_lot(self, lot_id):
         self.cursor.execute(
