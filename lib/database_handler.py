@@ -336,7 +336,6 @@ class DatabaseHandler:
         self.conn.commit()
 
     def serialize_lot(self, lot: Tuple):
-        from lib.user import User
         return {
             'id': lot[0],
             'date': lot[1],

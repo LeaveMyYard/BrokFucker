@@ -182,7 +182,7 @@ class RestAPI:
     # -------------------------------------------------------------------------
 
     @staticmethod
-    @route('lots/createNew', methods=['POST'])
+    @route('lots', methods=['POST'])
     @user.login_required
     def create_lot():
         if not request.json:

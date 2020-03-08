@@ -1,43 +1,38 @@
-# Rest API for BrokFucker (16.02.2020)
+# Rest API для BrokFucker (08.03.2020)
 
-## General API Information
-* The base endpoint is: **https://127.0.0.1:5000**
-* All endpoints return either a JSON object or array.
-* All time and timestamp related fields are in **human-readable format**.
+## Общая информация
+* Адрес сайта (пока что, локальный): **https://127.0.0.1:5000/api/v1/**
+* Все запросы возвращают JSON.
 
 ## HTTP Return Codes
 
-* HTTP `4XX` return codes are used for malformed requests;
-  the issue is on the sender's side.
-* HTTP `403` return code is used when the WAF Limit (Web Application Firewall) has been violated.
-* HTTP `429` return code is used when breaking a request rate limit.
-* HTTP `418` return code is used when an IP has been auto-banned for continuing to send requests after receiving `429` codes.
-* HTTP `5XX` return codes are used for internal errors; the issue is on
-  server's side.
-  It is important to **NOT** treat this as a failure operation; the execution status is
-  **UNKNOWN** and could have been a success.
+* HTTP `4XX` возвращается при не правильном запросе;
+  ошибка на стороне отправителя.
+* HTTP `429` возвращается в случае, если превышено количество запросов.
+* HTTP `418` возвращается в случае, когда ip адресс получил бан, после того как продолжил отправлять запросы после кода `429`.
+* HTTP `5XX` возвращается в случае, если ошибка находится на серверной стороне.
 
 ## Error Codes
-* Any endpoint can return an ERROR
+* Почти все запросы могут завершиться ошибкой:
 
-Sample Payload below:
+Пример ошибки:
 ```javascript
 {
   "code": -1121,
   "msg": "Invalid symbol."
 }
 ```
-* Specific error codes and messages are defined in [Errors Codes](./errors.md).
+* Описание всех ошибок лежит в отдельном файле: [Errors Codes](./errors.md).
 
-## General Information on Endpoints
-* All parameters must be sent as a `query string` with content type `application/json`.
-* Parameters may be sent in any order.
+## Общая информация по запросам
+* Все параметры отправляются  `query string` with content type `application/json`.
+* Запросы, не требующие параметров, не обрабатывают входящие данные.
+* Параметры могут находиться в любом порядке.
 
-## Endpoint Examples
-* Here is a step-by-step example of how to send a vaild signed payload from the
-* Windows command line using `curl`.
+## Примеры запросов
+* Пример запроса используя коммандную стоку Windows и `curl`.
 
-### Example for POST /api/v1/register
+### Пример для POST register
 * **request json:** {'email': 'test@gmail.com', 'password': 'qwerty1312'}
 
 * **curl command:**
@@ -46,23 +41,20 @@ Sample Payload below:
     [windows] curl -i -H "Content-Type: application/json" -X POST -d "{""email"":""test@gmail.com"", ""password"":""qwerty1312""}"  http://127.0.0.1:5000/api/v1/register
     ```
 
-Notice that standart Windows console support only "" brackets.
+Заметьте, что реальное тело запроса - `'{"email":"test@gmail.com", "password":"qwerty1312"}'`.
 
-Also, double bracket symbol inside double brackets should be called as two brackets.
-
-So, "{""email"":""test@gmail.com"", ""password"":""qwerty1312""}" would be '{"email":"test@gmail.com", "password":"qwerty1312"}'
+Стандартная консоль Windows (в отличии от Bash), использует только двойные ковычки для указания строки, 
+а символ " внутри строки должен экранироваться еще одной ковычкой.
 
 ### Example for GET /api/v1/getUserData with authentification
 
-Some endpoints are protected and only accessed with user/moderator authentification.
+Некоторые запросы требуют аутентификации.
 
-It requires you to provide username(email) and password in request.
+Для этого, требуется переслать данные логина и пароля в шапке запроса.
 
-Users are all the registered accounts, but moderator is a specific account type.
+Существует несколько уровней доступа запроса: **Public**, **User**, **Moderator** и **Admin**.
 
-From now, all the Endpoints will be described with **Level**, that could be **Public**, **User** and **Moderator**.
-
-If you don't provide account data (if needed), it is not correct or it has not enough privileges, you will recieve an error.
+В случае отсутствия необходимого уровня доступа, в ответе вернется ошибка.
 
 * **request json:** NONE
 
@@ -71,55 +63,92 @@ If you don't provide account data (if needed), it is not correct or it has not e
     ```
     [windows] curl -u test@gmail.com:qwerty1312 -i http://localhost:5000/api/v1/getUserData
     ```
-# List of all endpoints
-## Public stuff
-* ```GET /api/v1/ping```
-  * Tests the connectivity to the api server.
 
-## Registration stuff
-* ```POST /api/v1/register```
-  * Starts the registration for the user.
-* ```GET /api/v1/register/verify/<string:verification_hash>```
-  * Confirms the registration, is send on mail.
-
-## User stuff
-* ```GET /api/v1/user```
-  * Get current user's info.
-* ```GET /api/v1/user/avatar```
-  * Get the link to current user's avatar
-* ```POST /api/v1/user/avatar```
-  * Upload new avatar
-* ```DELETE /api/v1/user/avatar```
-  * Delete current avatar
   
-## Lots
-* ```POST /api/v1/lots/createNew```
-  * Create new lot
-* ```GET /api/v1/lots```
-  * Get all public lots
-* ```GET /api/v1/lots/approved```
-  * The same as above
-* ```PUT /api/v1/lots/favorites/<int:lot_id>```
-  * Add lot to favorites list
-* ```DELETE /api/v1/lots/favorites/<int:lot_id>```
-  * Remove lot from favorites list
-* ```GET /api/v1/lots/favorites```
-  * Get your list of favorites
-* ```GET /api/v1/lots/personal```
-  * Get your lots
+# Список всех запросов
+## Публичные запросы
+* ```GET /api/v1/ping```
+  * Проверяет соединение с сервером.
 
-## Moderator stuff
+## Запросы регистрации
+* ```POST /api/v1/register```
+  * [Начинает процесс регистрации нового пользователя.](#Create-new-account)
+* ```GET /api/v1/register/verify/<string:verification_hash>```
+  * Подтверждает регистрацию.
+
+## Запросы пользователя
+* ```GET /api/v1/user```
+  * Информация о текущем пользователе.
+* ```PUT /api/v1/user```
+  * Обновить данные текущего пользователя.
+* ```GET /api/v1/user/avatar```
+  * Ссылка на аватар текущего пользователя.
+* ```POST /api/v1/user/avatar```
+  * Загрузить новый аватар.
+* ```DELETE /api/v1/user/avatar```
+  * Удалить текущий аватар.
+  
+## Лоты
+* ```GET /api/v1/lots```
+  * Получить все публичные лоты.
+* ```POST /api/v1/lots```
+  * Создать новый лот.
+* ```GET /api/v1/lots/<int:id>```
+  * Получить данные о лоте.
+* ```PUT /api/v1/lots/<int:id>```
+  * Обновить данные лота.
+* ```POST /api/v1/lots/<int:id>```
+  * Восстановить удаленный лот.
+* ```DELETE /api/v1/lots/<int:id>```
+  * Удалить лот.
+* ```GET /api/v1/lots/<int:id>/photos```
+  * Получить список фотографий лота.
+* ```POST /api/v1/lots/<int:id>/photos```
+  * Добавить лоту фотографию.
+* ```DELETE /api/v1/lots/<int:id>/photos/<int:photo_id>```
+  * Удалить фотографию лота.
+* ```GET /api/v1/lots/approved```
+  * Копия GET /api/v1/lots.
+* ```PUT /api/v1/lots/favorites/<int:lot_id>```
+  * Добавить лот в избранное.
+* ```DELETE /api/v1/lots/favorites/<int:lot_id>```
+  * Удалить лот из избранных.
+* ```GET /api/v1/lots/favorites```
+  * Получить список избранных лотов.
+* ```GET /api/v1/lots/personal```
+  * Получить список своих лотов.
+* ```GET /api/v1/lots/personal/deleted```
+  * Получить список своих удаленных лотов.
+* ```PUT /api/v1/lots/subscription/<int:id>```
+  * Подписаться на лот.
+* ```DELETE /api/v1/lots/subscription/<int:id>```
+  * Убрать подписку на лот.
+* ```GET /api/v1/lots/subscription```
+  * Получить список лотов, на которые ты подписан.
+
+
+## Запросы модератора
 * ```PUT /api/v1/lots/<int:lot_id>/approve```
-  * Подтвердить лот
-* ```PUT /api/v1/lots/<int:lot_id>/setSecurityChecked```
-  * Set lot's security flag to checked
-* ```PUT /api/v1/lots/<int:lot_id>/setSecurityUnchecked```
-  * Set lot's security flag to unchecked
+  * Подтвердить лот.
+* ```PUT /api/v1/lots/<int:lot_id>/security```
+  * Подтвердить проверенное обеспечение лота.
+* ```DELETE /api/v1/lots/<int:lot_id>/security```
+  * Убрать проверенное обеспечение лота.
 * ```GET /api/v1/lots/unapproved```
   * Получить список неподтвержденных лотов.
+* ```GET /api/v1/lots/subscription/approved```
+  * Получить список подтвержденных подписок.
+* ```GET /api/v1/lots/subscription/unapproved```
+  * Получить список неподтвержденных подписок.
   
-## Admin stuff
-  Here be dragons...
+## Запросы администратора
+  Here be dragons... (Тут был Ваня)
+
+-------------------------------------------------------------
+
+Документация далее нуждается в доработке и русском переводе.
+
+Не рекомендуется ее читать, так как некоторые вещи могут быть не верными или устаревшими.
 
 # API Endpoints
 ## Public endpoints
