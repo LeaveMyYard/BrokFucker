@@ -1,4 +1,5 @@
-const URL = window.location.host + "api/v1/";
+const URL = "http://localhost:5000/api/v1/";
+// console.log(window.location.host);
 
 const myLotsBtn = document.getElementById("myLotsBtn");
 const myprofEmail = document.getElementById("myprofEmail");
@@ -10,6 +11,25 @@ const profilePic = document.getElementById("profilePic");
 function onReady() {
   if (!localStorage.getItem("email") && !sessionStorage.getItem("email")) {
     location.href = "login.html";
+  } else {
+    async () => {
+      try {
+        const response = await fetch(URL + "user", {
+          method: "GET",
+          headers: { Authorization: `Basic ${encData()}` }
+        });
+
+        if (!response.ok) {
+          throw new Error("Unsuccessfull response");
+        }
+      } catch (error) {
+        console.error(error);
+        localStorage.removeItem("email");
+        localStorage.removeItem("password");
+        sessionStorage.removeItem("email");
+        sessionStorage.removeItem("password");
+      }
+    };
   }
 }
 onReady();

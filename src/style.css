@@ -276,7 +276,7 @@ label.error {
   background: #e66465;
 }
 
-#create_lot_photo {
+.lot_photo {
   display: block;
   width: 300px;
   height: 300px;

@@ -1,4 +1,4 @@
-const URL = window.location.host + "api/v1/";
+const URL = "http://localhost:5000/api/v1/";
 
 const menuNotLogged = document.getElementById("menuIfNotLogged");
 const menuLogged = document.getElementById("menuIfLogged");

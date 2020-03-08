@@ -1,4 +1,4 @@
-const URL = window.location.host + "api/v1/";
+const URL = "http://localhost:5000/api/v1/";
 
 const loginBtn = document.querySelector(".loginBtn");
 const loginForm = document.querySelector("#loginForm");
@@ -8,9 +8,26 @@ const mailInput = document.getElementsByName("email");
 const termsCheckbox = document.getElementById("terms");
 
 function onReady() {
-  if (localStorage.getItem("email") || sessionStorage.getItem("email")) {
-    location.href = "index.html";
-  }
+  async () => {
+    try {
+      const response = await fetch(URL + "user", {
+        method: "GET",
+        headers: { Authorization: `Basic ${encData()}` }
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      } else {
+        location.href = "index.html";
+      }
+    } catch (error) {
+      console.error(error);
+      localStorage.removeItem("email");
+      localStorage.removeItem("password");
+      sessionStorage.removeItem("email");
+      sessionStorage.removeItem("password");
+    }
+  };
 }
 onReady();
 

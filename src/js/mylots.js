@@ -1,4 +1,4 @@
-const URL = window.location.host + "api/v1/";
+const URL = "http://localhost:5000/api/v1/";
 
 const myLotsHeading = document.getElementById("myLotsHeading");
 const lotProfilePic = document.getElementById("lotProfilePic");
@@ -80,6 +80,12 @@ function dateFix(date) {
 }
 
 document.querySelector(".inputReqSum").addEventListener("input", e => {
+  e.target.value = e.target.value.replace(/\D/g, "");
+});
+document.querySelector(".inputReqMonths").addEventListener("input", e => {
+  e.target.value = e.target.value.replace(/\D/g, "");
+});
+document.querySelector(".inputReqPercentage").addEventListener("input", e => {
   e.target.value = e.target.value.replace(/\D/g, "");
 });
 
@@ -198,6 +204,8 @@ const createLotAndListeners = async (
               </textarea>
             </label>
             </form>
+            <div class="lot_photo">
+            </div>
             <button class="deleteLotBtn btn">Remove</button>
             <button class="editLotBtn btn">Update</button>
             </div>
@@ -236,6 +244,7 @@ const createLotAndListeners = async (
         form: $(lotEl).find("input[name=lot_cred]")[0].value,
         percentage: $(lotEl).find("input[name=lot_percentage]")[0].value,
         commentary: $(lotEl).find("textarea[name=lot_shortdesc]")[0].value
+        // photo: $(lotEl).find('input[name=file]')[0]
       };
       try {
         const response = await fetch(URL + `lots/${lot.id}`, {
@@ -324,23 +333,6 @@ async function clearLots() {
   });
 }
 
-// document.getElementById('create_lot_photo').addEventListener('click', async function(){
-//   const formData = new FormData();
-//   const photos = document.querySelector('input[type="file"][multiple]');
-//   for (let i = 0; i < photos.files.length; i++) {
-//     formData.append("file", photos.files[i]);
-//   }
-//   try {
-//     const response = await fetch(URL + "lots/", {
-//       method: "POST",
-//       body: JSON.stringify(value),
-//       headers: {
-//         "Content-Type": "application/json",
-//         Authorization: `Basic ${encData()}`
-//       }
-//     });
-// })
-
 createLotPublish.addEventListener("click", async function(e) {
   e.preventDefault();
   if ($("#createLotForm").valid() == false) {
@@ -349,22 +341,24 @@ createLotPublish.addEventListener("click", async function(e) {
   if (createLotDescription.value == undefined) {
     createLotDescription.value = "";
   }
-
-  const value = {
-    name: createLotName.value,
-    amount: createLotAmount.value,
-    currency: createLotCurrency.value,
-    term: createLotTerm.value,
-    return_way: createLotReturnWay.value,
-    security: createLotSecurity.value,
-    form: createLotCredForm.value,
-    percentage: createLotPercentage.value,
-    commentary: createLotDescription.value
-  };
+  const formData = new FormData();
+  const photos = document.querySelector('input[type="file"][multiple]');
+  for (let i = 0; i < photos.files.length; i++) {
+    formData.append("file", photos.files[i]);
+  }
+  formData.append("name", createLotName.value),
+    formData.append("amount", createLotAmount.value),
+    formData.append("currency", createLotCurrency.value),
+    formData.append("term", createLotTerm.value),
+    formData.append("return_way", createLotReturnWay.value),
+    formData.append("security", createLotSecurity.value),
+    formData.append("form", createLotCredForm.value),
+    formData.append("percentage", createLotPercentage.value),
+    formData.append("commentary", createLotDescription.value);
   try {
     const response = await fetch(URL + "lots", {
       method: "POST",
-      body: JSON.stringify(value),
+      body: formData,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Basic ${encData()}`

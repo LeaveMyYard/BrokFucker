@@ -18,107 +18,106 @@
 
         <div class="profile-info">
           <p>
-            <span id="myprofEmail"></span>
+            <span id="profName"></span>
+            <span id="lotName"></span>
           </p>
           <p>
-            Зарегистрирован:
-            <span id="myprofRegDate"></span>
+            Гарантия клуба:
+            <span id="clubGuarantee"></span>
           </p>
-          <button id="createLot">+ Создать лот</button>
-          <!-- createLot -->
-          <div class="modal">
-            <span id="modalCloseBtn" class="close">&times;</span>
-            <div class="modal-content">
-              <h2>Создать лот</h2>
-              <form id="createLotForm">
-                <label class="label lot_field" for="create_lot_name"
-                  ><span>Название лота: </span>
-                  <input
-                    class="inputName"
-                    type="text"
-                    name="create_lot_name"
-                    placeholder="не заполнено"
-                    required
-                  />
-                </label>
-                <label class="label lot_field" for="create_lot_reqsum"
-                  ><span>Необходимая сумма: </span>
-                  <input
-                    class="inputReqSum"
-                    type="text"
-                    name="create_lot_reqsum"
-                    placeholder="не заполнено"
-                    required
-                  />
-                </label>
-                <label class="label lot_field" for="create_lot_currency"
-                  ><span>Валюта: </span>
-                  <input type="text" name="create_lot_currency" required />
-                </label>
-                <label class="label lot_field" for="create_lot_reqmonths"
-                  ><span>Срок, месяцев: </span>
-                  <input
-                    class="inputReqMonths"
-                    type="text"
-                    name="create_lot_reqmonths"
-                    placeholder="не заполнено"
-                    required
-                  />
-                </label>
-                <label class="label lot_field" for="create_lot_percentage"
-                  ><span>Ставка, годовых: </span>
-                  <input
-                    class="inputReqMonths"
-                    type="text"
-                    name="create_lot_percentage"
-                    placeholder="не заполнено"
-                    required
-                  />
-                </label>
-                <label class="label lot_field" for="create_lot_method"
-                  ><span>Метод погашения: </span>
-                  <input
-                    class="inputReqSum"
-                    type="text"
-                    name="create_lot_method"
-                    placeholder="не заполнено"
-                    required
-                  />
-                </label>
-                <label class="label lot_field" for="create_lot_security"
-                  ><span>Обеспечение: </span>
-                  <input
-                    class="inputReqSum"
-                    type="text"
-                    name="create_lot_security"
-                    placeholder="не заполнено"
-                    required
-                  />
-                </label>
-                <label class="label lot_field" for="create_lot_cred"
-                  ><span>Форма кредитирования: </span>
-                  <input
-                    class="inputReqSum"
-                    type="text"
-                    name="create_lot_cred"
-                    placeholder="не заполнено"
-                    required
-                  />
-                </label>
-                <label class="label lot_field" for="lot_reqsum"
-                  ><span>Короткое описание: </span>
-                  <textarea name="create_lot_desc"> </textarea>
-                </label>
-              </form>
-              <button id="createLotPublish">Опубликовать</button>
-            </div>
-          </div>
-          <!-- endCreateLot -->
+          <p id="clubProven">
+            Проверенное Обеспечение
+          </p>
+        </div>
+        </div>
+
+        <div>
+          <form id="CurrentLotForm">
+            <label class="label lot_field" for="lot_name"
+              ><span>Название лота: </span>
+              <input
+                class="inputName"
+                type="text"
+                name="lot_name"
+                placeholder="не заполнено"
+                required
+              />
+            </label>
+            <label class="label lot_field" for="lot_reqsum"
+              ><span>Необходимая сумма: </span>
+              <input
+                class="inputReqSum"
+                type="text"
+                name="lot_reqsum"
+                placeholder="не заполнено"
+                required
+              />
+            </label>
+            <label class="label lot_field" for="lot_currency"
+              ><span>Валюта: </span>
+              <input type="text" name="lot_currency" required />
+            </label>
+            <label class="label lot_field" for="lot_reqmonths"
+              ><span>Срок, месяцев: </span>
+              <input
+                class="inputReqMonths"
+                type="text"
+                name="lot_reqmonths"
+                placeholder="не заполнено"
+                required
+              />
+            </label>
+            <label class="label lot_field" for="lot_percentage"
+              ><span>Ставка, годовых: </span>
+              <input
+                class="inputReqMonths"
+                type="text"
+                name="lot_percentage"
+                placeholder="не заполнено"
+                required
+              />
+            </label>
+            <label class="label lot_field" for="lot_method"
+              ><span>Метод погашения: </span>
+              <input
+                class="inputReqSum"
+                type="text"
+                name="lot_method"
+                placeholder="не заполнено"
+                required
+              />
+            </label>
+            <label class="label lot_field" for="lot_security"
+              ><span>Обеспечение: </span>
+              <input
+                class="inputReqSum"
+                type="text"
+                name="lot_security"
+                placeholder="не заполнено"
+                required
+              />
+            </label>
+            <label class="label lot_field" for="lot_cred"
+              ><span>Форма кредитирования: </span>
+              <input
+                class="inputReqSum"
+                type="text"
+                name="lot_cred"
+                placeholder="не заполнено"
+                required
+              />
+            </label>
+            <label class="label lot_field" for="lot_reqsum"
+              ><span>Короткое описание: </span>
+              <textarea name="create_lot_desc"> </textarea>
+            </label>
+          </form>
+          <button class="btn" id="LotCallback">Связаться</button>
+          <button class="btn" id="LotToFav">В избранное</button>
+          <button class="btn"><a href="index.html">На главную</a></button>
           <br />
         </div>
-      </div>
-      <div class="my-lots">
-        <p><strong>Мои лоты:</strong></p>
+        <div class="lotPhotos">PHOTO HERE</div>
       </div>
     </div>
 

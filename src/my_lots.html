@@ -65,7 +65,7 @@
                 <label class="label lot_field" for="create_lot_percentage"
                   ><span>Ставка, годовых: </span>
                   <input
-                    class="inputReqMonths"
+                    class="inputReqPercentage"
                     type="text"
                     name="create_lot_percentage"
                     required
@@ -102,10 +102,10 @@
                   ><span>Короткое описание: </span>
                   <textarea name="create_lot_desc"> </textarea>
                 </label>
+                <div class="lot_photo">
+                  <input type="file" multiple name="file" id="createLotPhoto" />
+                </div>
               </form>
-              <div id="create_lot_photo">
-                <input type="file" multiple name="file" id="createLotPhoto" />
-              </div>
               <button id="createLotPublish">Опубликовать</button>
             </div>
           </div>
