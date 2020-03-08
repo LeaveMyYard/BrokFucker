@@ -1,4 +1,5 @@
-const URL = "http://localhost:5000/api/v1/";
+const URL = window.location.host + "api/v1/";
+
 const loginBtn = document.querySelector(".loginBtn");
 const loginForm = document.querySelector("#loginForm");
 const showPswButton = document.querySelector(".showPswIcon");

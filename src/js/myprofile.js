@@ -1,4 +1,5 @@
-const URL = "http://localhost:5000/api/v1/";
+const URL = window.location.host + "api/v1/";
+
 const myLotsBtn = document.getElementById("myLotsBtn");
 const myprofEmail = document.getElementById("myprofEmail");
 const myprofPhone = document.getElementById("myprofPhone");
