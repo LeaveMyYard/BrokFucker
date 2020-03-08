@@ -1,4 +1,4 @@
-const URL = "http://localhost:5000/api/v1/";
+const URL = window.location.host + "api/v1/";
 
 const myLotsHeading = document.getElementById("myLotsHeading");
 const lotProfilePic = document.getElementById("lotProfilePic");
@@ -324,6 +324,23 @@ async function clearLots() {
   });
 }
 
+// document.getElementById('create_lot_photo').addEventListener('click', async function(){
+//   const formData = new FormData();
+//   const photos = document.querySelector('input[type="file"][multiple]');
+//   for (let i = 0; i < photos.files.length; i++) {
+//     formData.append("file", photos.files[i]);
+//   }
+//   try {
+//     const response = await fetch(URL + "lots/", {
+//       method: "POST",
+//       body: JSON.stringify(value),
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Basic ${encData()}`
+//       }
+//     });
+// })
+
 createLotPublish.addEventListener("click", async function(e) {
   e.preventDefault();
   if ($("#createLotForm").valid() == false) {
@@ -332,6 +349,7 @@ createLotPublish.addEventListener("click", async function(e) {
   if (createLotDescription.value == undefined) {
     createLotDescription.value = "";
   }
+
   const value = {
     name: createLotName.value,
     amount: createLotAmount.value,
@@ -344,7 +362,7 @@ createLotPublish.addEventListener("click", async function(e) {
     commentary: createLotDescription.value
   };
   try {
-    const response = await fetch(URL + "lots/createNew", {
+    const response = await fetch(URL + "lots", {
       method: "POST",
       body: JSON.stringify(value),
       headers: {
