@@ -110,13 +110,16 @@ If you don't provide account data (if needed), it is not correct or it has not e
 
 ## Moderator stuff
 * ```PUT /api/v1/lots/<int:lot_id>/approve```
-  * Approve a lot
+  * Подтвердить лот
 * ```PUT /api/v1/lots/<int:lot_id>/setSecurityChecked```
   * Set lot's security flag to checked
 * ```PUT /api/v1/lots/<int:lot_id>/setSecurityUnchecked```
   * Set lot's security flag to unchecked
 * ```GET /api/v1/lots/unapproved```
-  * Get a list of unapproved lots
+  * Получить список неподтвержденных лотов.
+  
+## Admin stuff
+  Here be dragons...
 
 # API Endpoints
 ## Public endpoints
