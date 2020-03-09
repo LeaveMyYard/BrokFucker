@@ -8,6 +8,20 @@ const myprofName = document.getElementById("myprofName");
 const myprofRegDate = document.getElementById("myprofRegDate");
 const profilePic = document.getElementById("profilePic");
 
+const encData = function() {
+  if (localStorage.getItem("email")) {
+    return (
+      window.btoa(localStorage.getItem("email") + ":") +
+      localStorage.getItem("password")
+    );
+  } else {
+    return (
+      window.btoa(sessionStorage.getItem("email") + ":") +
+      sessionStorage.getItem("password")
+    );
+  }
+};
+
 function onReady() {
   if (!localStorage.getItem("email") && !sessionStorage.getItem("email")) {
     location.href = "login.html";
@@ -33,20 +47,6 @@ function onReady() {
   }
 }
 onReady();
-
-const encData = function() {
-  if (localStorage.getItem("email")) {
-    return (
-      window.btoa(localStorage.getItem("email") + ":") +
-      localStorage.getItem("password")
-    );
-  } else {
-    return (
-      window.btoa(sessionStorage.getItem("email") + ":") +
-      sessionStorage.getItem("password")
-    );
-  }
-};
 
 function dateFix(date) {
   let givenDate = new Date(date);
@@ -156,13 +156,3 @@ document
 document
   .getElementById("uploadProfPic")
   .addEventListener("change", uploadProfPic);
-
-// document.querySelector(".inputPhone").addEventListener("input", e => {
-//   let x = e.target.value
-//     .replace(/\D/g, "")
-//     .match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
-
-//   e.target.value = !x[2]
-//     ? x[1]
-//     : "( " + x[1] + " ) " + x[2] + (!x[3] ? "" : " - " + x[3]);
-// });

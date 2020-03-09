@@ -8,7 +8,7 @@
     <title>BrockFucker | Lot</title>
   </head>
   <body>
-    <div class="container container_my-lots">
+    <div class="container container_lot-menu">
       <div class="profile">
         <div class="profile-pic">
           <div class="profile-pic_1">
@@ -18,29 +18,31 @@
 
         <div class="profile-info">
           <p>
-            <span id="profName"></span>
+            <strong><span id="profName"></span></strong>
             <span id="lotName"></span>
           </p>
           <p>
             Гарантия клуба:
             <span id="clubGuarantee"></span>
           </p>
-          <p id="clubProven">
-            Проверенное Обеспечение
+          <p>
+            Проверенное Обеспечение:
+            <span id="clubProven"> </span>
           </p>
         </div>
-        </div>
+      </div>
 
+      <div class="lot_menu">
         <div>
-          <form id="CurrentLotForm">
-            <label class="label lot_field" for="lot_name"
-              ><span>Название лота: </span>
+          <form id="currentLotForm">
+            <label class="label lot_field" for="lot_date"
+              ><span>Опубликован: </span>
               <input
                 class="inputName"
                 type="text"
-                name="lot_name"
+                name="lot_date"
                 placeholder="не заполнено"
-                required
+                disabled
               />
             </label>
             <label class="label lot_field" for="lot_reqsum"
@@ -50,12 +52,12 @@
                 type="text"
                 name="lot_reqsum"
                 placeholder="не заполнено"
-                required
+                disabled
               />
             </label>
             <label class="label lot_field" for="lot_currency"
               ><span>Валюта: </span>
-              <input type="text" name="lot_currency" required />
+              <input type="text" name="lot_currency" disabled />
             </label>
             <label class="label lot_field" for="lot_reqmonths"
               ><span>Срок, месяцев: </span>
@@ -64,7 +66,7 @@
                 type="text"
                 name="lot_reqmonths"
                 placeholder="не заполнено"
-                required
+                disabled
               />
             </label>
             <label class="label lot_field" for="lot_percentage"
@@ -74,7 +76,7 @@
                 type="text"
                 name="lot_percentage"
                 placeholder="не заполнено"
-                required
+                disabled
               />
             </label>
             <label class="label lot_field" for="lot_method"
@@ -84,7 +86,7 @@
                 type="text"
                 name="lot_method"
                 placeholder="не заполнено"
-                required
+                disabled
               />
             </label>
             <label class="label lot_field" for="lot_security"
@@ -94,7 +96,7 @@
                 type="text"
                 name="lot_security"
                 placeholder="не заполнено"
-                required
+                disabled
               />
             </label>
             <label class="label lot_field" for="lot_cred"
@@ -104,24 +106,24 @@
                 type="text"
                 name="lot_cred"
                 placeholder="не заполнено"
-                required
+                disabled
               />
             </label>
             <label class="label lot_field" for="lot_reqsum"
               ><span>Короткое описание: </span>
-              <textarea name="create_lot_desc"> </textarea>
+              <textarea disabled name="lot_desc"> </textarea>
             </label>
           </form>
+          <div class="lotPhotos"></div>
           <button class="btn" id="LotCallback">Связаться</button>
           <button class="btn" id="LotToFav">В избранное</button>
           <button class="btn"><a href="index.html">На главную</a></button>
           <br />
         </div>
-        <div class="lotPhotos">PHOTO HERE</div>
       </div>
     </div>
 
     <script src="js/jquery-3.3.1.min.js"></script>
-    <script src="js/mylots.js"></script>
+    <script src="js/lot.js"></script>
   </body>
 </html>

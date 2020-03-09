@@ -327,3 +327,15 @@ nav div {
   justify-content: space-between;
   height: 3rem;
 }
+
+.lot-menu {
+  display: flex;
+}
+
+#currentLotForm {
+  margin-top: 2rem !important;
+}
+
+.lotPhotos {
+  margin: 1rem 0;
+}
