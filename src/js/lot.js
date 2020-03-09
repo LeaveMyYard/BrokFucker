@@ -21,6 +21,13 @@ const encData = function() {
   }
 };
 
+function logOut() {
+  localStorage.clearItem("email");
+  localStorage.clearItem("password");
+  sessionStorage.clearItem("email");
+  sessionStorage.clearItem("password");
+}
+
 function dateFix(date) {
   let lotDate = new Date(date);
   let day = lotDate.getDate();
