@@ -204,9 +204,7 @@ class RestAPI:
             if data not in request.json:
                 raise NotEnoughDataError(data_required, request.json.keys())
 
-        user.create_lot(*[request.json[data] for data in data_required])
-
-        return RestAPI.message('New lot created'), 201
+        return jsonify({'lot_id': user.create_lot(*[request.json[data] for data in data_required]) }), 201
 
     @staticmethod
     @route('lots/approved', methods=['GET'])

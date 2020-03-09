@@ -272,6 +272,8 @@ class DatabaseHandler:
 
         self.logger.info(f'New lot with id `{lot_id}` was created')
 
+        return lot_id
+
     def approve_lot(self, lot_id):
         self.cursor.execute(
             f"UPDATE Lots SET `confirmed` = 'True' WHERE `id` = '{lot_id}'"
