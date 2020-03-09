@@ -76,7 +76,7 @@ class User:
         commentary
     ):
         database = DatabaseHandler()
-        database.create_new_lot(
+        return database.create_new_lot(
             User.email(),
             name,
             amount,
