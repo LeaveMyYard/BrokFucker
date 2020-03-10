@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="style.css" />
-    <title>BrockFucker | Main</title>
+    <title>BrockFucker | My Lots</title>
   </head>
   <body>
     <header>
@@ -52,31 +52,32 @@
         </nav>
       </div>
     </header>
-    <main>
-      <div class="container container_main-page">
-        <p>
-          <span>Offer</span>
-          <span>Broker Fucker Club</span>
-        </p>
-        <table id="lotTable">
-          <tr>
-            <th>Дата</th>
-            <th>Название лота</th>
-            <th>Имя</th>
-            <th>Сумма</th>
-            <th>Валюта</th>
-            <th>Срок, мес.</th>
-            <th>Метод погашения</th>
-            <th>Обеспечение</th>
-            <th>Ставка годовых</th>
-            <th>Форма кредитирования</th>
-            <th>Проверенное Обеспечение</th>
-            <th>Гарантия клуба</th>
-          </tr>
-        </table>
+    <div class="container container_my-lots">
+      <div class="profile">
+        <div class="profile-pic">
+          <div class="profile-pic_1">
+            <div class="profile-pic_2" id="lotProfilePic"></div>
+          </div>
+        </div>
+
+        <div class="profile-info">
+          <p>
+            <span id="myprofEmail"></span>
+          </p>
+          <p>
+            Зарегистрирован:
+            <span id="myprofRegDate"></span>
+          </p>
+          <br />
+        </div>
       </div>
-    </main>
+      <div class="my-lots">
+        <p id="myLotsHeading"><strong>Избранные лоты:</strong></p>
+      </div>
+    </div>
+
+    <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/header.js"></script>
-    <script src="js/table_data.js"></script>
+    <script src="js/myfavlots.js"></script>
   </body>
 </html>

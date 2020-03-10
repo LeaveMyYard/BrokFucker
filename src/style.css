@@ -22,6 +22,7 @@ body {
   background: #eeeeee;
   width: 50%;
   padding: 1rem 2.5rem;
+  margin-top: 4rem;
 }
 .titleReg {
   font-size: 1.7rem;
@@ -337,6 +338,7 @@ li {
   left: 0;
   right: 0;
   padding: 0 5%;
+  z-index: 9999;
 }
 
 .fixed-header__logo {

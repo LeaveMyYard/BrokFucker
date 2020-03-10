@@ -8,6 +8,50 @@
     <title>BrockFucker | Lot</title>
   </head>
   <body>
+    <header>
+      <div class="fixed-header">
+        <div class="fixed-header__logo">
+          <a href="index.html" class="">
+            <img src="images/letter-b.svg" alt="logo" />
+          </a>
+        </div>
+        <nav class="fixed-header__menu">
+          <div id="menuIfNotLogged">
+            <ul>
+              <li
+                href="index.html"
+                class="fixed-header__menu-item fixed-header__menu-item_left"
+              >
+                <a href="index.html">Лоты</a>
+              </li>
+              <li href="login.html" class="fixed-header__menu-item">
+                <span class="menu-question">Уже зарегистрированы? </span>
+                <a href="login.html">Войти</a>
+              </li>
+              <li class="fixed-header__menu-item fixed-header__menu-item_reg">
+                <a href="registration.html">Регистрация</a>
+              </li>
+            </ul>
+          </div>
+          <div id="menuIfLogged">
+            <ul>
+              <li href="index.html" class="fixed-header__menu-item ">
+                <a href="index.html">Лоты</a>
+              </li>
+              <li class="fixed-header__menu-item fixed-header__menu-item_left">
+                <a href="my_favorite.html">Избранные лоты</a>
+              </li>
+              <li class="fixed-header__menu-item">
+                <a href="my_profile.html">Мой профиль</a>
+              </li>
+              <li class="fixed-header__menu-item fixed-header__menu-item_exit">
+                <a>Выйти</a>
+              </li>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </header>
     <div class="container container_lot-menu">
       <div class="profile">
         <div class="profile-pic">
@@ -124,6 +168,7 @@
     </div>
 
     <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/header.js"></script>
     <script src="js/lot.js"></script>
   </body>
 </html>
