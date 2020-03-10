@@ -204,12 +204,15 @@ const createLotAndListeners = async (
               </textarea>
             </label>
             </form>
-            <div class="lot_photo">
+            <div class="lot_photo" style="background-image: url(${
+              lot.photos.photos
+            })">
             </div>
             <button class="deleteLotBtn btn">Remove</button>
             <button class="editLotBtn btn">Update</button>
             </div>
   `).get(0);
+  console.log(lot.photos.photos.forEach(photo => console.log(photo)));
 
   $(lotEl)
     .find(".deleteLotBtn")
@@ -341,30 +344,36 @@ createLotPublish.addEventListener("click", async function(e) {
   if (createLotDescription.value == undefined) {
     createLotDescription.value = "";
   }
+  const value = {
+    name: createLotName.value,
+    amount: createLotAmount.value,
+    currency: createLotCurrency.value,
+    term: createLotTerm.value,
+    return_way: createLotReturnWay.value,
+    security: createLotSecurity.value,
+    form: createLotCredForm.value,
+    percentage: createLotPercentage.value,
+    commentary: createLotDescription.value
+  };
+
+  let newLotID = 0;
   const formData = new FormData();
   const photos = document.querySelector('input[type="file"][multiple]');
   for (let i = 0; i < photos.files.length; i++) {
     formData.append("file", photos.files[i]);
   }
-  formData.append("name", createLotName.value),
-    formData.append("amount", createLotAmount.value),
-    formData.append("currency", createLotCurrency.value),
-    formData.append("term", createLotTerm.value),
-    formData.append("return_way", createLotReturnWay.value),
-    formData.append("security", createLotSecurity.value),
-    formData.append("form", createLotCredForm.value),
-    formData.append("percentage", createLotPercentage.value),
-    formData.append("commentary", createLotDescription.value);
   try {
     const response = await fetch(URL + "lots", {
       method: "POST",
-      body: formData,
+      body: JSON.stringify(value),
       headers: {
         "Content-Type": "application/json",
         Authorization: `Basic ${encData()}`
       }
     });
     if (response.ok) {
+      const result = await response.json();
+      newLotID = result["lot_id"];
       clearLots();
       getMyLots();
       myLotsHeading.innerHTML = `<strong>Мои лоты:</strong>`;
@@ -379,6 +388,21 @@ createLotPublish.addEventListener("click", async function(e) {
       createLotPercentage.value = "";
       createLotDescription.value = "";
     } else throw new Error(error);
+  } catch (error) {
+    alert("Ошибка! Что-то пошло не так.");
+    console.log(error);
+  }
+  try {
+    const response = await fetch(URL + "lots/" + newLotID + "/photos", {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: `Basic ${encData()}`
+      }
+    });
+    if (response.ok) {
+      console.log("Photo added");
+    }
   } catch (error) {
     alert("Ошибка! Что-то пошло не так.");
     console.log(error);

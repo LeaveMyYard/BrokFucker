@@ -26,6 +26,7 @@ function logOut() {
   localStorage.clearItem("password");
   sessionStorage.clearItem("email");
   sessionStorage.clearItem("password");
+  location.reload();
 }
 
 function dateFix(date) {
@@ -92,7 +93,7 @@ const getTheLot = async () => {
     clubProven.innerText = result["security_checked"] == false ? "Нет" : "Да";
 
     result["photos"]["photos"].forEach(photo => {
-      lotPhotos.innerHTML += `<img>${photo}</img>`;
+      lotPhotos.innerHTML += `<img src="${photo}"></img>`;
     });
   } catch (error) {
     console.error(error);
