@@ -22,10 +22,8 @@ const encData = function() {
 };
 
 function logOut() {
-  localStorage.clearItem("email");
-  localStorage.clearItem("password");
-  sessionStorage.clearItem("email");
-  sessionStorage.clearItem("password");
+  localStorage.clear();
+  sessionStorage.clear();
   location.reload();
 }
 

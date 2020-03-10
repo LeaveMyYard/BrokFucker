@@ -2,6 +2,7 @@ const URL = "http://localhost:5000/api/v1/";
 
 const menuNotLogged = document.getElementById("menuIfNotLogged");
 const menuLogged = document.getElementById("menuIfLogged");
+const logOutBtn = document.querySelector(".fixed-header__menu-item_exit");
 
 const lotTable = document.getElementById("lotTable");
 
@@ -29,6 +30,14 @@ const encData = function() {
     );
   }
 };
+
+logOutBtn.addEventListener("click", logOut);
+
+function logOut() {
+  localStorage.clear();
+  sessionStorage.clear();
+  location.reload();
+}
 
 function dateFix(date) {
   let lotDate = new Date(date);
