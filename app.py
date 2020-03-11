@@ -83,6 +83,7 @@ class RestAPI:
         404: lambda error: {'code': -1001, 'msg': 'The stuff you requested for is not found.'},
         IndexedException: lambda error: {'code': error.error_id, 'msg': error.args[0]},
         NotEnoughDataError: lambda error: {'code': error.error_id, 'msg': error.args[0]},
+        NoJsonError: lambda error: {'code': error.error_id, 'msg': error.args[0]},
     }
 
     @staticmethod
@@ -149,7 +150,7 @@ class RestAPI:
     def edit_user_data():
         try:
             request_json = json.loads(request.data)
-        except:
+        except json.decoder.JSONDecodeError:
             raise NoJsonError()
 
         data_required = {
@@ -185,7 +186,10 @@ class RestAPI:
     @route('lots', methods=['POST'])
     @user.login_required
     def create_lot():
-        if not request.json:
+        try:
+            print(request.data)
+            request_json = json.loads(request.data)
+        except json.decoder.JSONDecodeError:
             raise NoJsonError()
         
         data_required = [
@@ -201,8 +205,8 @@ class RestAPI:
         ]
 
         for data in data_required:
-            if data not in request.json:
-                raise NotEnoughDataError(data_required, request.json.keys())
+            if data not in request_json:
+                raise NotEnoughDataError(data_required, request_json.keys())
 
         return jsonify({'lot_id': user.create_lot(*[request.json[data] for data in data_required]) }), 201
 

@@ -3,6 +3,7 @@ from typing import List
 class IndexedException(Exception):
     def __init__(self, id: int, message: str):
         self.error_id = id
+        self.message = message
         super().__init__(message)
 
     def __str__(self):
