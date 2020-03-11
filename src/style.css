@@ -372,7 +372,7 @@ li {
   flex-wrap: wrap;
 }
 
-.fixed-header__menu-item {
+.fixed-header__menu-item li {
   background-color: #2a88ff;
   border: solid black 3px;
   box-shadow: inset 10px 10px 0px -7px #3a639f;
@@ -381,11 +381,11 @@ li {
   cursor: pointer;
 }
 
-.fixed-header__menu-item:hover {
+.fixed-header__menu-item li:hover {
   color: white;
 }
 
-.fixed-header__menu-item:active {
+.fixed-header__menu-item li:active {
   color: black;
   box-shadow: inset 10px 10px 0px -7px transparent;
   box-shadow: 5px 5px 0px -1px #3a639f;

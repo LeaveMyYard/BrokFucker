@@ -375,7 +375,6 @@ createLotPublish.addEventListener("click", async function(e) {
       const result = await response.json();
       newLotID = result["lot_id"];
       clearLots();
-      getMyLots();
       myLotsHeading.innerHTML = `<strong>Мои лоты:</strong>`;
       modalWindow.style.display = "none";
       createLotCurrency.value = "";
@@ -402,6 +401,7 @@ createLotPublish.addEventListener("click", async function(e) {
     });
     if (response.ok) {
       console.log("Photo added");
+      getMyLots();
     }
   } catch (error) {
     alert("Ошибка! Что-то пошло не так.");
