@@ -348,8 +348,6 @@ createLotPublish.addEventListener("click", async function(e) {
 
   let newLotID = 0;
   const formData = new FormData();
-  console.log(formData.length);
-
   const photos = document.querySelector('input[type="file"][multiple]');
   for (let i = 0; i < photos.files.length; i++) {
     formData.append("file", photos.files[i]);
@@ -391,12 +389,7 @@ createLotPublish.addEventListener("click", async function(e) {
         Authorization: `Basic ${encData()}`
       }
     });
-    if (response.ok) {
-      console.log("Photo added");
-      getMyLots();
-    } else {
-      location.reload();
-    }
+    getMyLots();
   } catch (error) {
     alert("Ошибка! Что-то пошло не так.");
     console.log(error);
