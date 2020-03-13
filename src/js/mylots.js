@@ -238,7 +238,6 @@ const createLotAndListeners = async (
         form: $(lotEl).find("input[name=lot_cred]")[0].value,
         percentage: $(lotEl).find("input[name=lot_percentage]")[0].value,
         commentary: $(lotEl).find("textarea[name=lot_shortdesc]")[0].value
-        // photo: $(lotEl).find('input[name=file]')[0]
       };
       try {
         const response = await fetch(URL + `lots/${lot.id}`, {
@@ -349,6 +348,8 @@ createLotPublish.addEventListener("click", async function(e) {
 
   let newLotID = 0;
   const formData = new FormData();
+  console.log(formData.length);
+
   const photos = document.querySelector('input[type="file"][multiple]');
   for (let i = 0; i < photos.files.length; i++) {
     formData.append("file", photos.files[i]);
