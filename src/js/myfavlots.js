@@ -159,9 +159,8 @@ const createLotAndListeners = async (
               </textarea>
             </label>
             </form>
-            <div class="lot_photo" style="background-image: url(${
-              lot.photos.photos
-            })">
+            <div class="lot_photo">
+              <img height="300" src="${lot.photos.photos}"></img>
             </div>
             <button class="deleteLotBtn btn">Удалить из избранных</button>
             </div>
