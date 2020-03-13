@@ -160,7 +160,9 @@ const createLotAndListeners = async (
             </label>
             </form>
             <div class="lot_photo">
-              <img height="300" src="${lot.photos.photos}"></img>
+              ${lot.photos.photos.map(photo => {
+                return `<img height="300" src="${photo}"></img>`;
+              })}
             </div>
             <button class="deleteLotBtn btn">Удалить из избранных</button>
             </div>

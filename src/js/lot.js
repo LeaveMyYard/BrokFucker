@@ -82,7 +82,7 @@ const getTheLot = async () => {
     clubGuarantee.innerText = result["guarantee_percentage"];
     clubProven.innerText = result["security_checked"] == false ? "Нет" : "Да";
 
-    result["photos"]["photos"].forEach(photo => {
+    result["photos"]["photos"].map(photo => {
       lotPhotos.innerHTML += `<img height="300" src="${photo}"></img>`;
     });
   } catch (error) {
