@@ -210,6 +210,7 @@ label.error {
 /* my lots */
 .profile {
   display: flex;
+  margin-bottom: 1.5rem;
 }
 
 .lot_field {

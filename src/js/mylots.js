@@ -394,6 +394,8 @@ createLotPublish.addEventListener("click", async function(e) {
     if (response.ok) {
       console.log("Photo added");
       getMyLots();
+    } else {
+      location.reload();
     }
   } catch (error) {
     alert("Ошибка! Что-то пошло не так.");
