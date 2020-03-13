@@ -30,20 +30,6 @@ lotProfilePic.addEventListener("click", function() {
   location.href = "my_profile.html";
 });
 
-createLotBtn.addEventListener("click", function() {
-  modalWindow.style.display = "block";
-});
-
-modalCloseBtn.addEventListener("click", function() {
-  modalWindow.style.display = "none";
-});
-
-window.onclick = function(e) {
-  if (e.target == modalWindow) {
-    modalWindow.style.display = "none";
-  }
-};
-
 const encData = function() {
   if (localStorage.getItem("email")) {
     return (
@@ -57,16 +43,6 @@ const encData = function() {
     );
   }
 };
-
-document.querySelector(".inputReqSum").addEventListener("input", e => {
-  e.target.value = e.target.value.replace(/\D/g, "");
-});
-document.querySelector(".inputReqMonths").addEventListener("input", e => {
-  e.target.value = e.target.value.replace(/\D/g, "");
-});
-document.querySelector(".inputReqPercentage").addEventListener("input", e => {
-  e.target.value = e.target.value.replace(/\D/g, "");
-});
 
 const profData = async () => {
   try {
@@ -196,7 +172,7 @@ const createLotAndListeners = async (
     .find(".deleteLotBtn")
     .on("click", async function(event) {
       try {
-        const response = await fetch(URL + `lots/${lot.id}`, {
+        const response = await fetch(URL + `lots/favorites/${lot.id}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
@@ -211,42 +187,6 @@ const createLotAndListeners = async (
         console.log(error);
       }
     });
-
-  $(lotEl)
-    .find(".editLotBtn")
-    .on("click", async function(event) {
-      const value = {
-        name: $(lotEl).find("input[name=lot_name]")[0].value,
-        amount: $(lotEl).find("input[name=lot_reqsum]")[0].value,
-        currency: $(lotEl).find("input[name=lot_currency]")[0].value,
-        term: $(lotEl).find("input[name=lot_reqmonths]")[0].value,
-        return_way: $(lotEl).find("input[name=lot_method]")[0].value,
-        security: $(lotEl).find("input[name=lot_security]")[0].value,
-        form: $(lotEl).find("input[name=lot_cred]")[0].value,
-        percentage: $(lotEl).find("input[name=lot_percentage]")[0].value,
-        commentary: $(lotEl).find("textarea[name=lot_shortdesc]")[0].value
-        // photo: $(lotEl).find('input[name=file]')[0]
-      };
-      try {
-        const response = await fetch(URL + `lots/${lot.id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Basic ${encData()}`
-          },
-          body: JSON.stringify(value)
-        });
-        if (response.ok) {
-          console.log(response);
-
-          window.location.reload();
-        } else throw new Error(error);
-      } catch (error) {
-        alert("Ошибка! Что-то пошло не так.");
-        console.log(error);
-      }
-    });
-
   return lotEl;
 };
 
