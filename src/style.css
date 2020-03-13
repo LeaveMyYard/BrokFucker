@@ -338,6 +338,7 @@ li {
   left: 0;
   right: 0;
   padding: 0 5%;
+  z-index: 999;
 }
 
 .fixed-header__logo {
