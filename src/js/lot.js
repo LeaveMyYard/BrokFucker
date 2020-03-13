@@ -27,14 +27,6 @@ function logOut() {
   location.reload();
 }
 
-function dateFix(date) {
-  let lotDate = new Date(date);
-  let day = lotDate.getDate();
-  let month = lotDate.getMonth();
-  let year = lotDate.getFullYear() % 100;
-  return `${day}/${month + 1}/${year}`;
-}
-
 function onReady() {
   if (!localStorage.getItem("email") && !sessionStorage.getItem("email")) {
     location.href = "login.html";

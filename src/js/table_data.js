@@ -16,14 +16,6 @@ const encData = function() {
   }
 };
 
-function dateFix(date) {
-  let lotDate = new Date(date);
-  let day = lotDate.getDate();
-  let month = lotDate.getMonth();
-  let year = lotDate.getFullYear() % 100;
-  return `${day}/${month + 1}/${year}`;
-}
-
 const getLots = async () => {
   try {
     const response = await fetch(URL + "lots/approved", {

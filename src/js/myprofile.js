@@ -48,14 +48,6 @@ function onReady() {
 }
 onReady();
 
-function dateFix(date) {
-  let givenDate = new Date(date);
-  let day = givenDate.getDate();
-  let month = givenDate.getMonth();
-  let year = givenDate.getFullYear();
-  return `${day}.${month + 1}.${year}`;
-}
-
 myLotsBtn.addEventListener("click", function() {
   location.href = "my_lots.html";
 });
