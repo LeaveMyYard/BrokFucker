@@ -18,35 +18,42 @@
         <nav class="fixed-header__menu">
           <div id="menuIfNotLogged">
             <ul>
-              <li
+              <a
                 href="index.html"
                 class="fixed-header__menu-item fixed-header__menu-item_left"
               >
-                <a href="index.html">Лоты</a>
-              </li>
-              <li href="login.html" class="fixed-header__menu-item">
-                <span class="menu-question">Уже зарегистрированы? </span>
-                <a href="login.html">Войти</a>
-              </li>
-              <li class="fixed-header__menu-item fixed-header__menu-item_reg">
-                <a href="registration.html">Регистрация</a>
-              </li>
+                <li>Лоты</li>
+              </a>
+              <a href="login.html" class="fixed-header__menu-item">
+                <li>
+                  <span class="menu-question">Уже зарегистрированы? </span>Войти
+                </li>
+              </a>
+              <a class="fixed-header__menu-item fixed-header__menu-item_reg">
+                <li>Регистрация</li>
+              </a>
             </ul>
           </div>
           <div id="menuIfLogged">
             <ul>
-              <li href="index.html" class="fixed-header__menu-item ">
-                <a href="index.html">Лоты</a>
-              </li>
-              <li class="fixed-header__menu-item fixed-header__menu-item_left">
-                <a href="my_favorite.html">Избранные лоты</a>
-              </li>
-              <li class="fixed-header__menu-item">
-                <a href="my_profile.html">Мой профиль</a>
-              </li>
-              <li class="fixed-header__menu-item fixed-header__menu-item_exit">
-                <a>Выйти</a>
-              </li>
+              <a href="index.html" class="fixed-header__menu-item ">
+                <li>Лоты</li>
+              </a>
+              <a
+                href="my_favorite.html"
+                class="fixed-header__menu-item fixed-header__menu-item_left"
+              >
+                <li>Избранные лоты</li>
+              </a>
+              <a href="my_profile.html" class="fixed-header__menu-item">
+                <li>Мой профиль</li>
+              </a>
+              <a
+                href="login.html"
+                class="fixed-header__menu-item fixed-header__menu-item_exit"
+              >
+                <li>Выйти</li>
+              </a>
             </ul>
           </div>
         </nav>
