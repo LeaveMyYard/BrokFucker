@@ -515,7 +515,7 @@ class DatabaseHandler:
         )
         self.conn.commit()
 
-        return self.jsonify_photos(lot_id, photos)
+        return 'Photo is successfuly added.'
 
     def remove_photo(self, lot_id, photo_id):
         self.cursor.execute(
@@ -532,7 +532,7 @@ class DatabaseHandler:
         )
         self.conn.commit()
 
-        return self.jsonify_photos(lot_id, photos)
+        return 'Photo is successfuly removed.'
 
     def user_has_phone_number(self, user):
         return self.get_user_data(user)['phone'] is not None
