@@ -7,7 +7,7 @@ from lib.moderator import Moderator as moderator
 from lib.lot import Lot
 from lib.settings import Settings
 from datetime import timedelta
-from typing import Union, Dict, Callable
+from typing import Union, Dict, Callable, List
 import json
 
 from lib.util.exceptions import (
@@ -93,6 +93,19 @@ class RestAPI:
                 'msg': msg
             }
         )
+
+    @staticmethod
+    def request_data_to_json(request) -> dict:
+        try:
+            return json.loads(request)
+        except json.decoder.JSONDecodeError:
+            raise NoJsonError()
+
+    @staticmethod
+    def check_required_fields(json, data_required: List[str]) -> None:
+        for data in data_required:
+            if data not in json:
+                raise NotEnoughDataError(data_required, json.keys())
 
     # -------------------------------------------------------------------------
     # Public stuff
@@ -186,12 +199,8 @@ class RestAPI:
     @route('lots', methods=['POST'])
     @user.login_required
     def create_lot():
-        try:
-            print(request.data)
-            request_json = json.loads(request.data)
-        except json.decoder.JSONDecodeError:
-            raise NoJsonError()
-        
+        request_json = RestAPI.request_data_to_json(request.data)
+
         data_required = [
             'name',
             'amount',
@@ -204,11 +213,9 @@ class RestAPI:
             'commentary'
         ]
 
-        for data in data_required:
-            if data not in request_json:
-                raise NotEnoughDataError(data_required, request_json.keys())
-
-        return jsonify({'lot_id': user.create_lot(*[request.json[data] for data in data_required]) }), 201
+        RestAPI.check_required_fields(request_json, data_required)
+        
+        return jsonify({'lot_id': user.create_lot(*[request_json[data] for data in data_required]) }), 201
 
     @staticmethod
     @route('lots/approved', methods=['GET'])
