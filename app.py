@@ -214,7 +214,7 @@ class RestAPI:
         ]
 
         RestAPI.check_required_fields(request_json, data_required)
-        
+
         return jsonify({'lot_id': user.create_lot(*[request_json[data] for data in data_required]) }), 201
 
     @staticmethod
@@ -332,11 +332,20 @@ class RestAPI:
     @route('lots/subscription/<int:lot_id>', methods=['PUT'])
     @user.login_required
     def subscribe_to_lot(lot_id):
-        try:
-            user.subscribe_to_lot(lot_id)
+        request_json = RestAPI.request_data_to_json(request.data)
+
+        data_required = [
+            'type',
+            'message',
+        ]
+
+        RestAPI.check_required_fields(request_json, data_required)
+
+        if user.subscribe_to_lot(lot_id, *[request_json[data] for data in data_required]):
             return RestAPI.message(f'You are now subscribed to lot {lot_id}'), 201
-        except:
+        else:
             return RestAPI.message('You are already subscribed'), 200
+            
 
     @staticmethod
     @route('lots/subscription/<int:lot_id>', methods=['DELETE'])

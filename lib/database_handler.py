@@ -5,7 +5,7 @@ import base64
 from typing import Union, Tuple
 from flask import request
 from datetime import datetime, timedelta
-from lib.util.exceptions import RegistrationError, EmailValidationError
+from lib.util.exceptions import RegistrationError, EmailValidationError, UserHasNoPhoneNumber
 from lib.settings import Settings
 from lib.email_sender import EmailSender
 from threading import Timer
@@ -16,6 +16,7 @@ from werkzeug.utils import secure_filename
 from PIL import Image
 from os import path, remove
 from datetime import datetime
+from lib.util.enums import SubscriptionTypes
 
 class DatabaseHandler:
     def __init__(self, file_name: str = 'database.db'):
@@ -533,12 +534,22 @@ class DatabaseHandler:
 
         return self.jsonify_photos(lot_id, photos)
 
-    def subscribe_user_to_lot(self, user, lot_id):
+    def user_has_phone_number(self, user):
+        return self.get_user_data(user)['phone'] is not None
+
+    def subscribe_user_to_lot(self, user, lot_id, type: SubscriptionTypes, message) -> bool:
+        if type == SubscriptionTypes.PhoneCall and not self.user_has_phone_number(user):
+            raise UserHasNoPhoneNumber(user)
+
         id_hash = sha256(f'{user}_{lot_id}')
-        self.cursor.execute(
-            f"INSERT INTO SubscriptionRequests (`id`, `user`, `lot`) VALUES ('{id_hash}', '{user}', '{lot_id}')"
-        )
-        self.conn.commit()
+        try:
+            self.cursor.execute(
+                f"INSERT INTO SubscriptionRequests (`id`, `user`, `lot`, `type`, `message`) VALUES ('{id_hash}', '{user}', '{lot_id}', '{type.value}', '{message}')"
+            )
+            self.conn.commit()
+            return True
+        except:
+            return False
 
     def unsubscribe_user_from_lot(self, user, lot_id):
         id_hash = sha256(f'{user}_{lot_id}')
@@ -549,18 +560,18 @@ class DatabaseHandler:
 
     def get_user_subscriptions(self, user):
         self.cursor.execute(
-            f"SELECT `lot`, `confirmed` FROM SubscriptionRequests WHERE `user` = '{user}'"
+            f"SELECT `lot`, `confirmed`, `type`, `message` FROM SubscriptionRequests WHERE `user` = '{user}'"
         )
-        return [{'lot': lot, 'confirmed': eval(confirmed)} for lot, confirmed in self.cursor.fetchall()]
+        return [{'lot': lot, 'type': SubscriptionTypes(type).name, 'message': message, 'confirmed': eval(confirmed)} for lot, confirmed, type, message in self.cursor.fetchall()]
 
     def get_approved_subscriptions(self):
         self.cursor.execute(
             f"SELECT * FROM ConfirmedSubscriptions"
         )
-        return [{'id': id, 'user': user, 'lot': lot} for id, user, lot in self.cursor.fetchall()]
+        return [{'id': id, 'user': user, 'lot': lot, 'type': SubscriptionTypes(type).name, 'message': message} for id, user, lot, type, message in self.cursor.fetchall()]
 
     def get_unapproved_subscriptions(self):
         self.cursor.execute(
             f"SELECT * FROM UnconfirmedSubscriptions"
         )
-        return [{'id': id, 'user': user, 'lot': lot} for id, user, lot in self.cursor.fetchall()]
+        return [{'id': id, 'user': user, 'lot': lot, 'type': SubscriptionTypes(type).name, 'message': message} for id, user, lot, type, message in self.cursor.fetchall()]

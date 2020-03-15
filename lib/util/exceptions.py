@@ -1,6 +1,9 @@
 from typing import List
 
 class IndexedException(Exception):
+    '''
+        REST API Indexed Exception
+    '''
     def __init__(self, id: int, message: str):
         self.error_id = id
         self.message = message
@@ -32,3 +35,7 @@ class NoJsonError(IndexedException):
 class NotEnoughDataError(IndexedException):
     def __init__(self, sent: List[str], needed: List[str]):
         super().__init__(-1005, f'This request requires json to have next fields: {needed}, but got only: {sent}.')
+
+class UserHasNoPhoneNumber(IndexedException):
+    def __init__(self, user):
+        super().__init__(-1006, f'User {user} can not select recall by phone number option as he has no phone number assigned to his account.')
