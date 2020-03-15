@@ -286,7 +286,7 @@ class RestAPI:
         if not Lot.can_user_edit(user.email(), lot_id):
             raise NoPermissionError()
 
-        return jsonify(Lot.add_photo(request.files['file'], lot_id)), 201
+        return jsonify({filename: Lot.add_photo(request.files[filename], lot_id) for filename in request.files}), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/photos/<int:photo_id>', methods=['DELETE'])
