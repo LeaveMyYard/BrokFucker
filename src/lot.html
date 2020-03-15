@@ -84,6 +84,26 @@
       </div>
 
       <div class="lot_menu">
+        <div class="modal">
+          <span id="modalCloseBtn" class="close">&times;</span>
+          <div class="modal-content">
+            <h2>Связаться</h2>
+            <p id="lotSubMsg"></p>
+            <p>
+              Форма связи:
+              <select id="select">
+                <option value="email" selected>Email</option>
+                <option value="phone">Phone</option>
+              </select>
+              <input type="text" id="lotSubValue" disabled />
+            </p>
+            <p>
+              Комментарий:
+              <textarea id="lotSubCommentary"></textarea>
+            </p>
+            <button class="btn" id="lotSubBtn">Подписаться</button>
+          </div>
+        </div>
         <div>
           <form id="currentLotForm">
             <label class="label lot_field" for="lot_date"
