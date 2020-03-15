@@ -82,8 +82,6 @@ class RestAPI:
         400: lambda error: {'code': -1000, 'msg': 'An unknown error occured while processing the request.'},
         404: lambda error: {'code': -1001, 'msg': 'The stuff you requested for is not found.'},
         IndexedException: lambda error: {'code': error.error_id, 'msg': error.args[0]},
-        NotEnoughDataError: lambda error: {'code': error.error_id, 'msg': error.args[0]},
-        NoJsonError: lambda error: {'code': error.error_id, 'msg': error.args[0]},
     }
 
     @staticmethod
@@ -413,27 +411,28 @@ class Server:
     # If the request is for api, will respond as it is an api responce
     # Otherwise, will respond as a Web App 
     @staticmethod
-    def process_exception(ex):
+    def process_exception(ex, error):
         if not request.path.startswith('/api/') and ex in WebApp.exceptions_responses:
             return WebApp.exceptions_responses[ex](ex)
         elif ex in RestAPI.exceptions_responses:
-            return make_response(jsonify(RestAPI.exceptions_responses[ex](ex)), ex if isinstance(ex, int) else 403)
+            return make_response(jsonify(RestAPI.exceptions_responses[ex](error)), ex if isinstance(ex, int) else 403)
             
 
     # Then, looping through all that exceptions from WebApp and RestAPI
     # Creates functions with corresponding flask decorator to process
     # an error for that case
-    exceptions = set(WebApp.exceptions_responses) & set(RestAPI.exceptions_responses)
+    exceptions = set(WebApp.exceptions_responses) | set(RestAPI.exceptions_responses)
 
     # This one is just to prevent errors appearing in VSCode
     # Actually there is no error, just IDE being buged
     ex = None
     
     for ex in exceptions:
+        #print('Initializing exception handler:', ex, 'all:', set(WebApp.exceptions_responses), set(RestAPI.exceptions_responses))
         @staticmethod
         @app.errorhandler(ex)
         def error_handler(error, exception = ex):
-            return Server.process_exception(exception)
+            return Server.process_exception(exception, error)
 
 if __name__ == '__main__':
     app.run(debug=True)
