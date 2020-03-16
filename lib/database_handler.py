@@ -316,10 +316,11 @@ class DatabaseHandler:
         file_location = f'data/images/user/{photo_hash}.jpg'
 
         try:
-            f = open(file_location)
-            return f'{request.host_url}image/user/{photo_hash}.jpg'
+            open(file_location)
         except:
             return f'{request.host_url}image/user/default.jpg'
+        else:
+            return f'{request.host_url}image/user/{photo_hash}.jpg'
 
     def delete_user_avatar(self, user):
         self.cursor.execute(
