@@ -1,4 +1,5 @@
-const URL = "http://localhost:5000/api/v1/";
+// const URL = "http://localhost:5000/api/v1/";
+const URL = `${window.location.host}/`;
 
 const myLotsHeading = document.getElementById("myLotsHeading");
 const lotProfilePic = document.getElementById("lotProfilePic");

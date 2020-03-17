@@ -1,4 +1,4 @@
-const URL = "http://localhost:5000/api/v1/";
+const URL = `${window.location.host}/`;
 
 const lotSubMsg = document.getElementById("lotSubMsg");
 const lotProfilePic = document.getElementById("lotProfilePic");
