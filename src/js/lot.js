@@ -10,6 +10,8 @@ const lotCallback = document.getElementById("LotCallback");
 const modalCloseBtn = document.getElementById("modalCloseBtn");
 const modalWindow = document.getElementsByClassName("modal")[0];
 const lotSubCommentary = document.getElementById("lotSubCommentary");
+const selectSub = document.getElementById("select");
+const lotSubBtn = document.getElementById("lotSubBtn");
 
 const lotID = window.location.search.split("=")[1];
 
@@ -48,13 +50,13 @@ window.onclick = function(e) {
 };
 
 const lotSubValue = document.getElementById("lotSubValue");
+selectSub.value = "email";
 if (localStorage.getItem("email")) {
   lotSubValue.value = localStorage.getItem("email");
 } else if (sessionStorage.getItem("email")) {
   lotSubValue.value = sessionStorage.getItem("email");
 }
 
-const selectSub = document.getElementById("select");
 selectSub.addEventListener("change", function() {
   if (this.value == "email") {
     lotSubValue.disabled = true;
@@ -159,7 +161,6 @@ document.getElementById("LotToFav").addEventListener("click", async function() {
   }
 });
 
-const lotSubBtn = document.getElementById("lotSubBtn");
 lotSubBtn.addEventListener("click", async function() {
   const value = {
     type: selectSub.value == "email" ? "Email" : "PhoneCall",
