@@ -536,7 +536,7 @@ class DatabaseHandler:
         return 'Photo is successfuly removed.'
 
     def user_has_phone_number(self, user):
-        return self.get_user_data(user)['phone'] is not None
+        return self.get_user_data(user)['phone_number'] is not None
 
     def subscribe_user_to_lot(self, user, lot_id, type: SubscriptionTypes, message) -> bool:
         if type == SubscriptionTypes.PhoneCall and not self.user_has_phone_number(user):
