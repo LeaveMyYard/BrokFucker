@@ -1,5 +1,5 @@
-// const URL = "http://localhost:5000/api/v1/";
-const URL = `${window.location.host}/`;
+const URL = "http://localhost:5000/api/v1/";
+// const URL = `${window.location.host}/`;
 
 const lotTable = document.getElementById("lotTable");
 
@@ -16,6 +16,30 @@ const encData = function() {
     );
   }
 };
+
+async function onReady() {
+  if (!localStorage.getItem("email") && !sessionStorage.getItem("email")) {
+    location.href = "login.html";
+  } else {
+    try {
+      const response = await fetch(URL + "user", {
+        method: "GET",
+        headers: { Authorization: `Basic ${encData()}` }
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+    } catch (error) {
+      console.error(error);
+      localStorage.removeItem("email");
+      localStorage.removeItem("password");
+      sessionStorage.removeItem("email");
+      sessionStorage.removeItem("password");
+    }
+  }
+}
+onReady();
 
 const getLots = async () => {
   try {

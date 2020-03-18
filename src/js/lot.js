@@ -1,4 +1,5 @@
-const URL = `${window.location.host}/`;
+const URL = "http://localhost:5000/api/v1/";
+// const URL = `${window.location.host}/`;
 
 const lotSubMsg = document.getElementById("lotSubMsg");
 const lotProfilePic = document.getElementById("lotProfilePic");
@@ -47,33 +48,28 @@ window.onclick = function(e) {
 };
 
 const lotSubValue = document.getElementById("lotSubValue");
-lotSubValue.value = sessionStorage.getItem("email");
+if (localStorage.getItem("email")) {
+  lotSubValue.value = localStorage.getItem("email");
+} else if (sessionStorage.getItem("email")) {
+  lotSubValue.value = sessionStorage.getItem("email");
+}
 
 const selectSub = document.getElementById("select");
-selectSub.addEventListener("change", async function() {
+selectSub.addEventListener("change", function() {
   if (this.value == "email") {
-    lotSubValue.value = sessionStorage.getItem("email");
+    lotSubValue.disabled = true;
+    if (localStorage.getItem("email")) {
+      lotSubValue.value = localStorage.getItem("email");
+    } else if (sessionStorage.getItem("email")) {
+      lotSubValue.value = sessionStorage.getItem("email");
+    }
   } else {
-    if (sessionStorage.getItem("phone") != "") {
+    if (sessionStorage.getItem("phone") == "") {
+      lotSubValue.value = "";
+      lotSubValue.disabled = false;
+    } else {
       lotSubValue.disabled = true;
       lotSubValue.value = sessionStorage.getItem("phone");
-    } else {
-      lotSubValue.disabled = false;
-      const value = { phone: lotSubValue.value };
-      lotSubValue.addEventListener("focusout", async function() {
-        try {
-          const response = await fetch(URL + "user", {
-            method: "PUT",
-            headers: { Authorization: `Basic ${encData()}` },
-            body: JSON.stringify(value)
-          });
-          if (!response.ok) {
-            throw new Error("Unsuccessfull response");
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      });
     }
   }
 });
@@ -165,10 +161,30 @@ document.getElementById("LotToFav").addEventListener("click", async function() {
 
 const lotSubBtn = document.getElementById("lotSubBtn");
 lotSubBtn.addEventListener("click", async function() {
-  value = {
+  const value = {
     type: selectSub.value == "email" ? "Email" : "PhoneCall",
     message: lotSubCommentary.innerText
   };
+  if (value.type == "PhoneCall") {
+    const upd = {
+      phone: lotSubValue.value
+    };
+    try {
+      const response = await fetch(URL + `user`, {
+        method: "PUT",
+        headers: { Authorization: `Basic ${encData()}` },
+        body: JSON.stringify(upd)
+      });
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+      sessionStorage.removeItem("phone");
+    } catch (error) {
+      console.error(error);
+    }
+  } else {
+    sessionStorage.removeItem("phone");
+  }
   try {
     const response = await fetch(URL + `lots/subscription/${lotID}`, {
       method: "PUT",
