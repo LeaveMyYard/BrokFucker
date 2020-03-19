@@ -103,6 +103,10 @@ async function onReady() {
 }
 onReady();
 
+lotProfilePic.addEventListener("click", function() {
+  location.href = "my_profile.html";
+});
+
 const getTheLot = async () => {
   try {
     const response = await fetch(URL + `lots/${lotID}`, {
@@ -116,7 +120,8 @@ const getTheLot = async () => {
 
     const result = await response.json();
     console.log(result);
-    lotProfilePic.style.backgroundImage = `url(${result["user_avatar"]})`;
+
+    lotProfilePic.innerHTML = `<img src="${result["user_avatar"]}" style="width: 100%; height: 100%"/>`;
     lotSubMsg.innerText = `Вы собираетесь спонсировать ${result["name"]}.
     Для того, чтобы подтвердить вашу подписку, укажите, как Вы хотите,
     чтобы с вами связался наш модератор и (не обязательно) оставьте комментарий.`;

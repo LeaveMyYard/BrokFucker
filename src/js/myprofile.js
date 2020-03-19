@@ -65,7 +65,7 @@ const profData = async () => {
 
     const result = await response.json();
 
-    profilePic.style.backgroundImage = `url(${result["avatar"]})`;
+    profilePic.innerHTML = `<img src="${result["avatar"]}" style="width: 100%; height: 100%"/>`;
     myprofEmail.innerText = result["email"];
     myprofRegDate.innerText = dateFix(result["registration_date"]);
     myprofName.value = result["name"];

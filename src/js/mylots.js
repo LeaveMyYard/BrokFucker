@@ -33,6 +33,20 @@ const lotCurrency = document.getElementsByName("lot_currency")[0];
 const lotDescription = document.getElementsByName("lot_shortdesc")[0];
 const lotPercentage = document.getElementsByName("lot_percentage")[0];
 
+const encData = function() {
+  if (localStorage.getItem("email")) {
+    return (
+      window.btoa(localStorage.getItem("email") + ":") +
+      localStorage.getItem("password")
+    );
+  } else {
+    return (
+      window.btoa(sessionStorage.getItem("email") + ":") +
+      sessionStorage.getItem("password")
+    );
+  }
+};
+
 async function onReady() {
   if (!localStorage.getItem("email") && !sessionStorage.getItem("email")) {
     location.href = "login.html";
@@ -75,20 +89,6 @@ window.onclick = function(e) {
   }
 };
 
-const encData = function() {
-  if (localStorage.getItem("email")) {
-    return (
-      window.btoa(localStorage.getItem("email") + ":") +
-      localStorage.getItem("password")
-    );
-  } else {
-    return (
-      window.btoa(sessionStorage.getItem("email") + ":") +
-      sessionStorage.getItem("password")
-    );
-  }
-};
-
 document.querySelector(".inputReqSum").addEventListener("input", e => {
   e.target.value = e.target.value.replace(/\D/g, "");
 });
@@ -112,7 +112,7 @@ const profData = async () => {
 
     const result = await response.json();
 
-    lotProfilePic.style.backgroundImage = `url(${result["avatar"]})`;
+    lotProfilePic.innerHTML = `<img src="${result["avatar"]}" style="width: 100%; height: 100%"/>`;
     myprofEmail.innerText = result["email"];
     myprofRegDate.innerText = dateFix(result["registration_date"]);
   } catch (error) {

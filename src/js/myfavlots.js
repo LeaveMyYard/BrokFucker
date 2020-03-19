@@ -20,6 +20,20 @@ const lotCurrency = document.getElementsByName("lot_currency")[0];
 const lotDescription = document.getElementsByName("lot_shortdesc")[0];
 const lotPercentage = document.getElementsByName("lot_percentage")[0];
 
+const encData = function() {
+  if (localStorage.getItem("email")) {
+    return (
+      window.btoa(localStorage.getItem("email") + ":") +
+      localStorage.getItem("password")
+    );
+  } else {
+    return (
+      window.btoa(sessionStorage.getItem("email") + ":") +
+      sessionStorage.getItem("password")
+    );
+  }
+};
+
 async function onReady() {
   if (!localStorage.getItem("email") && !sessionStorage.getItem("email")) {
     location.href = "login.html";
@@ -48,20 +62,6 @@ lotProfilePic.addEventListener("click", function() {
   location.href = "my_profile.html";
 });
 
-const encData = function() {
-  if (localStorage.getItem("email")) {
-    return (
-      window.btoa(localStorage.getItem("email") + ":") +
-      localStorage.getItem("password")
-    );
-  } else {
-    return (
-      window.btoa(sessionStorage.getItem("email") + ":") +
-      sessionStorage.getItem("password")
-    );
-  }
-};
-
 const profData = async () => {
   try {
     const response = await fetch(URL + "user", {
@@ -75,7 +75,7 @@ const profData = async () => {
 
     const result = await response.json();
 
-    lotProfilePic.style.backgroundImage = `url(${result["avatar"]})`;
+    lotProfilePic.innerHTML = `<img src="${result["avatar"]}" style="width: 100%; height: 100%"/>`;
     myprofEmail.innerText = result["email"];
     myprofRegDate.innerText = dateFix(result["registration_date"]);
   } catch (error) {
