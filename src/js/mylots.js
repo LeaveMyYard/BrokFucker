@@ -215,15 +215,17 @@ const createLotAndListeners = async (
             </label>
             </form>
             <div class="lot_photo">
-            ${lot.photos.photos.map(photo => {
-              return `<img height="300" src="${photo}"></img>`;
-            })}  
+            ${lot.photos.photos
+              .map(photo => {
+                return `<img height="300" src="${photo}"></img>`;
+              })
+              .join("")}  
             </div>
             <button class="deleteLotBtn btn">Remove</button>
             <button class="editLotBtn btn">Update</button>
             </div>
   `).get(0);
-  console.log(lot.photos.photos.forEach(photo => console.log(photo)));
+  console.log(lot.photos.photos.map(photo => console.log(photo)));
 
   $(lotEl)
     .find(".deleteLotBtn")
@@ -370,7 +372,10 @@ createLotPublish.addEventListener("click", async function(e) {
   const formData = new FormData();
   const photos = document.querySelector('input[type="file"][multiple]');
   for (let i = 0; i < photos.files.length; i++) {
-    formData.append("file", photos.files[i]);
+    formData.append(
+      `file${(Math.random() * 100000).toFixed(0)}`,
+      photos.files[i]
+    );
   }
   try {
     const response = await fetch(URL + "lots", {
