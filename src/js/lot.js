@@ -121,7 +121,7 @@ const getTheLot = async () => {
     const result = await response.json();
     console.log(result);
 
-    lotProfilePic.innerHTML = `<img src="${result["user_avatar"]}" style="width: 100%; height: 100%"/>`;
+    lotProfilePic.innerHTML = `<img src="${result["user_avatar"]}" style="width: 80%; height: 100%; margin-left: 15%"/>`;
     lotSubMsg.innerText = `Вы собираетесь спонсировать ${result["name"]}.
     Для того, чтобы подтвердить вашу подписку, укажите, как Вы хотите,
     чтобы с вами связался наш модератор и (не обязательно) оставьте комментарий.`;

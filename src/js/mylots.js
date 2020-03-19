@@ -112,7 +112,7 @@ const profData = async () => {
 
     const result = await response.json();
 
-    lotProfilePic.innerHTML = `<img src="${result["avatar"]}" style="width: 100%; height: 100%"/>`;
+    lotProfilePic.innerHTML = `<img src="${result["avatar"]}" style="width: 80%; height: 100%; margin-left: 15%"/>`;
     myprofEmail.innerText = result["email"];
     myprofRegDate.innerText = dateFix(result["registration_date"]);
   } catch (error) {
@@ -414,6 +414,9 @@ createLotPublish.addEventListener("click", async function(e) {
         Authorization: `Basic ${encData()}`
       }
     });
+    for (let key of formData.keys()) {
+      formData.delete(key);
+    }
     getMyLots();
   } catch (error) {
     alert("Ошибка! Что-то пошло не так.");
