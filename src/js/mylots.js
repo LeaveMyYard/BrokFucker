@@ -112,7 +112,7 @@ const profData = async () => {
 
     const result = await response.json();
 
-    lotProfilePic.innerHTML = `<img src="${result["avatar"]}" style="width: 80%; height: 100%; margin-left: 15%"/>`;
+    lotProfilePic.innerHTML = `<img src="${result["avatar"]}" style="width: 60%; height: 100%; margin-left: 20%"/>`;
     myprofEmail.innerText = result["email"];
     myprofRegDate.innerText = dateFix(result["registration_date"]);
   } catch (error) {
