@@ -22,7 +22,7 @@ async function onReady() {
     return;
   } else {
     try {
-      const response = await fetch("user", {
+      const response = await fetch("/api/v1/" + "user", {
         method: "GET",
         headers: { Authorization: `Basic ${encData()}` }
       });
@@ -43,7 +43,7 @@ onReady();
 
 const getLots = async () => {
   try {
-    const response = await fetch("lots/approved", {
+    const response = await fetch("/api/v1/" + "lots/approved", {
       method: "GET"
       // headers: { Authorization: `Basic ${encData()}` }
     });

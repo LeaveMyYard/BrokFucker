@@ -14,9 +14,8 @@ regForm.addEventListener("submit", async function(e) {
   };
   try {
     spinner.style["display"] = "inline-block";
-    const response = await fetch("register", {
-      // credentials: 'include',  // cookies
-      method: "POST", // или 'PUT'
+    const response = await fetch("/api/v1/" + "register", {
+      method: "POST",
       body: JSON.stringify(value),
       headers: {
         "Content-Type": "application/json"
