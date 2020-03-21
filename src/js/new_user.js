@@ -1,5 +1,5 @@
 // const URL = "http://localhost:5000/api/v1/";
-const URL = `${window.location.host}/`;
+const URL = `${window.location.host}/api/v1/`;
 
 const regForm = document.getElementById("regForm");
 const inputEmail = document.querySelector(".inputEmail");

@@ -1,5 +1,5 @@
 // const URL = "http://localhost:5000/api/v1/";
-const URL = `${window.location.host}/`;
+const URL = `${window.location.host}/api/v1/`;
 
 const lotTable = document.getElementById("lotTable");
 
