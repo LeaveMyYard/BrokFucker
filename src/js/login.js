@@ -1,5 +1,5 @@
 const URL = "http://localhost:5000/api/v1/";
-// const URL = `${window.location.host}/`;
+const URL = `${window.location.host}/`;
 
 const loginBtn = document.querySelector(".loginBtn");
 const loginForm = document.querySelector("#loginForm");
