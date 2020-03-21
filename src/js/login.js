@@ -38,7 +38,7 @@ const logIn = async () => {
   const userData = `${mailInput[0].value}:${pswInput[0].value}`;
   const encData = window.btoa(userData);
   try {
-    const response = await fetch(URL + "user", {
+    const response = await fetch("user", {
       method: "GET",
       headers: { Authorization: `Basic ${encData}` }
     });

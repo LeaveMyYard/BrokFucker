@@ -19,10 +19,10 @@ const encData = function() {
 
 async function onReady() {
   if (!localStorage.getItem("email") && !sessionStorage.getItem("email")) {
-    location.href = "login.html";
+    return;
   } else {
     try {
-      const response = await fetch(URL + "user", {
+      const response = await fetch("user", {
         method: "GET",
         headers: { Authorization: `Basic ${encData()}` }
       });
@@ -43,7 +43,7 @@ onReady();
 
 const getLots = async () => {
   try {
-    const response = await fetch(URL + "lots/approved", {
+    const response = await fetch("lots/approved", {
       method: "GET"
       // headers: { Authorization: `Basic ${encData()}` }
     });

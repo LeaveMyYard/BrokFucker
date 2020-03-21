@@ -52,7 +52,7 @@ async function onReady() {
     location.href = "login.html";
   } else {
     try {
-      const response = await fetch(URL + "user", {
+      const response = await fetch("user", {
         method: "GET",
         headers: { Authorization: `Basic ${encData()}` }
       });
@@ -101,7 +101,7 @@ document.querySelector(".inputReqPercentage").addEventListener("input", e => {
 
 const profData = async () => {
   try {
-    const response = await fetch(URL + "user", {
+    const response = await fetch("user", {
       method: "GET",
       headers: { Authorization: `Basic ${encData()}` }
     });
@@ -231,7 +231,7 @@ const createLotAndListeners = async (
     .find(".deleteLotBtn")
     .on("click", async function(event) {
       try {
-        const response = await fetch(URL + `lots/${lot.id}`, {
+        const response = await fetch(`lots/${lot.id}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
@@ -262,7 +262,7 @@ const createLotAndListeners = async (
         commentary: $(lotEl).find("textarea[name=lot_shortdesc]")[0].value
       };
       try {
-        const response = await fetch(URL + `lots/${lot.id}`, {
+        const response = await fetch(`lots/${lot.id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -318,7 +318,7 @@ const manageLots = async sourceLots => {
 
 const getMyLots = async () => {
   try {
-    const response = await fetch(URL + "lots/personal", {
+    const response = await fetch("lots/personal", {
       method: "GET",
       headers: { Authorization: `Basic ${encData()}` }
     });
@@ -378,7 +378,7 @@ createLotPublish.addEventListener("click", async function(e) {
     );
   }
   try {
-    const response = await fetch(URL + "lots", {
+    const response = await fetch("lots", {
       method: "POST",
       body: JSON.stringify(value),
       headers: {
@@ -407,7 +407,7 @@ createLotPublish.addEventListener("click", async function(e) {
     console.log(error);
   }
   try {
-    const response = await fetch(URL + "lots/" + newLotID + "/photos", {
+    const response = await fetch("lots/" + newLotID + "/photos", {
       method: "POST",
       body: formData,
       headers: {

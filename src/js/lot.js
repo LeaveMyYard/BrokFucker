@@ -81,7 +81,7 @@ async function onReady() {
     location.href = "login.html";
   } else {
     try {
-      const response = await fetch(URL + "user", {
+      const response = await fetch("user", {
         method: "GET",
         headers: { Authorization: `Basic ${encData()}` }
       });
@@ -109,7 +109,7 @@ lotProfilePic.addEventListener("click", function() {
 
 const getTheLot = async () => {
   try {
-    const response = await fetch(URL + `lots/${lotID}`, {
+    const response = await fetch(`lots/${lotID}`, {
       method: "GET",
       headers: { Authorization: `Basic ${encData()}` }
     });
@@ -152,7 +152,7 @@ getTheLot();
 
 document.getElementById("LotToFav").addEventListener("click", async function() {
   try {
-    const response = await fetch(URL + `lots/favorites/${lotID}`, {
+    const response = await fetch(`lots/favorites/${lotID}`, {
       method: "PUT",
       headers: { Authorization: `Basic ${encData()}` }
     });
@@ -176,7 +176,7 @@ lotSubBtn.addEventListener("click", async function() {
       phone: lotSubValue.value
     };
     try {
-      const response = await fetch(URL + `user`, {
+      const response = await fetch(`user`, {
         method: "PUT",
         headers: { Authorization: `Basic ${encData()}` },
         body: JSON.stringify(upd)
@@ -192,7 +192,7 @@ lotSubBtn.addEventListener("click", async function() {
     sessionStorage.removeItem("phone");
   }
   try {
-    const response = await fetch(URL + `lots/subscription/${lotID}`, {
+    const response = await fetch(`lots/subscription/${lotID}`, {
       method: "PUT",
       headers: { Authorization: `Basic ${encData()}` },
       body: JSON.stringify(value)
