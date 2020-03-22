@@ -6,6 +6,8 @@ color and typography
 other
 */
 
+@import url("https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap&subset=cyrillic");
+
 html {
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
@@ -13,8 +15,6 @@ html {
 
 body {
   background: linear-gradient(#e66465, #9198e5) no-repeat;
-  width: 98vw;
-  height: 98.3vh;
 }
 
 .container {
@@ -22,6 +22,7 @@ body {
   background: #eeeeee;
   width: 50%;
   padding: 1rem 2.5rem;
+  margin-top: 4rem;
 }
 .titleReg {
   font-size: 1.7rem;
@@ -209,6 +210,7 @@ label.error {
 /* my lots */
 .profile {
   display: flex;
+  margin-bottom: 1.5rem;
 }
 
 .lot_field {
@@ -278,54 +280,17 @@ label.error {
 
 .lot_photo {
   display: block;
-  width: 300px;
-  height: 300px;
-  background: #000000;
   margin-top: 1.5rem;
-  margin-left: 8rem;
+}
+
+.create_lot_photo {
+  display: block;
+  margin: 1.5rem 0;
   cursor: pointer;
 }
 
 #createLotPhoto {
-  display: none;
-}
-
-/* Header */
-.fixed-header {
-  width: 100%;
-  position: fixed;
-  background: #eeeeee;
-  padding: 10px 0;
-  color: #fff;
-}
-.fixed-header {
-  top: 0;
-}
-.fixed-footer {
-  bottom: 0;
-}
-.menu_container {
-  width: 100%;
-  margin: 0 auto;
-}
-nav a {
-  color: #000;
-  font-size: 1.3rem;
-  text-decoration: none;
-  padding: 7px 25px;
-  display: inline-block;
-}
-nav a:hover {
-  color: #aaa;
-}
-nav div {
-  margin: 0 20px;
-}
-
-.menu {
-  display: flex;
-  justify-content: space-between;
-  height: 3rem;
+  display: block;
 }
 
 .lot-menu {
@@ -338,4 +303,134 @@ nav div {
 
 .lotPhotos {
   margin: 1rem 0;
+}
+
+/* Header */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+li {
+  list-style: none;
+}
+
+.fixed-header {
+  display: flex;
+  position: fixed;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #c6d8ff;
+  border-bottom: solid black 3px;
+  font-family: "Press Start 2P", cursive;
+  font-size: 0.8rem;
+  height: 64px;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 0 5%;
+  z-index: 999;
+}
+
+.fixed-header__logo {
+  display: inherit;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 5%;
+}
+
+.fixed-header__logo a img {
+  width: 32px;
+  height: 32px;
+}
+
+.fixed-header__menu {
+  display: flex;
+  min-width: 95%;
+  justify-content: space-between;
+  min-height: 100%;
+}
+
+.fixed-header__menu div {
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.fixed-header__menu ul {
+  display: flex;
+  align-items: center;
+  min-height: 100%;
+  flex-wrap: wrap;
+}
+
+.fixed-header__menu-item {
+  background-color: #2a88ff;
+  border: solid black 3px;
+  box-shadow: inset 10px 10px 0px -7px #3a639f;
+  padding: 7px 15px;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.fixed-header__menu-item:hover {
+  color: white;
+}
+
+.fixed-header__menu-item:active {
+  color: black;
+  box-shadow: inset 10px 10px 0px -7px transparent;
+  box-shadow: 5px 5px 0px -1px #3a639f;
+}
+
+.fixed-header__menu-item_left {
+  margin-right: auto;
+}
+
+.fixed-header__menu-item_left:active {
+  margin-right: auto;
+}
+
+.fixed-header__menu-item_reg {
+  background-color: #ffed62;
+  box-shadow: inset 10px 10px 0px -7px #ceb629;
+}
+
+.fixed-header__menu-item_reg:hover {
+  color: #ffa216;
+}
+
+.fixed-header__menu-item_reg:active {
+  box-shadow: inset 10px 10px 0px -7px transparent;
+  box-shadow: 5px 5px 0px -1px #ceb629;
+}
+
+.fixed-header__menu-item_exit {
+  background-color: #ff4747;
+  box-shadow: inset 10px 10px 0px -7px #ac2d2d;
+}
+
+.fixed-header__menu-item_exit:active {
+  box-shadow: inset 10px 10px 0px -7px transparent;
+  box-shadow: 5px 5px 0px -1px #ac2d2d;
+}
+
+.menu-question {
+  cursor: text;
+  color: white;
+}
+
+main {
+  margin-top: 67px;
+}
+/* ---------------------------- */
+
+#menuIfNotLogged {
+  display: none;
 }

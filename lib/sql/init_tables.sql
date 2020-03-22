@@ -75,12 +75,14 @@ CREATE TABLE IF NOT EXISTS SubscriptionRequests (
     `id` TEXT PRIMARY KEY,
     `user` TEXT NOT NULL,
     `lot` INTEGER NOT NULL,
+    `type` INTEGER NOT NULL,
+    `message` TEXT,
     `confirmed` BOOLEAN NOT NULL DEFAULT 'False'
 );
 
 CREATE VIEW IF NOT EXISTS ConfirmedSubscriptions
 AS
-    SELECT `id`, `user`, `lot`
+    SELECT `id`, `user`, `lot`, `type`, `message`
     FROM SubscriptionRequests
     WHERE `confirmed` = 'True' AND `lot` IN (
         SELECT `id` 
@@ -90,7 +92,7 @@ AS
     
 CREATE VIEW IF NOT EXISTS UnconfirmedSubscriptions
 AS
-    SELECT `id`, `user`, `lot`
+    SELECT `id`, `user`, `lot`, `type`, `message`
     FROM SubscriptionRequests
     WHERE `confirmed` = 'False' AND `lot` IN (
         SELECT `id` 

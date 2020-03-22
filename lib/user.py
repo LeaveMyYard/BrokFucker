@@ -7,6 +7,7 @@ from lib.settings import Settings
 from werkzeug.utils import secure_filename
 from PIL import Image
 from os import path, remove
+from lib.util.enums import SubscriptionTypes
 
 class User:
     auth = HTTPBasicAuth()
@@ -76,7 +77,7 @@ class User:
         commentary
     ):
         database = DatabaseHandler()
-        database.create_new_lot(
+        return database.create_new_lot(
             User.email(),
             name,
             amount,
@@ -130,9 +131,9 @@ class User:
         database.delete_user_avatar(User.email())
 
     @staticmethod
-    def subscribe_to_lot(lot_id):
+    def subscribe_to_lot(lot_id: int, type: str, message: str) -> bool:
         database = DatabaseHandler()
-        database.subscribe_user_to_lot(User.email(), lot_id)
+        return database.subscribe_user_to_lot(User.email(), lot_id, SubscriptionTypes[type], message)
 
     @staticmethod
     def unsubscribe_from_lot(lot_id):

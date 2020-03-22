@@ -7,7 +7,7 @@ from lib.moderator import Moderator as moderator
 from lib.lot import Lot
 from lib.settings import Settings
 from datetime import timedelta
-from typing import Union, Dict, Callable
+from typing import Union, Dict, Callable, List
 import json
 
 from lib.util.exceptions import (
@@ -82,7 +82,6 @@ class RestAPI:
         400: lambda error: {'code': -1000, 'msg': 'An unknown error occured while processing the request.'},
         404: lambda error: {'code': -1001, 'msg': 'The stuff you requested for is not found.'},
         IndexedException: lambda error: {'code': error.error_id, 'msg': error.args[0]},
-        NotEnoughDataError: lambda error: {'code': error.error_id, 'msg': error.args[0]},
     }
 
     @staticmethod
@@ -92,6 +91,19 @@ class RestAPI:
                 'msg': msg
             }
         )
+
+    @staticmethod
+    def request_data_to_json(request) -> dict:
+        try:
+            return json.loads(request)
+        except json.decoder.JSONDecodeError:
+            raise NoJsonError()
+
+    @staticmethod
+    def check_required_fields(json, data_required: List[str]) -> None:
+        for data in data_required:
+            if data not in json:
+                raise NotEnoughDataError(data_required, json.keys())
 
     # -------------------------------------------------------------------------
     # Public stuff
@@ -149,7 +161,7 @@ class RestAPI:
     def edit_user_data():
         try:
             request_json = json.loads(request.data)
-        except:
+        except json.decoder.JSONDecodeError:
             raise NoJsonError()
 
         data_required = {
@@ -185,9 +197,8 @@ class RestAPI:
     @route('lots', methods=['POST'])
     @user.login_required
     def create_lot():
-        if not request.json:
-            raise NoJsonError()
-        
+        request_json = RestAPI.request_data_to_json(request.data)
+
         data_required = [
             'name',
             'amount',
@@ -200,13 +211,9 @@ class RestAPI:
             'commentary'
         ]
 
-        for data in data_required:
-            if data not in request.json:
-                raise NotEnoughDataError(data_required, request.json.keys())
+        RestAPI.check_required_fields(request_json, data_required)
 
-        user.create_lot(*[request.json[data] for data in data_required])
-
-        return RestAPI.message('New lot created'), 201
+        return jsonify({'lot_id': user.create_lot(*[request_json[data] for data in data_required]) }), 201
 
     @staticmethod
     @route('lots/approved', methods=['GET'])
@@ -278,8 +285,11 @@ class RestAPI:
     def add_lot_photo(lot_id):
         if not Lot.can_user_edit(user.email(), lot_id):
             raise NoPermissionError()
+        
+        a = request.files
+        resp = {filename: Lot.add_photo(request.files[filename], lot_id) for filename in request.files}
 
-        return jsonify(Lot.add_photo(request.files['file'], lot_id)), 201
+        return jsonify(resp), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/photos/<int:photo_id>', methods=['DELETE'])
@@ -323,11 +333,20 @@ class RestAPI:
     @route('lots/subscription/<int:lot_id>', methods=['PUT'])
     @user.login_required
     def subscribe_to_lot(lot_id):
-        try:
-            user.subscribe_to_lot(lot_id)
+        request_json = RestAPI.request_data_to_json(request.data)
+
+        data_required = [
+            'type',
+            'message',
+        ]
+
+        RestAPI.check_required_fields(request_json, data_required)
+
+        if user.subscribe_to_lot(lot_id, *[request_json[data] for data in data_required]):
             return RestAPI.message(f'You are now subscribed to lot {lot_id}'), 201
-        except:
+        else:
             return RestAPI.message('You are already subscribed'), 200
+            
 
     @staticmethod
     @route('lots/subscription/<int:lot_id>', methods=['DELETE'])
@@ -395,27 +414,28 @@ class Server:
     # If the request is for api, will respond as it is an api responce
     # Otherwise, will respond as a Web App 
     @staticmethod
-    def process_exception(ex):
+    def process_exception(ex, error):
         if not request.path.startswith('/api/') and ex in WebApp.exceptions_responses:
             return WebApp.exceptions_responses[ex](ex)
         elif ex in RestAPI.exceptions_responses:
-            return make_response(jsonify(RestAPI.exceptions_responses[ex](ex)), ex if isinstance(ex, int) else 403)
+            return make_response(jsonify(RestAPI.exceptions_responses[ex](error)), ex if isinstance(ex, int) else 403)
             
 
     # Then, looping through all that exceptions from WebApp and RestAPI
     # Creates functions with corresponding flask decorator to process
     # an error for that case
-    exceptions = set(WebApp.exceptions_responses) & set(RestAPI.exceptions_responses)
+    exceptions = set(WebApp.exceptions_responses) | set(RestAPI.exceptions_responses)
 
     # This one is just to prevent errors appearing in VSCode
     # Actually there is no error, just IDE being buged
     ex = None
     
     for ex in exceptions:
+        #print('Initializing exception handler:', ex, 'all:', set(WebApp.exceptions_responses), set(RestAPI.exceptions_responses))
         @staticmethod
         @app.errorhandler(ex)
         def error_handler(error, exception = ex):
-            return Server.process_exception(exception)
+            return Server.process_exception(exception, error)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,5 +1,5 @@
-const URL = "http://localhost:5000/api/v1/";
-// console.log(window.location.host);
+// const URL = "http://localhost:5000/api/v1/";
+const URL = `${window.location.host}/api/v1/`;
 
 const myLotsBtn = document.getElementById("myLotsBtn");
 const myprofEmail = document.getElementById("myprofEmail");
@@ -28,7 +28,7 @@ function onReady() {
   } else {
     async () => {
       try {
-        const response = await fetch(URL + "user", {
+        const response = await fetch("/api/v1/" + "user", {
           method: "GET",
           headers: { Authorization: `Basic ${encData()}` }
         });
@@ -48,21 +48,13 @@ function onReady() {
 }
 onReady();
 
-function dateFix(date) {
-  let givenDate = new Date(date);
-  let day = givenDate.getDate();
-  let month = givenDate.getMonth();
-  let year = givenDate.getFullYear();
-  return `${day}.${month + 1}.${year}`;
-}
-
 myLotsBtn.addEventListener("click", function() {
   location.href = "my_lots.html";
 });
 
 const profData = async () => {
   try {
-    const response = await fetch(URL + "user", {
+    const response = await fetch("/api/v1/" + "user", {
       method: "GET",
       headers: { Authorization: `Basic ${encData()}` }
     });
@@ -73,7 +65,7 @@ const profData = async () => {
 
     const result = await response.json();
 
-    profilePic.style.backgroundImage = `url(${result["avatar"]})`;
+    profilePic.innerHTML = `<img src="${result["avatar"]}" style="width: 60%; height: 100%; margin-left: 20%" />`;
     myprofEmail.innerText = result["email"];
     myprofRegDate.innerText = dateFix(result["registration_date"]);
     myprofName.value = result["name"];
@@ -90,7 +82,7 @@ const updateProfData = async () => {
     phone: myprofPhone.value
   };
   try {
-    const response = await fetch(URL + "user", {
+    const response = await fetch("/api/v1/" + "user", {
       method: "PUT",
       headers: {
         Authorization: `Basic ${encData()}`,
@@ -119,7 +111,7 @@ const uploadProfPic = async () => {
   formData.append("file", file);
 
   try {
-    const response = await fetch(URL + "user/avatar", {
+    const response = await fetch("/api/v1/" + "user/avatar", {
       method: "POST",
       headers: { Authorization: `Basic ${encData()}` },
       body: formData
@@ -136,7 +128,7 @@ const uploadProfPic = async () => {
 
 const deleteProfPic = async () => {
   try {
-    const response = await fetch(URL + "user/avatar", {
+    const response = await fetch("/api/v1/" + "user/avatar", {
       method: "DELETE",
       headers: { Authorization: `Basic ${encData()}` }
     });

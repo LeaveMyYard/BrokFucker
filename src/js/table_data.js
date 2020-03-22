@@ -1,20 +1,7 @@
-const URL = "http://localhost:5000/api/v1/";
-
-const menuNotLogged = document.getElementById("menuIfNotLogged");
-const menuLogged = document.getElementById("menuIfLogged");
+// const URL = "http://localhost:5000/api/v1/";
+const URL = `${window.location.host}/api/v1/`;
 
 const lotTable = document.getElementById("lotTable");
-
-function checkIfLogged() {
-  if (localStorage.getItem("email") || sessionStorage.getItem("email")) {
-    menuNotLogged.style.display = "none";
-    menuLogged.style.display = "block";
-  } else {
-    menuLogged.style.display = "none";
-    menuNotLogged.style.display = "block";
-  }
-}
-checkIfLogged();
 
 const encData = function() {
   if (localStorage.getItem("email")) {
@@ -30,17 +17,33 @@ const encData = function() {
   }
 };
 
-function dateFix(date) {
-  let lotDate = new Date(date);
-  let day = lotDate.getDate();
-  let month = lotDate.getMonth();
-  let year = lotDate.getFullYear() % 100;
-  return `${day}/${month + 1}/${year}`;
+async function onReady() {
+  if (!localStorage.getItem("email") && !sessionStorage.getItem("email")) {
+    return;
+  } else {
+    try {
+      const response = await fetch("/api/v1/" + "user", {
+        method: "GET",
+        headers: { Authorization: `Basic ${encData()}` }
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+    } catch (error) {
+      console.error(error);
+      localStorage.removeItem("email");
+      localStorage.removeItem("password");
+      sessionStorage.removeItem("email");
+      sessionStorage.removeItem("password");
+    }
+  }
 }
+onReady();
 
 const getLots = async () => {
   try {
-    const response = await fetch(URL + "lots/approved", {
+    const response = await fetch("/api/v1/" + "lots/approved", {
       method: "GET"
       // headers: { Authorization: `Basic ${encData()}` }
     });

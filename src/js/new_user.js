@@ -1,4 +1,5 @@
-const URL = "http://localhost:5000/api/v1/";
+// const URL = "http://localhost:5000/api/v1/";
+const URL = `${window.location.host}/api/v1/`;
 
 const regForm = document.getElementById("regForm");
 const inputEmail = document.querySelector(".inputEmail");
@@ -13,9 +14,8 @@ regForm.addEventListener("submit", async function(e) {
   };
   try {
     spinner.style["display"] = "inline-block";
-    const response = await fetch(URL + "register", {
-      // credentials: 'include',  // cookies
-      method: "POST", // или 'PUT'
+    const response = await fetch("/api/v1/" + "register", {
+      method: "POST",
       body: JSON.stringify(value),
       headers: {
         "Content-Type": "application/json"

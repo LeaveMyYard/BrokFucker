@@ -3,11 +3,62 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="images/letter-b.svg" type="image/x-icon" />
     <link rel="stylesheet" href="style.css" />
     <title>BrockFucker | My Lots</title>
   </head>
   <body>
+    <header>
+      <div class="fixed-header">
+        <div class="fixed-header__logo">
+          <a href="index.html" class="">
+            <img src="images/letter-b.svg" alt="logo" />
+          </a>
+        </div>
+        <nav class="fixed-header__menu">
+          <div id="menuIfNotLogged">
+            <ul>
+              <a
+                href="index.html"
+                class="fixed-header__menu-item fixed-header__menu-item_left"
+              >
+                <li>Лоты</li>
+              </a>
+              <a href="login.html" class="fixed-header__menu-item">
+                <li>
+                  <span class="menu-question">Уже зарегистрированы? </span>Войти
+                </li>
+              </a>
+              <a class="fixed-header__menu-item fixed-header__menu-item_reg">
+                <li>Регистрация</li>
+              </a>
+            </ul>
+          </div>
+          <div id="menuIfLogged">
+            <ul>
+              <a href="index.html" class="fixed-header__menu-item ">
+                <li>Лоты</li>
+              </a>
+              <a
+                href="my_favorite.html"
+                class="fixed-header__menu-item fixed-header__menu-item_left"
+              >
+                <li>Избранные лоты</li>
+              </a>
+              <a href="my_profile.html" class="fixed-header__menu-item">
+                <li>Мой профиль</li>
+              </a>
+              <a
+                href="login.html"
+                class="fixed-header__menu-item fixed-header__menu-item_exit"
+              >
+                <li>Выйти</li>
+              </a>
+            </ul>
+          </div>
+        </nav>
+      </div>
+    </header>
     <div class="container container_my-lots">
       <div class="profile">
         <div class="profile-pic">
@@ -102,8 +153,8 @@
                   ><span>Короткое описание: </span>
                   <textarea name="create_lot_desc"> </textarea>
                 </label>
-                <div class="lot_photo">
-                  <input type="file" multiple name="file" id="createLotPhoto" />
+                <div class="create_lot_photo">
+                  <input type="file" name="file" id="createLotPhoto" multiple />
                 </div>
               </form>
               <button id="createLotPublish">Опубликовать</button>
@@ -120,6 +171,8 @@
 
     <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/jquery.validate.min.js"></script>
+    <script src="js/datefix.js"></script>
+    <script src="js/header.js"></script>
     <script src="js/mylots.js"></script>
   </body>
 </html>
