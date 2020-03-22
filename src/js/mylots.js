@@ -96,17 +96,6 @@ async function currencyOptions() {
   }
 }
 currencyOptions();
-console.log(currencySelectOptions);
-
-function deleteSelectedCurrency(curr) {
-  if (currencySelectOptions.includes(curr)) {
-    let index = currencySelectOptions.indexOf(curr);
-    currencySelectOptions.splice(index, 1);
-    return;
-  } else {
-    return;
-  }
-}
 
 lotProfilePic.addEventListener("click", function() {
   location.href = "my_profile.html";
@@ -190,11 +179,12 @@ const createLotAndListeners = async (
             <label class="label lot_field" for="lot_currency"
               ><span>Валюта: </span>
                   <select id="selectLotCurrency">
-                  <option value="${lot.currency}">${lot.currency}</option>
-                    ${deleteSelectedCurrency(lot.currency)}
-                    ${console.log("test: " + currencySelectOptions)}
                     ${currencySelectOptions.map(curr => {
-                      return `<option value="${curr}">${curr}</option>`;
+                      if (lot.currency == curr) {
+                        return `<option selected value="${curr}">${curr}</option>`;
+                      } else {
+                        return `<option value="${curr}">${curr}</option>`;
+                      }
                     })}
                   </select>
                   
