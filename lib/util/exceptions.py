@@ -16,9 +16,7 @@ class RegistrationError(IndexedException):
     pass
 
 class EmailValidationError(RegistrationError):
-    def __init__(self, id: int, message: str, link: str = None):
-        self.link = link
-        super().__init__(id, message)
+    pass
 
 class NotAutorizedError(IndexedException):
     def __init__(self):
@@ -26,7 +24,7 @@ class NotAutorizedError(IndexedException):
 
 class NoPermissionError(IndexedException):
     def __init__(self):
-        super().__init__(-1003, 'You don\'t have no permission to execute this request.')
+        super().__init__(-1003, 'You don\'t have permission to execute this request.')
 
 class NoJsonError(IndexedException):
     def __init__(self):

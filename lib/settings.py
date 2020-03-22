@@ -8,12 +8,8 @@ class Settings:
         return json.load(settings_file)
 
     @staticmethod
-    def vaild_email_verification_link() -> str:
-        return Settings.__load_settings()['email_verification_events']['on_valid']
-
-    @staticmethod
-    def failed_email_verification_link() -> str:
-        return Settings.__load_settings()['email_verification_events']['on_failed']
+    def get_email_verification_link_base() -> str:
+        return Settings.__load_settings()['email_verification_link_base']
 
     @staticmethod
     def get_smtp_data() -> Tuple[str, int, str, str]:

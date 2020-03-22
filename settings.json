@@ -1,8 +1,5 @@
 {
-    "email_verification_events": {
-        "on_valid": "verification_successful",
-        "on_failed": "verification_failed"
-    },
+    "email_verification_link_base": "email_verification.html",
     "smtp_settings": {
         "host": "smtp.gmail.com",
         "port": 465,

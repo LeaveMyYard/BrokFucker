@@ -166,24 +166,19 @@ class DatabaseHandler:
             f"SELECT * FROM EmailVerification WHERE `verification_hash` = '{code}'"
         )
 
-        on_failed = Settings.failed_email_verification_link()
-        on_valid = Settings.vaild_email_verification_link()
-
         try:
             (_, email, password, date) = self.cursor.fetchone()
         except TypeError:
-            raise EmailValidationError(-1204, 'No such verification code exists or it was already used.', on_failed)
+            raise EmailValidationError(-1204, 'No such verification code exists, it was already used or was already deleted.')
         
         if (datetime.now() - datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")) > timedelta(hours=24):
-            raise EmailValidationError(-1203, 'Email verification time has passed.', on_failed)
+            raise EmailValidationError(-1203, 'Email verification time has passed.')
 
         if self.check_user_exists(email):
-            raise EmailValidationError(-1200, 'Email is already in use.', on_failed)
+            raise EmailValidationError(-1200, 'Email is already in use.')
         
         self.logger.debug(f'New user `{email}` has successfuly confirmed his email and created an account')
         self.create_user(email, password)
-
-        return on_valid
 
     def delete_email_confirmation_code(self, code):
         self.cursor.execute(

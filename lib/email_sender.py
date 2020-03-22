@@ -30,6 +30,6 @@ class EmailSender:
             "Email confirmation",
             render_template(
                 'email_verification.html',
-                action_url = f"{request.host_url}api/v1/register/verify/{code}"
+                action_url = f"{request.host_url}{Settings.get_email_verification_link_base()}?code={code}"
             )
         )

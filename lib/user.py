@@ -36,17 +36,14 @@ class User:
         try:
             link = database.verify_email_confirmation(code)
         except EmailValidationError as e:
-            database.delete_email_confirmation_code(code)
-            if e.link is None: 
-                raise
-            else:
-                return f'<head><meta http-equiv="refresh" content="1;URL={request.host_url}{e.link}?msg={e.args[0].replace(" ", "_")}" /></head>'
-
-        database.delete_email_confirmation_code(code)
-        if link is None:
-            return jsonify({'msg': 'Email was succesfully confirmed.'})
+            raise
         else:
-            return f'<head><meta http-equiv="refresh" content="1;URL={request.host_url}{link}" /></head>'
+            return jsonify({'msg': 'Email was succesfully confirmed.'})
+        finally:
+            try:
+                database.delete_email_confirmation_code(code)
+            except sqlite3.Error:
+                pass
 
     @staticmethod
     def create(email, password):
