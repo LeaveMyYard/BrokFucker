@@ -71,6 +71,43 @@ async function onReady() {
 }
 onReady();
 
+const currencySelect = document.getElementById("currencySelect");
+const currencySelectOptions = [];
+
+async function currencyOptions() {
+  try {
+    const response = await fetch(URL + "lots/settings", {
+      method: "GET",
+      headers: { Authorization: `Basic ${encData()}` }
+    });
+
+    if (!response.ok) {
+      throw new Error("Unsuccessfull response");
+    }
+    const result = await response.json();
+    result.variables.currency.forEach(
+      curr =>
+        (currencySelect.innerHTML += `<option value="${curr}">${curr}</option>`)
+    );
+
+    result.variables.currency.forEach(curr => currencySelectOptions.push(curr));
+  } catch (error) {
+    console.error(error);
+  }
+}
+currencyOptions();
+console.log(currencySelectOptions);
+
+function deleteSelectedCurrency(curr) {
+  if (currencySelectOptions.includes(curr)) {
+    let index = currencySelectOptions.indexOf(curr);
+    currencySelectOptions.splice(index, 1);
+    return;
+  } else {
+    return;
+  }
+}
+
 lotProfilePic.addEventListener("click", function() {
   location.href = "my_profile.html";
 });
@@ -152,12 +189,15 @@ const createLotAndListeners = async (
             </label>
             <label class="label lot_field" for="lot_currency"
               ><span>Валюта: </span>
-                  <input
-                  type="text"
-                  name="lot_currency"
-                  value="${lot.currency}"
-                  required
-                  />
+                  <select id="selectLotCurrency">
+                  <option value="${lot.currency}">${lot.currency}</option>
+                    ${deleteSelectedCurrency(lot.currency)}
+                    ${console.log("test: " + currencySelectOptions)}
+                    ${currencySelectOptions.map(curr => {
+                      return `<option value="${curr}">${curr}</option>`;
+                    })}
+                  </select>
+                  
             </label>
             <label class="label lot_field" for="lot_reqmonths"
               ><span>Срок, месяцев: </span>
@@ -253,7 +293,7 @@ const createLotAndListeners = async (
       const value = {
         name: $(lotEl).find("input[name=lot_name]")[0].value,
         amount: $(lotEl).find("input[name=lot_reqsum]")[0].value,
-        currency: $(lotEl).find("input[name=lot_currency]")[0].value,
+        currency: $(lotEl).find("#selectLotCurrency")[0].value,
         term: $(lotEl).find("input[name=lot_reqmonths]")[0].value,
         return_way: $(lotEl).find("input[name=lot_method]")[0].value,
         security: $(lotEl).find("input[name=lot_security]")[0].value,
@@ -349,6 +389,7 @@ async function clearLots() {
 }
 
 createLotPublish.addEventListener("click", async function(e) {
+  currencyOptionsFill();
   e.preventDefault();
   if ($("#createLotForm").valid() == false) {
     return;
@@ -392,7 +433,6 @@ createLotPublish.addEventListener("click", async function(e) {
       clearLots();
       myLotsHeading.innerHTML = `<strong>Мои лоты:</strong>`;
       modalWindow.style.display = "none";
-      createLotCurrency.value = "";
       createLotName.value = "";
       createLotAmount.value = "";
       createLotTerm.value = "";
