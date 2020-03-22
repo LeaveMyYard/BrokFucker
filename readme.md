@@ -1,9 +1,11 @@
-**BrokFucker REST API**
+# **BrokFucker**
 
-  Rest API is a HTTP-based API for an application.
+  Сервер BrokFucker состоит из двух частей: Rest API и Web Application.
 
-  It is using the same commands and requests using HTTP protocol making the usage of the API available on different platforms (web, mobile, desktop applications).
+  Rest API является универсальным http api сервиса, которое может быть использовано другими приложениями.
 
-  This one is written on Python and Flask and starts from main.cmd file.
+  Сервер написан на Python/Flask.
 
-  User documentation is in [Rest API](./doc/rest-api.md).
+  -----------------------------------------
+
+  Пользовательская документация [Rest API](./doc/rest-api.md).

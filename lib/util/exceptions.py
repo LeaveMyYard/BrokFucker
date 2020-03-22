@@ -42,7 +42,7 @@ class LotCreationError(IndexedException):
     def __init__(self, message):
         super().__init__(-1007, message)
 
-class UserNotExists(IndexedError):
+class UserNotExists(IndexedException):
     def __init__(self, user):
         super().__init__(-1008, f'User {user} does not exist.')
 
