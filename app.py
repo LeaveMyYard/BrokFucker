@@ -4,6 +4,7 @@ from flask_httpauth import HTTPBasicAuth
 from lib.database_handler import DatabaseHandler
 from lib.user import User as user
 from lib.moderator import Moderator as moderator
+from lib.admin import Admin as administrator
 from lib.lot import Lot
 from lib.settings import Settings
 from datetime import timedelta
@@ -413,6 +414,19 @@ class RestAPI:
     # Admin stuff
     # -------------------------------------------------------------------------
 
+    @staticmethod
+    @route('user/<string:email>/moderator', methods=['PUT', 'POST'])
+    @administrator.login_required
+    def give_moderator_rights(email):
+        moderator.add(email)
+        return RestAPI.message(f'{email} is now a moderator.')
+
+    @staticmethod
+    @route('user/<string:email>/moderator', methods=['DELETE'])
+    @administrator.login_required
+    def remove_moderator_rights(email):
+        moderator.remove(email)
+        return RestAPI.message(f'{email} is no longer a moderator.')
 
 class Server:
     # This function processes exceptions.

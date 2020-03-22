@@ -127,7 +127,18 @@ class DatabaseHandler:
         )
         res = self.cursor.fetchone()
 
-        return res[0] == 1
+        return res[0] >= 1
+
+    def is_administrator(self, email: str) -> bool:
+        if not self.check_user_exists(email):
+            return False
+
+        self.cursor.execute(
+            f"SELECT `type` FROM Users WHERE `email` = '{email}'"
+        )
+        res = self.cursor.fetchone()
+
+        return res[0] >= 2
 
     def create_email_confirmation_request(self, email: str, password: str):
         '''
@@ -242,7 +253,7 @@ class DatabaseHandler:
         commentary
     ):
         currency_settings = Settings.get_currency_settings()
-        
+
         if currency not in currency_settings:
             raise APIExceptions.LotCreationError(f"'{currency}' is not a valid currency. Valid currencies are: {', '.join(currency_settings)}.")
 
@@ -540,7 +551,7 @@ class DatabaseHandler:
 
     def subscribe_user_to_lot(self, user, lot_id, type: SubscriptionTypes, message) -> bool:
         if type == SubscriptionTypes.PhoneCall and not self.user_has_phone_number(user):
-            raise UserHasNoPhoneNumber(user)
+            raise APIExceptions.UserHasNoPhoneNumber(user)
 
         id_hash = sha256(f'{user}_{lot_id}')
         try:
@@ -576,3 +587,17 @@ class DatabaseHandler:
             f"SELECT * FROM UnconfirmedSubscriptions"
         )
         return [{'id': id, 'user': user, 'lot': lot, 'type': SubscriptionTypes(type).name, 'message': message} for id, user, lot, type, message in self.cursor.fetchall()]
+
+    def set_moderator_rights(self, email):
+        self.cursor.execute(
+            f"UPDATE Users SET `type` = 1 WHERE `user` = {email}"
+        )
+
+        self.conn.commit()
+
+    def remove_moderator_rights(self, email):
+        self.cursor.execute(
+            f"UPDATE Users SET `type` = 0 WHERE `user` = {email}"
+        )
+
+        self.conn.commit()
