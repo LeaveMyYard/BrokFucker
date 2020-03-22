@@ -54,7 +54,7 @@ myLotsBtn.addEventListener("click", function() {
 
 const profData = async () => {
   try {
-    const response = await fetch("/api/v1/" + "user", {
+    const response = await fetch(URL + "user", {
       method: "GET",
       headers: { Authorization: `Basic ${encData()}` }
     });
@@ -82,7 +82,7 @@ const updateProfData = async () => {
     phone: myprofPhone.value
   };
   try {
-    const response = await fetch("/api/v1/" + "user", {
+    const response = await fetch(URL + "user", {
       method: "PUT",
       headers: {
         Authorization: `Basic ${encData()}`,
@@ -111,7 +111,7 @@ const uploadProfPic = async () => {
   formData.append("file", file);
 
   try {
-    const response = await fetch("/api/v1/" + "user/avatar", {
+    const response = await fetch(URL + "user/avatar", {
       method: "POST",
       headers: { Authorization: `Basic ${encData()}` },
       body: formData
@@ -128,7 +128,7 @@ const uploadProfPic = async () => {
 
 const deleteProfPic = async () => {
   try {
-    const response = await fetch("/api/v1/" + "user/avatar", {
+    const response = await fetch(URL + "user/avatar", {
       method: "DELETE",
       headers: { Authorization: `Basic ${encData()}` }
     });

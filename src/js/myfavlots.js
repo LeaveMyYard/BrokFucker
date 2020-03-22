@@ -64,7 +64,7 @@ lotProfilePic.addEventListener("click", function() {
 
 const profData = async () => {
   try {
-    const response = await fetch("/api/v1/" + "user", {
+    const response = await fetch(URL + "user", {
       method: "GET",
       headers: { Authorization: `Basic ${encData()}` }
     });
@@ -191,7 +191,7 @@ const createLotAndListeners = async (
     .find(".deleteLotBtn")
     .on("click", async function(event) {
       try {
-        const response = await fetch("/api/v1/" + `lots/favorites/${lot.id}`, {
+        const response = await fetch(URL + `lots/favorites/${lot.id}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
@@ -243,7 +243,7 @@ const manageLots = async sourceLots => {
 
 const getMyFavLots = async () => {
   try {
-    const response = await fetch("/api/v1/" + "lots/favorites", {
+    const response = await fetch(URL + "lots/favorites", {
       method: "GET",
       headers: { Authorization: `Basic ${encData()}` }
     });

@@ -407,7 +407,7 @@ createLotPublish.addEventListener("click", async function(e) {
     console.log(error);
   }
   try {
-    const response = await fetch("/api/v1/" + "lots/" + newLotID + "/photos", {
+    const response = await fetch(URL + "lots/" + newLotID + "/photos", {
       method: "POST",
       body: formData,
       headers: {

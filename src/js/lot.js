@@ -81,7 +81,7 @@ async function onReady() {
     location.href = "login.html";
   } else {
     try {
-      const response = await fetch("/api/v1/" + "user", {
+      const response = await fetch(URL + "user", {
         method: "GET",
         headers: { Authorization: `Basic ${encData()}` }
       });
