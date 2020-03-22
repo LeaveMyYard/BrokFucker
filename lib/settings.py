@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 
 class Settings:
     @staticmethod
@@ -19,3 +19,7 @@ class Settings:
     @staticmethod
     def get_maximum_image_size() -> int:
         return Settings.__load_settings()['server_settings']['maximum_upload_file_size']
+
+    @staticmethod
+    def get_currency_settings() -> List[str]:
+        return Settings.__load_settings()['lot_settings']['currency_types']

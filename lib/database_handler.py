@@ -5,7 +5,7 @@ import base64
 from typing import Union, Tuple
 from flask import request
 from datetime import datetime, timedelta
-from lib.util.exceptions import RegistrationError, EmailValidationError, UserHasNoPhoneNumber
+import lib.util.exceptions as APIExceptions
 from lib.settings import Settings
 from lib.email_sender import EmailSender
 from threading import Timer
@@ -135,13 +135,13 @@ class DatabaseHandler:
         '''
 
         if self.check_user_exists(email):
-            raise RegistrationError(-1200, 'Email is already in use.')
+            raise APIExceptions.RegistrationError(-1200, 'Email is already in use.')
 
         if len(password) < 8:
-            raise RegistrationError(-1201, 'A password size is less than 8.')
+            raise APIExceptions.RegistrationError(-1201, 'A password size is less than 8.')
 
         if len(password) > 32:
-            raise RegistrationError(-1201, 'A password size is bigger than 32.')
+            raise APIExceptions.RegistrationError(-1201, 'A password size is bigger than 32.')
 
         password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
         random_hash = self.generage_new_random_hash()
@@ -169,13 +169,13 @@ class DatabaseHandler:
         try:
             (_, email, password, date) = self.cursor.fetchone()
         except TypeError:
-            raise EmailValidationError(-1204, 'No such verification code exists, it was already used or was already deleted.')
+            raise APIExceptions.EmailValidationError(-1204, 'No such verification code exists, it was already used or was already deleted.')
         
         if (datetime.now() - datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")) > timedelta(hours=24):
-            raise EmailValidationError(-1203, 'Email verification time has passed.')
+            raise APIExceptions.EmailValidationError(-1203, 'Email verification time has passed.')
 
         if self.check_user_exists(email):
-            raise EmailValidationError(-1200, 'Email is already in use.')
+            raise APIExceptions.EmailValidationError(-1200, 'Email is already in use.')
         
         self.logger.debug(f'New user `{email}` has successfuly confirmed his email and created an account')
         self.create_user(email, password)
@@ -241,6 +241,11 @@ class DatabaseHandler:
         form,
         commentary
     ):
+        currency_settings = Settings.get_currency_settings()
+        
+        if currency not in currency_settings:
+            raise APIExceptions.LotCreationError(f"'{currency}' is not a valid currency. Valid currencies are: {', '.join(currency_settings)}.")
+
         date = datetime.now()
         self.cursor.execute(
             f"INSERT INTO Lots (`date`, `name`, `user`, `amount`, `currency`, `term`, `return_way`, `security`, `percentage`, `form`, `security_checked`, `guarantee_percentage`, `confirmed`, `commentary`)"

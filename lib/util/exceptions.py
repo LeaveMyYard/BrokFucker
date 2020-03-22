@@ -37,3 +37,7 @@ class NotEnoughDataError(IndexedException):
 class UserHasNoPhoneNumber(IndexedException):
     def __init__(self, user):
         super().__init__(-1006, f'User {user} can not select recall by phone number option as he has no phone number assigned to his account.')
+
+class LotCreationError(IndexedException):
+    def __init__(self, message):
+        super().__init__(-1007, message)

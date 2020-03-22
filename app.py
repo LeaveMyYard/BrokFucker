@@ -194,6 +194,11 @@ class RestAPI:
     # -------------------------------------------------------------------------
 
     @staticmethod
+    @route('lots/settings', methods=['GET'])
+    def get_lot_settings():
+        return jsonify(Lot.get_settings()), 200
+
+    @staticmethod
     @route('lots', methods=['POST'])
     @user.login_required
     def create_lot():
