@@ -1,5 +1,5 @@
-// const URL = "http://localhost:5000/api/v1/";
-const URL = `${window.location.host}/api/v1/`;
+const URL = "http://localhost:5000/api/v1/";
+// const URL = `${window.location.host}/api/v1/`;
 
 const loginBtn = document.querySelector(".loginBtn");
 const loginForm = document.querySelector("#loginForm");
@@ -38,7 +38,7 @@ const logIn = async () => {
   const userData = `${mailInput[0].value}:${pswInput[0].value}`;
   const encData = window.btoa(userData);
   try {
-    const response = await fetch("/api/v1/" + "user", {
+    const response = await fetch(URL + "user", {
       method: "GET",
       headers: { Authorization: `Basic ${encData}` }
     });

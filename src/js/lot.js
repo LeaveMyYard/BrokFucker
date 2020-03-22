@@ -1,5 +1,5 @@
-// const URL = "http://localhost:5000/api/v1/1";
-const URL = `${window.location.host}/api/v1/`;
+const URL = "http://localhost:5000/api/v1/1";
+// const URL = `${window.location.host}/api/v1/`;
 
 const lotSubMsg = document.getElementById("lotSubMsg");
 const lotProfilePic = document.getElementById("lotProfilePic");
@@ -109,7 +109,7 @@ lotProfilePic.addEventListener("click", function() {
 
 const getTheLot = async () => {
   try {
-    const response = await fetch("/api/v1/" + `lots/${lotID}`, {
+    const response = await fetch(URL + `lots/${lotID}`, {
       method: "GET",
       headers: { Authorization: `Basic ${encData()}` }
     });
@@ -152,7 +152,7 @@ getTheLot();
 
 document.getElementById("LotToFav").addEventListener("click", async function() {
   try {
-    const response = await fetch("/api/v1/" + `lots/favorites/${lotID}`, {
+    const response = await fetch(URL + `lots/favorites/${lotID}`, {
       method: "PUT",
       headers: { Authorization: `Basic ${encData()}` }
     });
@@ -176,7 +176,7 @@ lotSubBtn.addEventListener("click", async function() {
       phone: lotSubValue.value
     };
     try {
-      const response = await fetch("/api/v1/" + `user`, {
+      const response = await fetch(URL + `user`, {
         method: "PUT",
         headers: { Authorization: `Basic ${encData()}` },
         body: JSON.stringify(upd)
@@ -192,7 +192,7 @@ lotSubBtn.addEventListener("click", async function() {
     sessionStorage.removeItem("phone");
   }
   try {
-    const response = await fetch("/api/v1/" + `lots/subscription/${lotID}`, {
+    const response = await fetch(URL + `lots/subscription/${lotID}`, {
       method: "PUT",
       headers: { Authorization: `Basic ${encData()}` },
       body: JSON.stringify(value)

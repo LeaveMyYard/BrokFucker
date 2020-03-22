@@ -1,5 +1,5 @@
-// const URL = "http://localhost:5000/api/v1/";
-const URL = `${window.location.host}/api/v1/`;
+const URL = "http://localhost:5000/api/v1/";
+// const URL = `${window.location.host}/api/v1/`;
 
 const myLotsBtn = document.getElementById("myLotsBtn");
 const myprofEmail = document.getElementById("myprofEmail");
@@ -28,7 +28,7 @@ function onReady() {
   } else {
     async () => {
       try {
-        const response = await fetch("/api/v1/" + "user", {
+        const response = await fetch(URL + "user", {
           method: "GET",
           headers: { Authorization: `Basic ${encData()}` }
         });
