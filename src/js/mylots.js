@@ -152,6 +152,9 @@ const createLotAndListeners = async (
         <div class="userLots" data-id="myLotForm__${index + 1}">
           <form>
           <p><strong>${index + 1}</strong></p>
+          <a class="linkToLotPage" href="lot.html?id=${
+            lot.id
+          }">Страница лота</a>
           <label class="label lot_field" for="lot_name"
               ><span>Название лота: </span>
               <input
