@@ -3,3 +3,4 @@ flask-httpauth>=3.3.0
 flask-cors
 colorlog
 Pillow
+pyopenssl

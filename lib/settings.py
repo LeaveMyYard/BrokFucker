@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 
 class Settings:
     @staticmethod
@@ -8,12 +8,8 @@ class Settings:
         return json.load(settings_file)
 
     @staticmethod
-    def vaild_email_verification_link() -> str:
-        return Settings.__load_settings()['email_verification_events']['on_valid']
-
-    @staticmethod
-    def failed_email_verification_link() -> str:
-        return Settings.__load_settings()['email_verification_events']['on_failed']
+    def get_email_verification_link_base() -> str:
+        return Settings.__load_settings()['email_verification_link_base']
 
     @staticmethod
     def get_smtp_data() -> Tuple[str, int, str, str]:
@@ -23,3 +19,7 @@ class Settings:
     @staticmethod
     def get_maximum_image_size() -> int:
         return Settings.__load_settings()['server_settings']['maximum_upload_file_size']
+
+    @staticmethod
+    def get_enter_settings() -> Dict:
+        return Settings.__load_settings()['user_entered_values']

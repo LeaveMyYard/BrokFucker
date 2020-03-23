@@ -1,5 +1,5 @@
-// const URL = "http://localhost:5000/api/v1/";
-const URL = `${window.location.host}/api/v1/`;
+const URL = "http://localhost:5000/api/v1/";
+// const URL = `${window.location.host}/api/v1/`;
 
 const lotTable = document.getElementById("lotTable");
 
@@ -22,7 +22,7 @@ async function onReady() {
     return;
   } else {
     try {
-      const response = await fetch("/api/v1/" + "user", {
+      const response = await fetch(URL + "user", {
         method: "GET",
         headers: { Authorization: `Basic ${encData()}` }
       });
@@ -43,7 +43,7 @@ onReady();
 
 const getLots = async () => {
   try {
-    const response = await fetch("/api/v1/" + "lots/approved", {
+    const response = await fetch(URL + "lots/approved", {
       method: "GET"
       // headers: { Authorization: `Basic ${encData()}` }
     });

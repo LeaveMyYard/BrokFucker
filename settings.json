@@ -1,8 +1,5 @@
 {
-    "email_verification_events": {
-        "on_valid": "verification_successful",
-        "on_failed": "verification_failed"
-    },
+    "email_verification_link_base": "email_verification.html",
     "smtp_settings": {
         "host": "smtp.gmail.com",
         "port": 465,
@@ -11,5 +8,32 @@
     },
     "server_settings": {
         "maximum_upload_file_size": 262144
+    },
+    "user_entered_values": {
+        "lot": {
+            "name": null,
+            "amount": "^\\d+$",
+            "currency": [
+                "UAH",
+                "USD",
+                "EUR",
+                "BTC",
+                "ETH"
+            ],
+            "term": "^\\d+$",
+            "return_way": [
+                "every_month",
+                "term_end",
+                "other"
+            ],
+            "security": null,
+            "percentage": "[+-]?([0-9]*[.])?[0-9]+",
+            "form": [
+                "cash",
+                "cashless",
+                "any"
+            ],
+            "commentary": null
+        }
     }
 }

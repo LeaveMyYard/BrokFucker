@@ -9,11 +9,14 @@ other
 @import url("https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap&subset=cyrillic");
 
 html {
+  width: 100%;
+  min-height: 100vh;
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
 }
 
 body {
+  width: 100%;
   background: linear-gradient(#e66465, #9198e5) no-repeat;
 }
 
@@ -432,5 +435,16 @@ main {
 /* ---------------------------- */
 
 #menuIfNotLogged {
+  display: none;
+}
+
+/* end Nav */
+
+.btnActive {
+  background: #aaa;
+  text-decoration: underline;
+}
+
+.my-lots-archived {
   display: none;
 }

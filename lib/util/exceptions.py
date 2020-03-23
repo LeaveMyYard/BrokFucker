@@ -16,9 +16,7 @@ class RegistrationError(IndexedException):
     pass
 
 class EmailValidationError(RegistrationError):
-    def __init__(self, id: int, message: str, link: str = None):
-        self.link = link
-        super().__init__(id, message)
+    pass
 
 class NotAutorizedError(IndexedException):
     def __init__(self):
@@ -26,7 +24,7 @@ class NotAutorizedError(IndexedException):
 
 class NoPermissionError(IndexedException):
     def __init__(self):
-        super().__init__(-1003, 'You don\'t have no permission to execute this request.')
+        super().__init__(-1003, 'You don\'t have permission to execute this request.')
 
 class NoJsonError(IndexedException):
     def __init__(self):
@@ -39,3 +37,19 @@ class NotEnoughDataError(IndexedException):
 class UserHasNoPhoneNumber(IndexedException):
     def __init__(self, user):
         super().__init__(-1006, f'User {user} can not select recall by phone number option as he has no phone number assigned to his account.')
+
+class LotCreationError(IndexedException):
+    def __init__(self, message):
+        super().__init__(-1007, message)
+
+class UserNotExists(IndexedException):
+    def __init__(self, user):
+        super().__init__(-1008, f'User {user} does not exist.')
+
+class ModeratorAddingError(IndexedException):
+    def __init__(self, message):
+        super().__init__(-1009, message)
+
+class JSONValueException(IndexedException):
+    def __init__(self, param, avaited, got):
+        super().__init__(-1010, f'Strange value got for {param}. Waited for {avaited} but got "{got}"')

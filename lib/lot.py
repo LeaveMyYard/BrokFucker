@@ -1,8 +1,13 @@
 from lib.database_handler import DatabaseHandler
 from flask import Flask, abort, jsonify, request, make_response
 from lib.util.hash import sha256
+from lib.settings import Settings
 
 class Lot:
+    @staticmethod
+    def get_settings():
+        return Settings.get_enter_settings()['lot']
+
     @staticmethod
     def approve(lot_id: int):
         database = DatabaseHandler()
