@@ -450,8 +450,15 @@ main {
 }
 
 .linkToLotPage {
+<<<<<<< HEAD
   color: #9198e5;
   margin: 1.5rem 0;
+=======
+  display: block;
+  margin: 1rem 0;
+  font-size: 1.5rem;
+  color: #9198e5;
+>>>>>>> developer
 }
 
 .linkToPage {
