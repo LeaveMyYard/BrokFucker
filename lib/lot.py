@@ -6,11 +6,7 @@ from lib.settings import Settings
 class Lot:
     @staticmethod
     def get_settings():
-        return {
-            'variables': {
-                'currency': Settings.get_currency_settings()
-            }
-        }
+        return Settings.get_enter_settings()['lot']
 
     @staticmethod
     def approve(lot_id: int):

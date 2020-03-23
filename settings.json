@@ -9,13 +9,31 @@
     "server_settings": {
         "maximum_upload_file_size": 262144
     },
-    "lot_settings": {
-        "currency_types": [
-            "UAH",
-            "USD",
-            "EUR",
-            "BTC",
-            "ETH"
-        ]
+    "user_entered_values": {
+        "lot": {
+            "name": null,
+            "amount": "^\\d+$",
+            "currency": [
+                "UAH",
+                "USD",
+                "EUR",
+                "BTC",
+                "ETH"
+            ],
+            "term": "^\\d+$",
+            "return_way": [
+                "every_month",
+                "term_end",
+                "other"
+            ],
+            "security": null,
+            "percentage": "[+-]?([0-9]*[.])?[0-9]+",
+            "form": [
+                "cash",
+                "cashless",
+                "any"
+            ],
+            "commentary": null
+        }
     }
 }

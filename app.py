@@ -10,11 +10,8 @@ from lib.settings import Settings
 from datetime import timedelta
 from typing import Union, Dict, Callable, List
 import json
-
-from lib.util.exceptions import (
-    IndexedException, NotAutorizedError, NoPermissionError, NoJsonError,
-    NotEnoughDataError,
-)
+import lib.util.exceptions as APIExceptions
+import re
 
 app = Flask(__name__)
 CORS(app)
@@ -82,7 +79,7 @@ class RestAPI:
     exceptions_responses = {
         400: lambda error: {'code': -1000, 'msg': 'An unknown error occured while processing the request.'},
         404: lambda error: {'code': -1001, 'msg': 'The stuff you requested for is not found.'},
-        IndexedException: lambda error: {'code': error.error_id, 'msg': error.args[0]},
+        APIExceptions.IndexedException: lambda error: {'code': error.error_id, 'msg': error.args[0]},
     }
 
     @staticmethod
@@ -98,13 +95,26 @@ class RestAPI:
         try:
             return json.loads(request)
         except json.decoder.JSONDecodeError:
-            raise NoJsonError()
+            raise APIExceptions.NoJsonError()
 
     @staticmethod
     def check_required_fields(json, data_required: List[str]) -> None:
         for data in data_required:
             if data not in json:
-                raise NotEnoughDataError(data_required, json.keys())
+                raise APIExceptions.NotEnoughDataError(data_required, json.keys())
+
+    @staticmethod
+    def check_fields_values(json: Dict, field_setting: str) -> None:
+        settings = Settings.get_enter_settings()[field_setting]
+        for key, value in json.items():
+            if settings[key] is None:
+                continue
+            elif isinstance(settings[key], str):
+                if not re.fullmatch(settings[key], value):
+                    raise APIExceptions.JSONValueException(key, settings[key], value)
+            elif isinstance(settings[key], list):
+                if value not in settings[key]:
+                    raise APIExceptions.JSONValueException(key, settings[key], value)
 
     # -------------------------------------------------------------------------
     # Public stuff
@@ -123,7 +133,7 @@ class RestAPI:
     @route('register', methods=['POST'])
     def register():
         if not request.json:
-            raise NoJsonError()
+            raise APIExceptions.NoJsonError()
 
         data_required = [
             'email',
@@ -132,7 +142,7 @@ class RestAPI:
 
         for data in data_required:
             if data not in request.json:
-                raise NotEnoughDataError(data_required, request.json.keys())
+                raise APIExceptions.NotEnoughDataError(data_required, request.json.keys())
 
         user.begin_email_verification(
             request.json['email'],
@@ -163,7 +173,7 @@ class RestAPI:
         try:
             request_json = json.loads(request.data)
         except json.decoder.JSONDecodeError:
-            raise NoJsonError()
+            raise APIExceptions.NoJsonError()
 
         data_required = {
             'phone': 'phone_number',
@@ -218,6 +228,7 @@ class RestAPI:
         ]
 
         RestAPI.check_required_fields(request_json, data_required)
+        RestAPI.check_fields_values(request_json, "lot")
 
         return jsonify({'lot_id': user.create_lot(*[request_json[data] for data in data_required]) }), 201
 
@@ -237,10 +248,10 @@ class RestAPI:
     @user.login_required
     def update_lot(lot_id):
         if not Lot.can_user_edit(user.email(), lot_id):
-            raise NoPermissionError()
+            raise APIExceptions.NoPermissionError()
 
         if not request.json:
-            raise NoJsonError()
+            raise APIExceptions.NoJsonError()
 
         data_available = [
             'name',
@@ -254,6 +265,8 @@ class RestAPI:
             'commentary'
         ]
 
+        RestAPI.check_fields_values(request.json, "lot")
+
         for data in data_available:
             if data in request.json:
                 Lot.update_data(lot_id, data, request.json[data])
@@ -265,7 +278,7 @@ class RestAPI:
     @user.login_required
     def delete_lot(lot_id):
         if not Lot.can_user_edit(user.email(), lot_id):
-            raise NoPermissionError()
+            raise APIExceptions.NoPermissionError()
         
         Lot.delete_lot(lot_id)
         return RestAPI.message('A lot is deleted'), 201
@@ -275,7 +288,7 @@ class RestAPI:
     @user.login_required
     def restore_lot(lot_id):
         if not Lot.can_user_edit(user.email(), lot_id):
-            raise NoPermissionError()
+            raise APIExceptions.NoPermissionError()
 
         Lot.restore_lot(lot_id)
         return RestAPI.message('A lot is restored'), 201
@@ -290,7 +303,7 @@ class RestAPI:
     @user.login_required
     def add_lot_photo(lot_id):
         if not Lot.can_user_edit(user.email(), lot_id):
-            raise NoPermissionError()
+            raise APIExceptions.NoPermissionError()
         
         a = request.files
         resp = {filename: Lot.add_photo(request.files[filename], lot_id) for filename in request.files}
@@ -302,7 +315,7 @@ class RestAPI:
     @user.login_required
     def remove_lot_photo(lot_id, photo_id):
         if not Lot.can_user_edit(user.email(), lot_id):
-            raise NoPermissionError()
+            raise APIExceptions.NoPermissionError()
         
         return jsonify(Lot.remove_photo(lot_id, photo_id)), 201
 
@@ -450,7 +463,6 @@ class Server:
     ex = None
     
     for ex in exceptions:
-        #print('Initializing exception handler:', ex, 'all:', set(WebApp.exceptions_responses), set(RestAPI.exceptions_responses))
         @staticmethod
         @app.errorhandler(ex)
         def error_handler(error, exception = ex):

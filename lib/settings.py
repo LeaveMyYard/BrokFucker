@@ -21,5 +21,5 @@ class Settings:
         return Settings.__load_settings()['server_settings']['maximum_upload_file_size']
 
     @staticmethod
-    def get_currency_settings() -> List[str]:
-        return Settings.__load_settings()['lot_settings']['currency_types']
+    def get_enter_settings() -> Dict:
+        return Settings.__load_settings()['user_entered_values']
