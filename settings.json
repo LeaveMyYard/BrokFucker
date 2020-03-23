@@ -34,6 +34,14 @@
                 "any"
             ],
             "commentary": null
+        },
+        "register": {
+            "email": "^([a-z0-9_-]+\\.)*[a-z0-9_-]+@[a-z0-9_-]+(\\.[a-z0-9_-]+)*\\.[a-z]{2,6}$",
+            "password": "(?=^.{8,}$)((?=.*\\d)|(?=.*\\W+))(?![.\\n])(?=.*[A-Z])(?=.*[a-z]).*$"
+        },
+        "user_data": {
+            "phone_number": 2,
+            "name": null
         }
     }
 }

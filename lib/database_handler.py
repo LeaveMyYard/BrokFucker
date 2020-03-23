@@ -264,11 +264,6 @@ class DatabaseHandler:
         form,
         commentary
     ):
-        currency_settings = Settings.get_currency_settings()
-
-        if currency not in currency_settings:
-            raise APIExceptions.LotCreationError(f"'{currency}' is not a valid currency. Valid currencies are: {', '.join(currency_settings)}.")
-
         date = datetime.now()
         self.cursor.execute(
             f"INSERT INTO Lots (`date`, `name`, `user`, `amount`, `currency`, `term`, `return_way`, `security`, `percentage`, `form`, `security_checked`, `guarantee_percentage`, `confirmed`, `commentary`)"

@@ -79,7 +79,7 @@ class RestAPI:
     exceptions_responses = {
         400: lambda error: {'code': -1000, 'msg': 'An unknown error occured while processing the request.'},
         404: lambda error: {'code': -1001, 'msg': 'The stuff you requested for is not found.'},
-        APIExceptions.IndexedException: lambda error: {'code': error.error_id, 'msg': error.args[0]},
+        APIExceptions.IndexedException: lambda error: {'code': error.error_id, 'msg': error.args[0], 'type': error.__class__.__name__},
     }
 
     @staticmethod
@@ -107,8 +107,10 @@ class RestAPI:
     def check_fields_values(json: Dict, field_setting: str) -> None:
         settings = Settings.get_enter_settings()[field_setting]
         for key, value in json.items():
-            if settings[key] is None:
-                continue
+            if key not in settings:
+                pass
+            elif settings[key] is None:
+                pass
             elif isinstance(settings[key], str):
                 if not re.fullmatch(settings[key], value):
                     raise APIExceptions.JSONValueException(key, settings[key], value)
@@ -143,6 +145,8 @@ class RestAPI:
         for data in data_required:
             if data not in request.json:
                 raise APIExceptions.NotEnoughDataError(data_required, request.json.keys())
+
+        RestAPI.check_fields_values(request.json, "register")
 
         user.begin_email_verification(
             request.json['email'],
@@ -179,6 +183,8 @@ class RestAPI:
             'phone': 'phone_number',
             'name': 'name',
         }
+
+        RestAPI.check_fields_values(request_json, "user_data")
 
         for data in data_required:
             if data in request_json:
