@@ -44,7 +44,7 @@ onReady();
 
 const getLots = async () => {
   try {
-    const response = await fetch(URL + "lots/", {
+    const response = await fetch(URL + "lots", {
       method: "GET"
       // headers: { Authorization: `Basic ${encData()}` }
     });
