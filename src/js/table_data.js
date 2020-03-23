@@ -43,7 +43,7 @@ onReady();
 
 const getLots = async () => {
   try {
-    const response = await fetch(URL + "lots/approved", {
+    const response = await fetch(URL + "lots", {
       method: "GET"
       // headers: { Authorization: `Basic ${encData()}` }
     });
@@ -57,7 +57,9 @@ const getLots = async () => {
         item = `
       <tr>
       <td>${dateFix(item.date)}</td>
-      <td><a href="${"lot.html?id=" + item.id}">${item.name}</a></td>
+      <td><a class="linkToPage" href="${"lot.html?id=" + item.id}">${
+          item.name
+        }</a></td>
       <td>${item.user}</td>
       <td>${item.amount}</td>
       <td>${item.currency}</td>

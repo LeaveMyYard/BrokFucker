@@ -74,10 +74,31 @@ async function onReady() {
 }
 onReady();
 
-const currencySelect = document.getElementById("currencySelect");
-const currencySelectOptions = [];
+vocabulary = {
+  cash: "Наличные",
+  cashless: "Безналичные",
+  any: "Любой",
+  every_month: "Ежемесячно",
+  term_end: "Окончание срока",
+  other: "Другое"
+};
 
-async function currencyOptions() {
+function translate(data) {
+  for (let word in vocabulary) {
+    if (word == data) {
+      return vocabulary[word];
+    }
+  }
+}
+
+const currencySelect = document.getElementById("currencySelect");
+const formSelect = document.getElementById("formSelect");
+const returnSelect = document.getElementById("returnSelect");
+const currencySelectOptions = [];
+const formSelectOptions = [];
+const returnSelectOptions = [];
+
+async function dataOptions() {
   try {
     const response = await fetch(URL + "lots/settings", {
       method: "GET",
@@ -90,17 +111,23 @@ async function currencyOptions() {
     const result = await response.json();
     console.log(result);
 
-    result.currency.forEach(
-      curr =>
-        (currencySelect.innerHTML += `<option value="${curr}">${curr}</option>`)
-    );
-
-    result.currency.forEach(curr => currencySelectOptions.push(curr));
+    result.currency.forEach(curr => {
+      currencySelect.innerHTML += `<option value="${curr}">${curr}</option>`;
+      currencySelectOptions.push(curr);
+    });
+    result.form.forEach(form => {
+      formSelect.innerHTML += `<option value="${form}">${translate(form)}</option>`;
+      formSelectOptions.push(form);
+    });
+    result.return_way.forEach(way => {
+      returnSelect.innerHTML += `<option value="${way}">${translate(way)}</option>`;
+      returnSelectOptions.push(way);
+    });
   } catch (error) {
     console.error(error);
   }
 }
-currencyOptions();
+dataOptions();
 
 lotProfilePic.addEventListener("click", function() {
   location.href = "my_profile.html";
@@ -208,13 +235,17 @@ const createLotAndListeners = async (
             </label>
             <label class="label lot_field" for="lot_method"
               ><span>Метод погашения: </span>
-              <!-- fix -->
-              <input
-                type="text"
-                name="lot_method"
-                value="${lot.return_way}"
-                required
-              />
+              <select id="selectReturnWayOption">
+              ${returnSelectOptions.map(way => {
+                if (lot.return_way == way) {
+                  return `<option selected value="${way}">${translate(
+                    way
+                  )}</option>`;
+                } else {
+                  return `<option value="${way}">${translate(way)}</option>`;
+                }
+              })}
+              </select>
             </label>
             <label class="label lot_field" for="lot_security"
               ><span>Обеспечение: </span>
@@ -227,12 +258,19 @@ const createLotAndListeners = async (
             </label>
             <label class="label lot_field" for="lot_cred"
               ><span>Форма кредитирования: </span>
-              <input
-                type="text"
-                name="lot_cred"
-                value="${lot.form}"
-                required
-              />
+              <select id="selectLotForm">
+                    ${formSelectOptions.map(form => {
+                      if (lot.form == form) {
+                        return `<option selected value="${form}">${translate(
+                          form
+                        )}</option>`;
+                      } else {
+                        return `<option value="${form}">${translate(
+                          form
+                        )}</option>`;
+                      }
+                    })}
+                  </select>
             </label>
             <label class="label lot_field" for="lot_shortdesc"
               ><span>Короткое описание: </span>
@@ -253,7 +291,6 @@ const createLotAndListeners = async (
             <button class="editLotBtn btn">Update</button>
             </div>
   `).get(0);
-  console.log(lot.photos.photos.map(photo => console.log(photo)));
 
   $(lotEl)
     .find(".deleteLotBtn")
@@ -283,9 +320,9 @@ const createLotAndListeners = async (
         amount: $(lotEl).find("input[name=lot_reqsum]")[0].value,
         currency: $(lotEl).find("#selectLotCurrency")[0].value,
         term: $(lotEl).find("input[name=lot_reqmonths]")[0].value,
-        return_way: $(lotEl).find("input[name=lot_method]")[0].value,
+        return_way: $(lotEl).find("#selectReturnWayOption")[0].value,
         security: $(lotEl).find("input[name=lot_security]")[0].value,
-        form: $(lotEl).find("input[name=lot_cred]")[0].value,
+        form: $(lotEl).find("#selectLotForm")[0].value,
         percentage: $(lotEl).find("input[name=lot_percentage]")[0].value,
         commentary: $(lotEl).find("textarea[name=lot_shortdesc]")[0].value
       };
@@ -350,12 +387,15 @@ const createArchiveLotAndListeners = async (
   { parent: myArchiveLotsContainer, onLotRemove }
 ) => {
   const archiveLotEl = $(`
-        <div class="userLots" data-id="myLotForm__${index + 1}">
+          <div class="userLots" data-id="myLotForm__${index + 1}">
           <form>
           <p><strong>${index + 1}</strong></p>
+          <a class="linkToLotPage" href="lot.html?id=${
+            lot.id
+          }">Страница лота</a>
           <label class="label lot_field" for="lot_name"
               ><span>Название лота: </span>
-              <input
+              <input disabled
                 class="inputName"
                 type="text"
                 name="lot_name"
@@ -365,7 +405,7 @@ const createArchiveLotAndListeners = async (
             </label>
             <label class="label lot_field" for="lot_reqsum"
               ><span>Необходимая сумма: </span>
-              <input
+              <input disabled
                 class="inputReqSum"
                 type="number"
                 name="lot_reqsum"
@@ -375,7 +415,7 @@ const createArchiveLotAndListeners = async (
             </label>
             <label class="label lot_field" for="lot_currency"
               ><span>Валюта: </span>
-                  <select id="selectLotCurrency">
+                  <select disabled id="selectLotCurrency">
                     ${currencySelectOptions.map(curr => {
                       if (lot.currency == curr) {
                         return `<option selected value="${curr}">${curr}</option>`;
@@ -388,7 +428,7 @@ const createArchiveLotAndListeners = async (
             </label>
             <label class="label lot_field" for="lot_reqmonths"
               ><span>Срок, месяцев: </span>
-              <input
+              <input disabled
                 class="inputReqMonths"
                 type="number"
                 name="lot_reqmonths"
@@ -398,7 +438,7 @@ const createArchiveLotAndListeners = async (
             </label>
             <label class="label lot_field" for="lot_percentage"
               ><span>Ставка, годовых: </span>
-              <input
+              <input disabled
                 type="number"
                 name="lot_percentage"
                 value="${lot.percentage}"
@@ -407,17 +447,21 @@ const createArchiveLotAndListeners = async (
             </label>
             <label class="label lot_field" for="lot_method"
               ><span>Метод погашения: </span>
-              <!-- fix -->
-              <input
-                type="text"
-                name="lot_method"
-                value="${lot.return_way}"
-                required
-              />
+              <select disabled id="selectReturnWayOption">
+              ${returnSelectOptions.map(way => {
+                if (lot.return_way == way) {
+                  return `<option selected value="${way}">${translate(
+                    way
+                  )}</option>`;
+                } else {
+                  return `<option value="${way}">${translate(way)}</option>`;
+                }
+              })}
+              </select>
             </label>
             <label class="label lot_field" for="lot_security"
               ><span>Обеспечение: </span>
-              <input
+              <input disabled
                 type="text"
                 name="lot_security"
                 value="${lot.security}"
@@ -426,16 +470,23 @@ const createArchiveLotAndListeners = async (
             </label>
             <label class="label lot_field" for="lot_cred"
               ><span>Форма кредитирования: </span>
-              <input
-                type="text"
-                name="lot_cred"
-                value="${lot.form}"
-                required
-              />
+              <select disabled id="selectLotForm">
+                    ${formSelectOptions.map(form => {
+                      if (lot.form == form) {
+                        return `<option selected value="${form}">${translate(
+                          form
+                        )}</option>`;
+                      } else {
+                        return `<option value="${form}">${translate(
+                          form
+                        )}</option>`;
+                      }
+                    })}
+                  </select>
             </label>
             <label class="label lot_field" for="lot_shortdesc"
               ><span>Короткое описание: </span>
-              <textarea
+              <textarea disabled
                 name="lot_shortdesc"
               >${lot.commentary}
               </textarea>
@@ -560,7 +611,6 @@ async function clearLots() {
 }
 
 createLotPublish.addEventListener("click", async function(e) {
-  currencyOptionsFill();
   e.preventDefault();
   if ($("#createLotForm").valid() == false) {
     return;
@@ -625,9 +675,9 @@ createLotPublish.addEventListener("click", async function(e) {
         Authorization: `Basic ${encData()}`
       }
     });
-    for (let key of formData.keys()) {
-      formData.delete(key);
-    }
+    // for (let key of formData.keys()) {
+    //   formData.delete(key);
+    // }
     getMyLots();
   } catch (error) {
     alert("Ошибка! Что-то пошло не так.");
