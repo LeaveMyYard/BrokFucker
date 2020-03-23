@@ -71,7 +71,7 @@
           <p>
             <span id="myprofEmail"></span>
           </p>
-          <p>
+          <p style="width:250px">
             Зарегистрирован:
             <span id="myprofRegDate"></span>
           </p>
@@ -95,7 +95,7 @@
                   ><span>Необходимая сумма: </span>
                   <input
                     class="inputReqSum"
-                    type="text"
+                    type="number"
                     name="create_lot_reqsum"
                     required
                   />
@@ -109,7 +109,7 @@
                   ><span>Срок, месяцев: </span>
                   <input
                     class="inputReqMonths"
-                    type="text"
+                    type="number"
                     name="create_lot_reqmonths"
                     required
                   />
@@ -118,7 +118,7 @@
                   ><span>Ставка, годовых: </span>
                   <input
                     class="inputReqPercentage"
-                    type="text"
+                    type="number"
                     name="create_lot_percentage"
                     required
                   />
@@ -165,8 +165,15 @@
           <br />
         </div>
       </div>
-      <div class="my-lots">
-        <p id="myLotsHeading"><strong>Мои лоты:</strong></p>
+      <div>
+        <button class="btn btnActive" id="myLotsButton">Мои Лоты</button>
+        <button class="btn" id="archiveLotsButton">Архив</button>
+        <div class="my-lots">
+          <p id="myLotsHeading"><strong>Мои лоты:</strong></p>
+        </div>
+        <div class="my-lots-archived">
+          <p id="myLotsHeading"><strong>Архивные лоты:</strong></p>
+        </div>
       </div>
     </div>
 
