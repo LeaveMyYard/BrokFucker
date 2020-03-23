@@ -89,16 +89,6 @@ window.onclick = function(e) {
   }
 };
 
-document.querySelector(".inputReqSum").addEventListener("input", e => {
-  e.target.value = e.target.value.replace(/\D/g, "");
-});
-document.querySelector(".inputReqMonths").addEventListener("input", e => {
-  e.target.value = e.target.value.replace(/\D/g, "");
-});
-document.querySelector(".inputReqPercentage").addEventListener("input", e => {
-  e.target.value = e.target.value.replace(/\D/g, "");
-});
-
 const profData = async () => {
   try {
     const response = await fetch("/api/v1/" + "user", {
