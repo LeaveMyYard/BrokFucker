@@ -456,3 +456,8 @@ main {
   font-size: 1.5rem;
   color: #9198e5;
 }
+
+.linkToPage {
+  color: #ff4747;
+  font-weight: 600;
+}
