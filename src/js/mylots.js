@@ -88,12 +88,14 @@ async function currencyOptions() {
       throw new Error("Unsuccessfull response");
     }
     const result = await response.json();
-    result.variables.currency.forEach(
+    console.log(result);
+
+    result.currency.forEach(
       curr =>
         (currencySelect.innerHTML += `<option value="${curr}">${curr}</option>`)
     );
 
-    result.variables.currency.forEach(curr => currencySelectOptions.push(curr));
+    result.currency.forEach(curr => currencySelectOptions.push(curr));
   } catch (error) {
     console.error(error);
   }
