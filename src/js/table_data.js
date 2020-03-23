@@ -58,7 +58,9 @@ const getLots = async () => {
         item = `
       <tr>
       <td>${dateFix(item.date)}</td>
-      <td><a href="${"lot.html?id=" + item.id}">${item.name}</a></td>
+      <td><a class="linkToPage" href="${"lot.html?id=" + item.id}">${
+          item.name
+        }</a></td>
       <td>${item.user}</td>
       <td>${item.amount}</td>
       <td>${item.currency}</td>

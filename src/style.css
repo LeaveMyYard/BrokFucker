@@ -448,3 +448,13 @@ main {
 .my-lots-archived {
   display: none;
 }
+
+.linkToLotPage {
+  color: #9198e5;
+  margin: 1.5rem 0;
+}
+
+.linkToPage {
+  color: #ff4747;
+  font-weight: 600;
+}
