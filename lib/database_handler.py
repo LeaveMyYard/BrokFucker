@@ -288,7 +288,7 @@ class DatabaseHandler:
 
         self.cursor.execute(
             f"UPDATE UsersLots SET `user_lots` = ? WHERE `email` = ?",
-            (res, user)
+            (str(res), user)
         )
 
         self.conn.commit()
@@ -438,7 +438,7 @@ class DatabaseHandler:
 
         self.cursor.execute(
             f"UPDATE UsersLots SET `favorite_lots` = ? WHERE `email` = ?",
-            (res, email)
+            (str(res), email)
         )
         self.conn.commit()
 
