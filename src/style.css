@@ -437,3 +437,14 @@ main {
 #menuIfNotLogged {
   display: none;
 }
+
+/* end Nav */
+
+.btnActive {
+  background: #aaa;
+  text-decoration: underline;
+}
+
+.my-lots-archived {
+  display: none;
+}
