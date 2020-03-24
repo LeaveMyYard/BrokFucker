@@ -37,10 +37,10 @@
         },
         "register": {
             "email": "^([a-z0-9_-]+\\.)*[a-z0-9_-]+@[a-z0-9_-]+(\\.[a-z0-9_-]+)*\\.[a-z]{2,6}$",
-            "password": "(?=^.{8,}$)((?=.*\\d)|(?=.*\\W+))(?![.\\n])(?=.*[A-Z])(?=.*[a-z]).*$"
+            "password": null
         },
         "user_data": {
-            "phone_number": 2,
+            "phone_number": null,
             "name": null
         }
     }
