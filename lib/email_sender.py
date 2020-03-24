@@ -33,3 +33,25 @@ class EmailSender:
                 action_url = f"{request.host_url}{Settings.get_email_verification_link_base()}?code={code}"
             )
         )
+
+    @staticmethod
+    def send_password_change_verification(email: str, code: str):
+        EmailSender.send(
+            email,
+            "New password confirmation",
+            render_template(
+                'password_change_verification.html',
+                action_url = f"{request.host_url}{Settings.get_new_password_verification_link_base()}?code={code}"
+            )
+        )
+
+    @staticmethod
+    def send_account_restore_verification(email: str, code: str):
+        EmailSender.send(
+            email,
+            "Forgot a password confirmation",
+            render_template(
+                'account_restore_verification.html',
+                action_url = f"{request.host_url}{Settings.get_account_restore_verification_link_base()}?code={code}"
+            )
+        )

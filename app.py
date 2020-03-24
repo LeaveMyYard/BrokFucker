@@ -171,6 +171,26 @@ class RestAPI:
         return jsonify(user.get_data()), 200
 
     @staticmethod
+    @route('user/password', methods=['PUT'])
+    @user.login_required
+    def change_password():
+        data_required = [
+            'password'
+        ]
+
+        RestAPI.check_required_fields(request.json, data_required)
+        RestAPI.check_fields_values(request.json, "register")
+
+        user.change_password(request.json['password'])
+        return RestAPI.message(f'Verification in sent to {user.email()}')
+
+    @staticmethod
+    @route('user/password/verify/<string:code>')
+    def verify_password_code(code):
+        user.verify_password_change(code)
+        return RestAPI.message(f'Password was successfuly changed.')
+
+    @staticmethod
     @route('user', methods=['PUT'])
     @user.login_required
     def edit_user_data():
