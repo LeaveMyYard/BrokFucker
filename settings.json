@@ -1,5 +1,6 @@
 {
     "email_verification_link_base": "email_verification.html",
+    "new_password_verification_link_base": "new_password_verification.html",
     "smtp_settings": {
         "host": "smtp.gmail.com",
         "port": 465,

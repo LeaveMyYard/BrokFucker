@@ -39,6 +39,13 @@ CREATE TABLE IF NOT EXISTS EmailVerification (
     `request_date` DATETIME NOT NULL
 );
 
+CREATE TABLE IF NOT EXISTS PasswordChangeVerification(
+    `verification_hash` TEXT PRIMARY KEY,
+    `email` TEXT NOT NULL,
+    `password` TEXT NOT NULL,
+    `request_date` DATETIME NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS Lots (
     `id` INTEGER PRIMARY KEY AUTOINCREMENT,
     `date` DATETIME NOT NULL,

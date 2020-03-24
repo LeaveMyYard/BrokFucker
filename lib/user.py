@@ -62,6 +62,11 @@ class User:
         database.update_user_data(User.email(), data, value)
 
     @staticmethod
+    def change_password(new_password):
+        database = DatabaseHandler()
+        database.make_request_for_user_password_change(User.email(), new_password)
+
+    @staticmethod
     def create_lot(
         name,
         amount,
