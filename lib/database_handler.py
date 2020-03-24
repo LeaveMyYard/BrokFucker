@@ -87,6 +87,19 @@ class DatabaseHandler:
                     (code, )
                 )
 
+        self.cursor.execute(
+            f"SELECT `verification_hash`, `request_date` FROM PasswordChangeVerification"
+        )
+
+        for code, date in self.cursor.fetchall():
+            date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")
+            if (datetime.now() - date) > duration_to_delete:
+                codes += 1
+                self.cursor.execute(
+                    f"DELETE FROM EmailVerification WHERE `verification_hash` = ?",
+                    (code, )
+                )
+
         
         self.logger.info(f'Clearing complete. Removed {codes} unused codes.')
         self.conn.commit()
@@ -213,9 +226,50 @@ class DatabaseHandler:
         self.logger.debug(f'New user `{email}` has successfuly confirmed his email and created an account')
         self.create_user(email, password)
 
-    def delete_email_confirmation_code(self, code):
+    def delete_email_confirmation_code(self, code: str):
         self.cursor.execute(
             f"DELETE FROM EmailVerification WHERE `verification_hash` = ?",
+            (code, )
+        )
+        self.conn.commit()
+
+    def create_email_for_user_password_change(self, email, new_password):
+        password_hash = hashlib.sha256(new_password.encode('utf-8')).hexdigest()
+        random_hash = self.generage_new_random_hash()
+        date = datetime.now()
+
+        self.cursor.execute(
+            f"INSERT INTO PasswordChangeVerification (`email`, `password`, `verification_hash`, `request_date`)"
+            f"VALUES (?,?,?,?)",
+            (email, password_hash, random_hash, date)
+        )
+        self.conn.commit()
+
+        EmailSender.send_password_change_verification(email, random_hash)
+        self.logger.debug(f'New password confirmation with code `{random_hash}` was sent to `{email}`')
+
+    def verify_email_for_user_password_change(self, code: str):
+        self.cursor.execute(
+            f"SELECT * FROM PasswordChangeVerification WHERE `verification_hash` = ?",
+            (code, )
+        )
+
+        try:
+            (_, email, password, date) = self.cursor.fetchone()
+        except TypeError:
+            raise APIExceptions.EmailValidationError(-1204, 'No such verification code exists, it was already used or was already deleted.')
+
+        if (datetime.now() - datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")) > timedelta(hours=24):
+            raise APIExceptions.EmailValidationError(-1203, 'Email verification time has passed.')
+
+        self.cursor.execute(
+            f"UPDATE Users SET `password` = ? WHERE `email` = ?",
+            (password, email)
+        )
+
+    def delete_email_for_password_change_confirmation_code(self, code: str):
+        self.cursor.execute(
+            f"DELETE FROM PasswordChangeVerification WHERE `verification_hash` = ?",
             (code, )
         )
         self.conn.commit()
