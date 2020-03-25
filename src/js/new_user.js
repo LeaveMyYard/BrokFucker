@@ -4,9 +4,23 @@ const regForm = document.getElementById("regForm");
 const inputEmail = document.querySelector(".inputEmail");
 const inputPsw = document.querySelector(".inputPsw");
 const spinner = document.getElementById("spinner");
+const errorContainer = document.getElementById("errorContainer");
+
+let errorMsg = document.createElement("p");
+
+const errorReg = window.location.search.split("error=")[1];
+
+if (errorReg == 1) {
+  errorMsg.classList.add("errorMsg");
+  errorMsg.innerText = "Этот email уже используется!";
+  errorContainer.append(errorMsg);
+}
 
 regForm.addEventListener("submit", async function(e) {
   e.preventDefault();
+  if ($("#regForm").valid() == false) {
+    return;
+  }
   const value = {
     email: inputEmail.value,
     password: inputPsw.value
@@ -23,9 +37,12 @@ regForm.addEventListener("submit", async function(e) {
     if (response.ok) {
       alert(`Успех! Письмо с подтверждением отослано на ${inputEmail.value}`);
       spinner.style["display"] = "none";
-    } else throw new Error(error);
+    } else throw new Error("Ошибка! Проверьте корректность введённых данных.");
   } catch (error) {
-    alert("Ошибка! Что-то пошло не так.");
+    errorMsg.remove();
+    errorContainer.append(errorMsg);
+    errorMsg.classList.add("errorMsg");
+    errorMsg.innerText = error.message;
     spinner.style["display"] = "none";
   }
 });

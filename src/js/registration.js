@@ -4,11 +4,6 @@ const showPswButtons = document.querySelectorAll(".showPswIcon");
 const pswInput = document.getElementsByName("psw");
 const mailInput = document.getElementsByName("email");
 const pswRepeatInput = document.getElementsByName("psw_repeat");
-const errorContainer = document.getElementById("errorContainer");
-
-let errorMsg = document.createElement("p");
-
-const errorReg = window.location.search.split("error=")[1];
 
 inputTerms.addEventListener("click", function() {
   if (inputTerms.checked) {
@@ -48,7 +43,8 @@ const validateForm = $(function() {
       },
       psw: {
         required: true,
-        minlength: 8
+        minlength: 8,
+        maxlength: 32
       },
       psw_repeat: {
         equalTo: "#psw"
@@ -58,11 +54,12 @@ const validateForm = $(function() {
     messages: {
       psw: {
         required: "Это обязательное поле!",
-        minlength: "Пароль не может быть меньше 8 символов"
+        minlength: "Пароль не может быть меньше 8 символов",
+        maxlength: "Пароль не может быть больше 32 символов"
       },
       email: "Пожалуйста, укажите действительный email"
     }
   });
 });
 
-registerBtn.addEventListener("change", validateForm());
+registerBtn.addEventListener("change", validateForm);
