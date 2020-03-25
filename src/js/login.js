@@ -74,13 +74,11 @@ const validateForm = $(function() {
         required: true
       }
     }
-    // Specify validation error messages
     // messages: {
     //   psw: {
-    //     required: "Это обязательное поле!",
-    //     minlength: "Пароль не может быть меньше 8 символов"
+    //     required: "Это обязательное поле!"
     //   },
-    //   email: "Пожалуйста, укажите действительный email"
+    //   email: "Это обязательное поле!"
     // }
   });
 });

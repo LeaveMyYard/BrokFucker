@@ -57,7 +57,22 @@ const validateForm = $(function() {
         minlength: "Пароль не может быть меньше 8 символов",
         maxlength: "Пароль не может быть больше 32 символов"
       },
-      email: "Пожалуйста, укажите действительный email"
+      email: {
+        email: "Пожалуйста, укажите действительный email",
+        required: "Это обязательное поле!"
+      },
+      psw_repeat: {
+        equalTo: "Пароли должны совпадать!",
+        required: "Это обязательное поле!"
+      }
+    },
+    errorPlacement: function(error, element) {
+      let placement = $(element).data("error");
+      if (placement) {
+        $(placement).append(error);
+      } else {
+        error.insertAfter(element);
+      }
     }
   });
 });
