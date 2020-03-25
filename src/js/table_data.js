@@ -1,6 +1,4 @@
-// const URL = "http://localhost:5000/api/v1/";
-const host = window.location.host;
-const URL = `/api/v1/`;
+const URL = "http://localhost:5000/api/v1/";
 
 const lotTable = document.getElementById("lotTable");
 
@@ -78,6 +76,10 @@ const getLots = async () => {
       lotTable.innerHTML += lotArr.join("");
     }
   } catch (error) {
+    errorMsg.remove();
+    errorMsg.classList.add("errorMsg");
+    errorMsg.innerText = "Неправильные данные для входа.";
+    errorContainer.prepend(errorMsg);
     console.error(error);
   }
 };

@@ -1,6 +1,4 @@
-// const URL = "http://localhost:5000/api/v1/";
-const host = window.location.host;
-const URL = `/api/v1/`;
+const URL = "http://localhost:5000/api/v1/";
 
 const verification = window.location.search.split("code=")[1];
 
@@ -19,7 +17,7 @@ async function emailVerification() {
   } catch (error) {
     console.error(error);
     alert(error);
-    location.href = "registration.html";
+    location.href = `registration.html?error=${error.msg}`;
   }
 }
 

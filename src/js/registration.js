@@ -4,6 +4,11 @@ const showPswButtons = document.querySelectorAll(".showPswIcon");
 const pswInput = document.getElementsByName("psw");
 const mailInput = document.getElementsByName("email");
 const pswRepeatInput = document.getElementsByName("psw_repeat");
+const errorContainer = document.getElementById("errorContainer");
+
+let errorMsg = document.createElement("p");
+
+const errorReg = window.location.search.split("error=")[1];
 
 inputTerms.addEventListener("click", function() {
   if (inputTerms.checked) {
@@ -60,8 +65,4 @@ const validateForm = $(function() {
   });
 });
 
-registerBtn.addEventListener("change", handleReg);
-
-function handleReg() {
-  validateForm();
-}
+registerBtn.addEventListener("change", validateForm());

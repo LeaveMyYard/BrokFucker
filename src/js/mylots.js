@@ -1,6 +1,4 @@
-// const URL = "http://localhost:5000/api/v1/";
-const host = window.location.host;
-const URL = `/api/v1/`;
+const URL = "http://localhost:5000/api/v1/";
 
 const myLotsHeading = document.getElementById("myLotsHeading");
 const lotProfilePic = document.getElementById("lotProfilePic");
@@ -117,11 +115,15 @@ async function dataOptions() {
       currencySelectOptions.push(curr);
     });
     result.form.forEach(form => {
-      formSelect.innerHTML += `<option value="${form}">${translate(form)}</option>`;
+      formSelect.innerHTML += `<option value="${form}">${translate(
+        form
+      )}</option>`;
       formSelectOptions.push(form);
     });
     result.return_way.forEach(way => {
-      returnSelect.innerHTML += `<option value="${way}">${translate(way)}</option>`;
+      returnSelect.innerHTML += `<option value="${way}">${translate(
+        way
+      )}</option>`;
       returnSelectOptions.push(way);
     });
   } catch (error) {

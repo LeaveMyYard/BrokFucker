@@ -1,6 +1,4 @@
-// const URL = "http://localhost:5000/api/v1/";
-const host = window.location.host;
-const URL = `/api/v1/`;
+const URL = "http://localhost:5000/api/v1/";
 
 const loginBtn = document.querySelector(".loginBtn");
 const loginForm = document.querySelector("#loginForm");
@@ -8,6 +6,9 @@ const showPswButton = document.querySelector(".showPswIcon");
 const pswInput = document.getElementsByName("psw");
 const mailInput = document.getElementsByName("email");
 const termsCheckbox = document.getElementById("terms");
+const errorContainer = document.getElementById("errorContainer");
+
+let errorMsg = document.createElement("p");
 
 function onReady() {
   if (localStorage.getItem("email") || sessionStorage.getItem("email")) {
@@ -43,9 +44,9 @@ const logIn = async () => {
       method: "GET",
       headers: { Authorization: `Basic ${encData}` }
     });
-
+    const result = await response.json();
     if (!response.ok) {
-      throw new Error("Wrong User Data");
+      throw new Error(result.msg);
     } else {
       if (termsCheckbox.checked == true) {
         storeLocalStorage();
@@ -55,11 +56,41 @@ const logIn = async () => {
       location.href = "index.html";
     }
   } catch (error) {
+    errorMsg.remove();
+    errorMsg.classList.add("errorMsg");
+    errorMsg.innerText = "Неправильные данные для входа.";
+    errorContainer.prepend(errorMsg);
     console.error(error);
   }
 };
 
+const validateForm = $(function() {
+  $("#loginForm").validate({
+    rules: {
+      email: {
+        required: true
+      },
+      psw: {
+        required: true
+      }
+    }
+    // Specify validation error messages
+    // messages: {
+    //   psw: {
+    //     required: "Это обязательное поле!",
+    //     minlength: "Пароль не может быть меньше 8 символов"
+    //   },
+    //   email: "Пожалуйста, укажите действительный email"
+    // }
+  });
+});
+
+loginBtn.addEventListener("change", validateForm);
+
 loginBtn.addEventListener("click", function(e) {
   e.preventDefault();
+  if ($("#loginForm").valid() == false) {
+    return;
+  }
   logIn();
 });
