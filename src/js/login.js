@@ -64,6 +64,10 @@ const logIn = async () => {
   }
 };
 
+document.querySelector(".inputEmail").addEventListener("input", e => {
+  e.target.value = e.target.value.replace(/[^a-z ]/i, "");
+});
+
 const validateForm = $(function() {
   $("#loginForm").validate({
     rules: {
@@ -73,13 +77,11 @@ const validateForm = $(function() {
       psw: {
         required: true
       }
+    },
+    messages: {
+      psw: "",
+      email: ""
     }
-    // messages: {
-    //   psw: {
-    //     required: "Это обязательное поле!"
-    //   },
-    //   email: "Это обязательное поле!"
-    // }
   });
 });
 

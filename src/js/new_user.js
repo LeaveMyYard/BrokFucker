@@ -16,6 +16,10 @@ if (errorReg == 1) {
   errorContainer.append(errorMsg);
 }
 
+document.querySelector(".inputEmail").addEventListener("input", e => {
+  e.target.value = e.target.value.replace(/[^a-z ]/i, "");
+});
+
 regForm.addEventListener("submit", async function(e) {
   e.preventDefault();
   if ($("#regForm").valid() == false) {
