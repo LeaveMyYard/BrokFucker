@@ -180,10 +180,14 @@ const createLotAndListeners = async (
   const lotEl = $(`
         <div class="userLots" data-id="myLotForm__${index + 1}">
           <form>
+          <br />
           <p><strong>${index + 1}</strong></p>
+          <br />
           <a class="linkToLotPage" href="lot.html?id=${
             lot.id
           }">Страница лота</a>
+          <br />
+          <br />
           <label class="label lot_field" for="lot_name"
               ><span>Название лота: </span>
               <input
@@ -283,15 +287,21 @@ const createLotAndListeners = async (
               </textarea>
             </label>
             </form>
-            <div class="lot_photo">
-            ${lot.photos.photos
-              .map(photo => {
-                return `<img height="300" src="${photo}"></img>`;
-              })
-              .join("")}  
-            </div>
-            <button class="deleteLotBtn btn">Remove</button>
-            <button class="editLotBtn btn">Update</button>
+                ${lot.photos.photos
+                  .map(function(value, key) {
+                    return `
+                        <div class="swiper-container">
+                          <img class="lot_photo" src="${value}"></img>
+                            <button data-id="${key}" class="btn deletePhotoBtn">Удалить фото</button>
+                        </div>`;
+                  })
+                  .join("")}
+              <button class="deleteLotBtn btn">Remove</button>
+              <button class="editLotBtn btn">Update</button>
+              <label for="updateLotPhoto" class="addPhotoBtn btn">
+                <input style="display:none" type="file" name="file" id="updateLotPhoto" />
+                <span class="addPhotoImg"></span>
+              </label>
             </div>
   `).get(0);
 
@@ -316,8 +326,38 @@ const createLotAndListeners = async (
     });
 
   $(lotEl)
+    .find(".deletePhotoBtn")
+    .on("click", async function(event) {
+      const photoID = $(event.target).attr("data-id");
+      try {
+        const response = await fetch(URL + `lots/${lot.id}/photos/${photoID}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${encData()}`
+          }
+        });
+        if (response.ok) {
+          alert("removed");
+          location.reload();
+        } else throw new Error(error);
+      } catch (error) {
+        alert("Ошибка! Что-то пошло не так.");
+        console.log(error);
+      }
+    });
+
+  $(lotEl)
     .find(".editLotBtn")
     .on("click", async function(event) {
+      const formData = new FormData();
+      const photos = document.querySelector("#updateLotPhoto");
+      for (let i = 0; i < photos.files.length; i++) {
+        formData.append(
+          `file${(Math.random() * 100000).toFixed(0)}`,
+          photos.files[i]
+        );
+      }
       const value = {
         name: $(lotEl).find("input[name=lot_name]")[0].value,
         amount: $(lotEl).find("input[name=lot_reqsum]")[0].value,
@@ -340,7 +380,22 @@ const createLotAndListeners = async (
         });
         if (response.ok) {
           console.log(response);
-
+          getMyLots();
+        } else throw new Error(error);
+      } catch (error) {
+        alert("Ошибка! Что-то пошло не так.");
+        console.log(error);
+      }
+      try {
+        const response = await fetch(URL + `lots/${lot.id}/photos`, {
+          method: "POST",
+          headers: {
+            Authorization: `Basic ${encData()}`
+          },
+          body: formData
+        });
+        if (response.ok) {
+          console.log(response);
           window.location.reload();
         } else throw new Error(error);
       } catch (error) {
@@ -348,7 +403,6 @@ const createLotAndListeners = async (
         console.log(error);
       }
     });
-
   return lotEl;
 };
 
@@ -393,9 +447,6 @@ const createArchiveLotAndListeners = async (
           <div class="userLots" data-id="myLotForm__${index + 1}">
           <form>
           <p><strong>${index + 1}</strong></p>
-          <a class="linkToLotPage" href="lot.html?id=${
-            lot.id
-          }">Страница лота</a>
           <label class="label lot_field" for="lot_name"
               ><span>Название лота: </span>
               <input disabled
@@ -495,10 +546,11 @@ const createArchiveLotAndListeners = async (
               </textarea>
             </label>
             </form>
-            <div class="lot_photo">
+            
+            <div class="swiper-archived-container">
             ${lot.photos.photos
               .map(photo => {
-                return `<img height="300" src="${photo}"></img>`;
+                return `<img class="lot_photo" src="${photo}"></img>`;
               })
               .join("")}  
             </div>
@@ -635,7 +687,7 @@ createLotPublish.addEventListener("click", async function(e) {
 
   let newLotID = 0;
   const formData = new FormData();
-  const photos = document.querySelector('input[type="file"][multiple]');
+  const photos = document.querySelector("#createLotPhoto");
   for (let i = 0; i < photos.files.length; i++) {
     formData.append(
       `file${(Math.random() * 100000).toFixed(0)}`,

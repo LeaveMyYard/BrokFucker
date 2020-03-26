@@ -284,14 +284,30 @@ label.error {
 }
 
 .lot_photo {
-  display: block;
-  margin-top: 1.5rem;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  opacity: 1;
+  transition: 0.5s ease;
 }
 
 .create_lot_photo {
   display: block;
   margin: 1.5rem 0;
   cursor: pointer;
+}
+
+.deletePhotoBtn {
+  transition: 0.5s ease;
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  text-align: center;
 }
 
 #createLotPhoto {
@@ -465,4 +481,44 @@ main {
   margin: 1rem 0;
   color: #ff4747;
   font-weight: 600;
+}
+
+#myprofEmail {
+  font-weight: 600;
+}
+
+.addPhotoBtn {
+  /* position: absolute; */
+  margin-left: 5px;
+  height: 42px;
+  background: #2a88ff;
+  color: #fff;
+}
+
+.addPhotoImg {
+  display: inline-block;
+  width: 32px;
+  height: auto;
+  background-image: url(images/addphoto.png);
+  background-size: cover;
+}
+
+/* swiper */
+.swiper-container {
+  display: block;
+  position: relative;
+  margin: 1.5rem 0;
+}
+
+.swiper-archived-container {
+  display: block;
+  position: relative;
+  margin: 1.5rem 0;
+}
+
+.swiper-container:hover img {
+  opacity: 0.3;
+}
+.swiper-container:hover .deletePhotoBtn {
+  opacity: 1;
 }
