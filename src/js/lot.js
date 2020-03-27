@@ -102,6 +102,23 @@ async function onReady() {
 }
 onReady();
 
+vocabulary = {
+  cash: "Наличные",
+  cashless: "Безналичные",
+  any: "Любой",
+  every_month: "Ежемесячно",
+  term_end: "Окончание срока",
+  other: "Другое"
+};
+
+function translate(data) {
+  for (let word in vocabulary) {
+    if (word == data) {
+      return vocabulary[word];
+    }
+  }
+}
+
 lotProfilePic.addEventListener("click", function() {
   location.href = "my_profile.html";
 });
@@ -130,9 +147,11 @@ const getTheLot = async () => {
     document.getElementsByName("lot_reqsum")[0].value = result["amount"];
     document.getElementsByName("lot_currency")[0].value = result["currency"];
     document.getElementsByName("lot_reqmonths")[0].value = result["term"];
-    document.getElementsByName("lot_method")[0].value = result["return_way"];
+    document.getElementsByName("lot_method")[0].value = translate(
+      result["return_way"]
+    );
     document.getElementsByName("lot_security")[0].value = result["security"];
-    document.getElementsByName("lot_cred")[0].value = result["form"];
+    document.getElementsByName("lot_cred")[0].value = translate(result["form"]);
     document.getElementsByName("lot_desc")[0].innerText = result["commentary"];
     document.getElementsByName("lot_percentage")[0].value =
       result["percentage"];
@@ -140,7 +159,9 @@ const getTheLot = async () => {
     clubProven.innerText = result["security_checked"] == false ? "Нет" : "Да";
 
     result["photos"]["photos"].map(photo => {
-      lotPhotos.innerHTML += `<img height="300" src="${photo}"></img>`;
+      ` <div class="lot_photo">
+            <img height="300" src="${photo}" />
+        </div>`;
     });
   } catch (error) {
     console.error(error);

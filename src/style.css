@@ -281,6 +281,7 @@ label.error {
   font-size: 1.2rem;
   font-weight: 600;
   background: #e66465;
+  cursor: pointer;
 }
 
 .lot_photo {
@@ -487,20 +488,28 @@ main {
   font-weight: 600;
 }
 
+.btnContainer {
+  display: flex;
+  max-width: 380px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
 .addPhotoBtn {
-  /* position: absolute; */
-  margin-left: 5px;
-  height: 42px;
+  min-width: 20px;
+  border: 1px solid #000;
   background: #2a88ff;
-  color: #fff;
+  height: 25px;
+  position: relative;
+  cursor: pointer;
 }
 
 .addPhotoImg {
   display: inline-block;
   width: 32px;
   height: auto;
-  background-image: url(images/addphoto.png);
-  background-size: cover;
+  bottom: 5px;
+  left: 23%;
+  position: absolute;
 }
 
 /* swiper */

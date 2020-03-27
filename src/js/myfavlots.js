@@ -95,6 +95,7 @@ const createLotAndListeners = async (
           <label class="label lot_field" for="lot_name"
               ><span>Название лота: </span>
               <input
+                disabled
                 class="inputName"
                 type="text"
                 name="lot_name"
@@ -105,6 +106,7 @@ const createLotAndListeners = async (
             <label class="label lot_field" for="lot_reqsum"
               ><span>Необходимая сумма: </span>
               <input
+                disabled
                 class="inputReqSum"
                 type="text"
                 name="lot_reqsum"
@@ -114,16 +116,18 @@ const createLotAndListeners = async (
             </label>
             <label class="label lot_field" for="lot_currency"
               ><span>Валюта: </span>
-                  <input
-                  type="text"
-                  name="lot_currency"
-                  value="${lot.currency}"
-                  required
-                  />
+              <input
+                disabled
+                type="text"
+                name="lot_currency"
+                value="${lot.currency}"
+                required
+              />
             </label>
             <label class="label lot_field" for="lot_reqmonths"
               ><span>Срок, месяцев: </span>
               <input
+                disabled
                 class="inputReqMonths"
                 type="text"
                 name="lot_reqmonths"
@@ -134,6 +138,7 @@ const createLotAndListeners = async (
             <label class="label lot_field" for="lot_percentage"
               ><span>Ставка, годовых: </span>
               <input
+                disabled
                 type="text"
                 name="lot_percentage"
                 value="${lot.percentage}"
@@ -142,8 +147,8 @@ const createLotAndListeners = async (
             </label>
             <label class="label lot_field" for="lot_method"
               ><span>Метод погашения: </span>
-              <!-- fix -->
               <input
+                disabled
                 type="text"
                 name="lot_method"
                 value="${lot.return_way}"
@@ -153,6 +158,7 @@ const createLotAndListeners = async (
             <label class="label lot_field" for="lot_security"
               ><span>Обеспечение: </span>
               <input
+                disabled
                 type="text"
                 name="lot_security"
                 value="${lot.security}"
@@ -162,6 +168,7 @@ const createLotAndListeners = async (
             <label class="label lot_field" for="lot_cred"
               ><span>Форма кредитирования: </span>
               <input
+                disabled
                 type="text"
                 name="lot_cred"
                 value="${lot.form}"
@@ -171,20 +178,21 @@ const createLotAndListeners = async (
             <label class="label lot_field" for="lot_shortdesc"
               ><span>Короткое описание: </span>
               <textarea
+                disabled
                 name="lot_shortdesc"
               >${lot.commentary}
               </textarea>
             </label>
             </form>
-            <div class="lot_photo">
               ${lot.photos.photos.map(photo => {
-                return `<img height="300" src="${photo}"></img>`;
+                return `
+                <div class="lot_photo">
+                    <img height="100%" width="100%" src="${photo}"></img>
+                </div>`;
               })}
-            </div>
             <button class="deleteLotBtn btn">Удалить из избранных</button>
             </div>
   `).get(0);
-  console.log(lot.photos.photos.forEach(photo => console.log(photo)));
 
   $(lotEl)
     .find(".deleteLotBtn")

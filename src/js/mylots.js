@@ -175,7 +175,7 @@ profData();
 const createLotAndListeners = async (
   lot,
   index,
-  { parent: myLotsContainer, onLotRemove }
+  { parent: myLotsContainer, onLotRemove, onPhotoRemove }
 ) => {
   const lotEl = $(`
         <div class="userLots" data-id="myLotForm__${index + 1}">
@@ -287,21 +287,25 @@ const createLotAndListeners = async (
               </textarea>
             </label>
             </form>
-                ${lot.photos.photos
-                  .map(function(value, key) {
-                    return `
-                        <div class="swiper-container">
-                          <img class="lot_photo" src="${value}"></img>
-                            <button data-id="${key}" class="btn deletePhotoBtn">Удалить фото</button>
-                        </div>`;
-                  })
-                  .join("")}
-              <button class="deleteLotBtn btn">Remove</button>
-              <button class="editLotBtn btn">Update</button>
-              <label for="updateLotPhoto" class="addPhotoBtn btn">
-                <input style="display:none" type="file" name="file" id="updateLotPhoto" />
-                <span class="addPhotoImg"></span>
-              </label>
+                <div class="lotPhotosContainer">
+                  ${lot.photos.photos
+                    .map(function(value, key) {
+                      return `
+                          <div class="swiper-container">
+                            <img class="lot_photo" src="${value}"></img>
+                              <button data-id="${key}" class="btn deletePhotoBtn">Удалить фото</button>
+                          </div>`;
+                    })
+                    .join("")}
+                </div>
+                <div class="btnContainer">
+                  <button class="deleteLotBtn btn">Удалить</button>
+                  <button class="editLotBtn btn">Обновить</button>
+                  <label for="updateLotPhoto" class="addPhotoBtn btn">
+                  <input style="display:none" type="file" name="file" id="updateLotPhoto" multiple/>
+                    <img class="addPhotoImg" src="images/addphoto.png"></span>
+                  </label>
+                </div>
             </div>
   `).get(0);
 
@@ -328,7 +332,8 @@ const createLotAndListeners = async (
   $(lotEl)
     .find(".deletePhotoBtn")
     .on("click", async function(event) {
-      const photoID = $(event.target).attr("data-id");
+      const photoID = Number($(event.target).attr("data-id"));
+      const lotPhoto = lot.photos.photos[photoID];
       try {
         const response = await fetch(URL + `lots/${lot.id}/photos/${photoID}`, {
           method: "DELETE",
@@ -338,8 +343,7 @@ const createLotAndListeners = async (
           }
         });
         if (response.ok) {
-          alert("removed");
-          location.reload();
+          onPhotoRemove(lot, lotEl, index, lotPhoto, photoID);
         } else throw new Error(error);
       } catch (error) {
         alert("Ошибка! Что-то пошло не так.");
@@ -380,7 +384,6 @@ const createLotAndListeners = async (
         });
         if (response.ok) {
           console.log(response);
-          getMyLots();
         } else throw new Error(error);
       } catch (error) {
         alert("Ошибка! Что-то пошло не так.");
@@ -406,13 +409,14 @@ const createLotAndListeners = async (
   return lotEl;
 };
 
-const createLotEls = async (lots, { onLotRemove }) => {
+const createLotEls = async (lots, { onLotRemove, onPhotoRemove }) => {
   const lotEls = await Promise.all(
     lots.map(
       async (lot, index) =>
         await createLotAndListeners(lot, index, {
           parent: myLotsContainer,
-          onLotRemove
+          onLotRemove,
+          onPhotoRemove
         })
     )
   );
@@ -423,7 +427,7 @@ const createLotEls = async (lots, { onLotRemove }) => {
 const manageLots = async sourceLots => {
   const lots = [...sourceLots];
 
-  let lotEls = await createLotEls(lots, { onLotRemove });
+  let lotEls = await createLotEls(lots, { onLotRemove, onPhotoRemove });
 
   async function onLotRemove(lot, lotEl, i) {
     lots.splice(i, 1);
@@ -434,6 +438,28 @@ const manageLots = async sourceLots => {
     lotEls = await createLotEls(lots, { onLotRemove });
     lotEls.forEach(lotEl => myLotsContainer.appendChild(lotEl));
   }
+
+  async function onPhotoRemove(lot, lotEl, lotIndex, lotPhoto, lotPhotoIndex) {
+    const lotPhotosContainer = lotEl.querySelector(".lotPhotosContainer");
+    const swiperContainerEls = lotPhotosContainer.querySelectorAll(
+      ".swiper-container"
+    );
+
+    for (let i = lotPhotoIndex + 1; i < swiperContainerEls.length; i++) {
+      const currentSwiperContainerEl = [...swiperContainerEls][i];
+      const currentPhotoDeleteButtonEl = currentSwiperContainerEl.querySelector(
+        "button.deletePhotoBtn"
+      );
+
+      $(currentPhotoDeleteButtonEl).attr("data-id", i - 1);
+    }
+
+    lotPhotosContainer.removeChild(swiperContainerEls[lotPhotoIndex]);
+
+    lot.photos.photos.splice(lotPhotoIndex, 1);
+  }
+
+  // [ 0,1,2,3,4,5 ]
 
   lotEls.forEach(lotEl => myLotsContainer.appendChild(lotEl));
 };
