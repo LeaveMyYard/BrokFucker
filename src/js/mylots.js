@@ -303,11 +303,24 @@ const createLotAndListeners = async (
                   <button class="editLotBtn btn">Обновить</button>
                   <label for="updateLotPhoto" class="addPhotoBtn btn">
                   <input style="display:none" type="file" name="file" id="updateLotPhoto" multiple/>
-                    <img class="addPhotoImg" src="images/addphoto.png"></span>
+                    <img class="addPhotoImg" src="images/addphoto.png" />
+                    <label for="updateLotPhoto" class="addPhotoText">Добавить</label>
                   </label>
                 </div>
             </div>
   `).get(0);
+
+  $(lotEl)
+    .find("#updateLotPhoto")
+    .on("change", function() {
+      if ($(this).val() != "") {
+        $(".addPhotoImg").hide();
+        $(".addPhotoText").text("Выбрано фото: " + $(this)[0].files.length);
+      } else {
+        $(".addPhotoImg").show();
+        $(".addPhotoText").text("Выберите файлы");
+      }
+    });
 
   $(lotEl)
     .find(".deleteLotBtn")
@@ -472,7 +485,9 @@ const createArchiveLotAndListeners = async (
   const archiveLotEl = $(`
           <div class="userLots" data-id="myLotForm__${index + 1}">
           <form>
+          <br />
           <p><strong>${index + 1}</strong></p>
+          <br />
           <label class="label lot_field" for="lot_name"
               ><span>Название лота: </span>
               <input disabled
@@ -580,7 +595,7 @@ const createArchiveLotAndListeners = async (
               })
               .join("")}  
             </div>
-            <button class="postLotBtn btn">Restore</button>
+            <button class="postLotBtn btn">Восстановить</button>
             </div>
   `).get(0);
 
