@@ -187,21 +187,6 @@ class DatabaseHandler:
         EmailSender.send_email_verification(email, random_hash)
         self.logger.debug(f'New email with confirmation code `{random_hash}` was sent to `{email}`')
 
-    def create_email_for_user_password_change(self, user, new_password):
-        password_hash = hashlib.sha256(new_password.encode('utf-8')).hexdigest()
-        random_hash = self.generage_new_random_hash()
-        date = datetime.now()
-
-        self.cursor.execute(
-            f"INSERT INTO PasswordChangeVerification (`email`, `password`, `verification_hash`, `request_date`)"
-            f"VALUES (?,?,?,?)",
-            (email, password_hash, random_hash, date)
-        )
-        self.conn.commit()
-
-        EmailSender.send_password_change_verification(email, new_password)
-        self.logger.debug(f'New password confirmation with code `{random_hash}` was sent to `{email}`')
-
     def verify_email_confirmation(self, code: str) -> Union[str, None]:
         '''
             If the corresponding email verification exist, create such user.
