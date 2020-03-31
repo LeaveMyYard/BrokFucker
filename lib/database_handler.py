@@ -458,10 +458,11 @@ class DatabaseHandler:
 
         return self.serialize_lot(lot)
 
-    def get_all_approved_lots(self, lot_filter=None):
+    def get_all_approved_lots(self, lot_filter):
         self.cursor.execute(
-            f"SELECT * FROM LiveLots"
-            f"LIMIT {}"
+            "SELECT * FROM LiveLots"
+            f"LIMIT {lot_filter['limit']}" if lot_filter['limit'] is not None else ""
+            f"OFFSET {lot_filter['offset']}" if lot_filter['offset'] is not None else ""
         )
 
         return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]

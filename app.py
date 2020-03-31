@@ -112,29 +112,54 @@ class RestAPI:
                 pass
             elif settings[key] is None:
                 pass
-            elif isinstance(settings[key], str):
-                if not re.fullmatch(settings[key], value):
-                    raise APIExceptions.JSONValueException(key, settings[key], value)
-            elif isinstance(settings[key], list):
-                if value not in settings[key]:
-                    raise APIExceptions.JSONValueException(key, settings[key], value)
+            else:
+                RestAPI.validate_field(key, value, settings[key])
+
+    @staticmethod
+    def validate_field(field_name, field_value, validation):
+        if isinstance(validation, str):
+            if not re.fullmatch(validation, field_value):
+                raise APIExceptions.JSONValueException(field_name, validation, field_value)
+        elif isinstance(validation, list):
+            if field_value not in validation:
+                raise APIExceptions.JSONValueException(field_name, validation, field_value)
 
     @staticmethod
     def check_lot_filter(lot_filter: Dict) -> Dict:
         settings = Settings.get_lot_filter_settings()
+        lot_settings = Settings.get_enter_settings()['lot']
         result_filter = {}
 
         available_types = settings['available_types']
+        available_types['order_by'] = lot_settings.keys()
 
         for value in available_types:
             result_filter[value] = lot_filter[value] if value in lot_filter else None
-            if result_filter[value] is not None and not re.fullmatch(result_filter[value], available_types[value]):
-                raise APIExceptions.LotFiltrationError(f"Invalid value got in {value}. Waited for {available_types[value]}, but got {result_filter[value]}")
+            if result_filter[value] is not None:
+                RestAPI.validate_field(value, result_filter[value], available_types[value])
 
         # limit check
         if lot_filter['limit'] > settings['maximum_length']:
-            raise APIExceptions.LotFiltrationError(f"Could not load {lot_filter['limit']}")
-        
+            raise APIExceptions.LotFiltrationError(f"Could not load {lot_filter['limit']} lots. Maximum is {settings['maximum_length']}")
+
+        show_only = {
+            key: value for key, value in filter(lambda k, v: isinstance(v, list), lot_settings.items())
+        }
+
+        if 'show_only' in lot_filter:
+            if not isinstance(lot_filter['show_only'], dict):
+                raise APIExceptions.LotFiltrationError(f"show_only field in lot filtration should be a Map[str, List[str]]")
+
+            result_filter['show_only'] = {}
+
+            for key in show_only:
+                result_filter['show_only'][key] = val = lot_filter['show_only'][key]
+                if not isinstance(val, list) or any([not isinstance(v, str) or v not in show_only.values() for v in val]):
+                    raise APIExceptions.LotFiltrationError(f"show_only field in lot filtration should be a Map[str, List[str]]")
+        else:
+            result_filter['show_only'] = None
+
+        return result_filter
 
     # -------------------------------------------------------------------------
     # Public stuff
