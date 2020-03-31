@@ -14,9 +14,9 @@ class Lot:
         database.approve_lot(lot_id)
 
     @staticmethod
-    def get_all_approved_lots():
+    def get_all_approved_lots(lot_filter=None):
         database = DatabaseHandler()
-        return database.get_all_approved_lots()
+        return database.get_all_approved_lots(lot_filter=lot_filter)
 
     @staticmethod
     def get_all_unapproved_lots():

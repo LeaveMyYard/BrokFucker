@@ -53,3 +53,7 @@ class ModeratorAddingError(IndexedException):
 class JSONValueException(IndexedException):
     def __init__(self, param, avaited, got):
         super().__init__(-1010, f'Strange value got for {param}. Waited for {avaited} but got "{got}"')
+
+class LotFiltrationError(IndexedException):
+    def __init__(self, message):
+        super().__init__(-1011, message)

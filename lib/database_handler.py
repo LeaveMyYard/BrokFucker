@@ -458,9 +458,10 @@ class DatabaseHandler:
 
         return self.serialize_lot(lot)
 
-    def get_all_approved_lots(self):
+    def get_all_approved_lots(self, lot_filter=None):
         self.cursor.execute(
             f"SELECT * FROM LiveLots"
+            f"LIMIT {}"
         )
 
         return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]

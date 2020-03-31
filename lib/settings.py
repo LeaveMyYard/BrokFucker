@@ -31,3 +31,7 @@ class Settings:
     @staticmethod
     def get_enter_settings() -> Dict:
         return Settings.__load_settings()['user_entered_values']
+
+    @staticmethod
+    def get_lot_filter_settings() -> Dict:
+        return Settings.__load_settings()['lot_filter_settings']

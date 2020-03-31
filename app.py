@@ -12,6 +12,7 @@ from typing import Union, Dict, Callable, List
 import json
 import lib.util.exceptions as APIExceptions
 import re
+import copy
 
 app = Flask(__name__)
 CORS(app)
@@ -117,6 +118,23 @@ class RestAPI:
             elif isinstance(settings[key], list):
                 if value not in settings[key]:
                     raise APIExceptions.JSONValueException(key, settings[key], value)
+
+    @staticmethod
+    def check_lot_filter(lot_filter: Dict) -> Dict:
+        settings = Settings.get_lot_filter_settings()
+        result_filter = {}
+
+        available_types = settings['available_types']
+
+        for value in available_types:
+            result_filter[value] = lot_filter[value] if value in lot_filter else None
+            if result_filter[value] is not None and not re.fullmatch(result_filter[value], available_types[value]):
+                raise APIExceptions.LotFiltrationError(f"Invalid value got in {value}. Waited for {available_types[value]}, but got {result_filter[value]}")
+
+        # limit check
+        if lot_filter['limit'] > settings['maximum_length']:
+            raise APIExceptions.LotFiltrationError(f"Could not load {lot_filter['limit']}")
+        
 
     # -------------------------------------------------------------------------
     # Public stuff
@@ -262,7 +280,8 @@ class RestAPI:
     @route('lots/approved', methods=['GET'])
     @route('lots', methods=['GET'])
     def get_approved_lots():
-        return jsonify(Lot.get_all_approved_lots()), 200
+        lot_filter = json.loads(request.json['filter']) if request.json and 'filter' in request.json else None
+        return jsonify(Lot.get_all_approved_lots(lot_filter = lot_filter)), 200
 
     @staticmethod
     @route('lots/<int:lot_id>', methods=['GET'])
@@ -331,7 +350,6 @@ class RestAPI:
         if not Lot.can_user_edit(user.email(), lot_id):
             raise APIExceptions.NoPermissionError()
         
-        a = request.files
         resp = {filename: Lot.add_photo(request.files[filename], lot_id) for filename in request.files}
 
         return jsonify(resp), 201
