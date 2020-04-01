@@ -480,9 +480,9 @@ class DatabaseHandler:
 
         return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
 
-    def get_all_unapproved_lots(self):
+    def get_all_unapproved_lots(self, lot_filter):
         self.cursor.execute(
-            f"SELECT * FROM LiveUnacceptedLots"
+            f"SELECT * FROM LiveUnacceptedLots" + self.__format_sql_lot_filter_string(lot_filter)
         )
 
         return [self.serialize_lot for lot in self.cursor.fetchall()]
@@ -527,9 +527,9 @@ class DatabaseHandler:
         )
         self.conn.commit()
 
-    def get_favorites(self, email):
+    def get_favorites(self, email, lot_filter):
         self.cursor.execute(
-            f"SELECT `favorite_lots` FROM UsersLots WHERE `email` = ?",
+            f"SELECT `favorite_lots` FROM UsersLots WHERE `email` = ?" + self.__format_sql_lot_filter_string(lot_filter), 
             (email, )
         )
         
@@ -537,17 +537,17 @@ class DatabaseHandler:
 
         return [self.get_lot(lot_id) for lot_id in reversed(res)]
 
-    def get_personal(self, email):
+    def get_personal(self, email, lot_filter):
         self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `user` = ? and `deleted` = 'False'",
+            f"SELECT * FROM Lots WHERE `user` = ? and `deleted` = 'False'" + self.__format_sql_lot_filter_string(lot_filter),
             (email, )
         )
 
         return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
 
-    def get_personal_deleted(self, email):
+    def get_personal_deleted(self, email, lot_filter):
         self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `user` = ? and `deleted` = 'True'",
+            f"SELECT * FROM Lots WHERE `user` = ? and `deleted` = 'True'" + self.__format_sql_lot_filter_string(lot_filter),
             (email, )
         )
 

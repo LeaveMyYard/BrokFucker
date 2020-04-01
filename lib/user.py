@@ -108,21 +108,6 @@ class User:
         database.remove_lot_from_favorites(User.email(), lot_id)
 
     @staticmethod
-    def get_favorites():
-        database = DatabaseHandler()
-        return database.get_favorites(User.email())
-
-    @staticmethod
-    def get_personal():
-        database = DatabaseHandler()
-        return database.get_personal(User.email())
-
-    @staticmethod
-    def get_personal_deleted():
-        database = DatabaseHandler()
-        return database.get_personal_deleted(User.email())
-
-    @staticmethod
     def add_avatar(image):
         database = DatabaseHandler()
         database.set_user_avatar(User.email(), image)

@@ -88,14 +88,29 @@ class Lot:
         return self.database.remove_photo(self.lot_id, photo_id)
 
     @staticmethod
+    def get_favorites(user, lot_filter = None):
+        database = DatabaseHandler()
+        return database.get_favorites(user, lot_filter=Lot.check_filter(lot_filter))
+
+    @staticmethod
+    def get_personal(user, lot_filter = None):
+        database = DatabaseHandler()
+        return database.get_personal(user, lot_filter=Lot.check_filter(lot_filter))
+
+    @staticmethod
+    def get_personal_deleted(user, lot_filter = None):
+        database = DatabaseHandler()
+        return database.get_personal_deleted(user, lot_filter=Lot.check_filter(lot_filter))
+
+    @staticmethod
     def get_all_approved_lots(lot_filter = None):
         database = DatabaseHandler()
         return database.get_all_approved_lots(lot_filter=Lot.check_filter(lot_filter))
 
     @staticmethod
-    def get_all_unapproved_lots():
+    def get_all_unapproved_lots(lot_filter = None):
         database = DatabaseHandler()
-        return database.get_all_unapproved_lots()
+        return database.get_all_unapproved_lots(lot_filter=Lot.check_filter(lot_filter))
 
     @staticmethod
     def get_approved_subscriptions():

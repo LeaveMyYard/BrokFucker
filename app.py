@@ -371,19 +371,22 @@ class RestAPI:
     @route('lots/favorites', methods=['GET'])
     @user.login_required
     def get_favorite_lots():
-        return jsonify(user.get_favorites()), 200
+        lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
+        return jsonify(Lot.get_favorites(user.email(), lot_filter)), 200
 
     @staticmethod
     @route('lots/personal', methods=['GET'])
     @user.login_required
     def get_personal_lots():
-        return jsonify(user.get_personal()), 200
+        lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
+        return jsonify(Lot.get_personal(user.email(), lot_filter)), 200
 
     @staticmethod
     @route('lots/personal/deleted', methods=['GET'])
     @user.login_required
     def get_personal_deleted_lots():
-        return jsonify(user.get_personal_deleted()), 200
+        lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
+        return jsonify(Lot.get_personal_deleted(user.email(), lot_filter)), 200
 
     @staticmethod
     @route('lots/subscription/<int:lot_id>', methods=['PUT'])
@@ -447,7 +450,8 @@ class RestAPI:
     @route('lots/unapproved', methods=['GET'])
     @moderator.login_required
     def get_unapproved_lots():
-        return jsonify(Lot.get_all_unapproved_lots()), 200
+        lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
+        return jsonify(Lot.get_all_unapproved_lots(lot_filter)), 200
 
     @staticmethod
     @route('lots/subscription/approved', methods=['GET'])
