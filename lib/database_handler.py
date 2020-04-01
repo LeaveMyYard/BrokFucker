@@ -458,11 +458,24 @@ class DatabaseHandler:
 
         return self.serialize_lot(lot)
 
+    @staticmethod
+    def __format_sql_lot_filter_string(lot_filter) -> str:
+        res = ""
+        if lot_filter['show_only'] is not None:
+            res += ' WHERE ' + ' AND '.join(
+                [' OR '.join([f"`{type}` = '{value}'" for value in lot_filter['show_only'][type]]) for type in lot_filter['show_only']]
+            )
+        if lot_filter['order_by'] is not None:
+            res += f" ORDER BY {lot_filter['order_by']} {lot_filter['order_type'] if lot_filter['order_type'] is not None else ''}"
+        if lot_filter['limit'] is not None:
+            res += f" LIMIT {lot_filter['limit']}"
+        if lot_filter['offset'] is not None:
+            res += f" OFFSET {lot_filter['offset']}"
+        return res
+
     def get_all_approved_lots(self, lot_filter):
         self.cursor.execute(
-            "SELECT * FROM LiveLots"
-            f"LIMIT {lot_filter['limit']}" if lot_filter['limit'] is not None else ""
-            f"OFFSET {lot_filter['offset']}" if lot_filter['offset'] is not None else ""
+            "SELECT * FROM LiveLots" + self.__format_sql_lot_filter_string(lot_filter)
         )
 
         return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]

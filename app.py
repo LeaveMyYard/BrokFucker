@@ -124,43 +124,6 @@ class RestAPI:
             if field_value not in validation:
                 raise APIExceptions.JSONValueException(field_name, validation, field_value)
 
-    @staticmethod
-    def check_lot_filter(lot_filter: Dict) -> Dict:
-        settings = Settings.get_lot_filter_settings()
-        lot_settings = Settings.get_enter_settings()['lot']
-        result_filter = {}
-
-        available_types = settings['available_types']
-        available_types['order_by'] = lot_settings.keys()
-
-        for value in available_types:
-            result_filter[value] = lot_filter[value] if value in lot_filter else None
-            if result_filter[value] is not None:
-                RestAPI.validate_field(value, result_filter[value], available_types[value])
-
-        # limit check
-        if lot_filter['limit'] > settings['maximum_length']:
-            raise APIExceptions.LotFiltrationError(f"Could not load {lot_filter['limit']} lots. Maximum is {settings['maximum_length']}")
-
-        show_only = {
-            key: value for key, value in filter(lambda k, v: isinstance(v, list), lot_settings.items())
-        }
-
-        if 'show_only' in lot_filter:
-            if not isinstance(lot_filter['show_only'], dict):
-                raise APIExceptions.LotFiltrationError(f"show_only field in lot filtration should be a Map[str, List[str]]")
-
-            result_filter['show_only'] = {}
-
-            for key in show_only:
-                result_filter['show_only'][key] = val = lot_filter['show_only'][key]
-                if not isinstance(val, list) or any([not isinstance(v, str) or v not in show_only.values() for v in val]):
-                    raise APIExceptions.LotFiltrationError(f"show_only field in lot filtration should be a Map[str, List[str]]")
-        else:
-            result_filter['show_only'] = None
-
-        return result_filter
-
     # -------------------------------------------------------------------------
     # Public stuff
     # -------------------------------------------------------------------------
@@ -305,19 +268,20 @@ class RestAPI:
     @route('lots/approved', methods=['GET'])
     @route('lots', methods=['GET'])
     def get_approved_lots():
-        lot_filter = json.loads(request.json['filter']) if request.json and 'filter' in request.json else None
-        return jsonify(Lot.get_all_approved_lots(lot_filter = lot_filter)), 200
+        lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
+        return jsonify(Lot.get_all_approved_lots(lot_filter)), 200
 
     @staticmethod
     @route('lots/<int:lot_id>', methods=['GET'])
     def get_lot(lot_id):
-        return jsonify(Lot.get_lot(lot_id)), 200
+        return jsonify(Lot(lot_id).get_lot_data()), 200
 
     @staticmethod
     @route('lots/<int:lot_id>', methods=['PUT'])
     @user.login_required
     def update_lot(lot_id):
-        if not Lot.can_user_edit(user.email(), lot_id):
+        lot = Lot(lot_id)
+        if not lot.can_user_edit(user.email()):
             raise APIExceptions.NoPermissionError()
 
         if not request.json:
@@ -339,7 +303,7 @@ class RestAPI:
 
         for data in data_available:
             if data in request.json:
-                Lot.update_data(lot_id, data, request.json[data])
+                lot.update_data(data, request.json[data])
 
         return RestAPI.message('A lot is changed'), 201
 
@@ -347,35 +311,38 @@ class RestAPI:
     @route('lots/<int:lot_id>', methods=['DELETE'])
     @user.login_required
     def delete_lot(lot_id):
-        if not Lot.can_user_edit(user.email(), lot_id):
+        lot = Lot(lot_id)
+        if not lot.can_user_edit(user.email()):
             raise APIExceptions.NoPermissionError()
         
-        Lot.delete_lot(lot_id)
+        lot.delete_lot()
         return RestAPI.message('A lot is deleted'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>', methods=['POST'])
     @user.login_required
     def restore_lot(lot_id):
-        if not Lot.can_user_edit(user.email(), lot_id):
+        lot = Lot(lot_id)
+        if not lot.can_user_edit(user.email()):
             raise APIExceptions.NoPermissionError()
 
-        Lot.restore_lot(lot_id)
+        lot.restore_lot()
         return RestAPI.message('A lot is restored'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/photos', methods=['GET'])
     def get_lot_photo(lot_id):
-        return jsonify({'link': Lot.get_photos(lot_id)}), 200
+        return jsonify({'link': Lot(lot_id).get_photos()}), 200
 
     @staticmethod
     @route('lots/<int:lot_id>/photos', methods=['POST'])
     @user.login_required
     def add_lot_photo(lot_id):
-        if not Lot.can_user_edit(user.email(), lot_id):
+        lot = Lot(lot_id)
+        if not lot.can_user_edit(user.email()):
             raise APIExceptions.NoPermissionError()
         
-        resp = {filename: Lot.add_photo(request.files[filename], lot_id) for filename in request.files}
+        resp = {filename: lot.add_photo(request.files[filename]) for filename in request.files}
 
         return jsonify(resp), 201
 
@@ -383,10 +350,11 @@ class RestAPI:
     @route('lots/<int:lot_id>/photos/<int:photo_id>', methods=['DELETE'])
     @user.login_required
     def remove_lot_photo(lot_id, photo_id):
-        if not Lot.can_user_edit(user.email(), lot_id):
+        lot = Lot(lot_id)
+        if not lot.can_user_edit(user.email()):
             raise APIExceptions.NoPermissionError()
         
-        return jsonify(Lot.remove_photo(lot_id, photo_id)), 201
+        return jsonify(lot.remove_photo(photo_id)), 201
 
     @staticmethod
     @route('lots/favorites/<int:lot_id>', methods=['PUT', 'DELETE'])
@@ -460,18 +428,19 @@ class RestAPI:
     @route('lots/<int:lot_id>/approve', methods=['PUT'])
     @moderator.login_required
     def approve_lot(lot_id):
-        Lot.approve(lot_id)
+        Lot(lot_id).approve()
         return RestAPI.message('A lot is now approved'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/security', methods=['PUT', 'DELETE'])
     @moderator.login_required
     def set_security_checked(lot_id):
+        lot = Lot(lot_id)
         if request.type == 'PUT':
-            Lot.set_security_checked(lot_id, True)
+            lot.set_security_checked(True)
             return RestAPI.message('Lot\'s security is now checked'), 201
         if request.type == 'DELETE':
-            Lot.set_security_checked(lot_id, False)
+            lot.set_security_checked(False)
             return RestAPI.message('Lot\'s security is no more checked'), 201
 
     @staticmethod
