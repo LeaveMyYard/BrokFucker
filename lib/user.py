@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 from PIL import Image
 from os import path, remove
 from lib.util.enums import SubscriptionTypes
+import sqlite3
 
 class User:
     auth = HTTPBasicAuth()
@@ -34,8 +35,8 @@ class User:
     def verify_email_from_code(code):
         database = DatabaseHandler()
         try:
-            link = database.verify_email_confirmation(code)
-        except EmailValidationError as e:
+            database.verify_email_confirmation(code)
+        except EmailValidationError:
             raise
         else:
             return jsonify({'msg': 'Email was succesfully confirmed.'})

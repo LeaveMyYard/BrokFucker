@@ -459,10 +459,10 @@ class DatabaseHandler:
         return self.serialize_lot(lot)
 
     @staticmethod
-    def __format_sql_lot_filter_string(lot_filter) -> str:
+    def __format_sql_lot_filter_string(lot_filter, where_is_already_used: bool = False) -> str:
         res = ""
         if lot_filter['show_only'] is not None:
-            res += ' WHERE ' + ' AND '.join(
+            res += (' WHERE ' if not where_is_already_used else ' AND ') + ' AND '.join(
                 [' OR '.join([f"`{type}` = '{value}'" for value in lot_filter['show_only'][type]]) for type in lot_filter['show_only']]
             )
         if lot_filter['order_by'] is not None:
@@ -474,6 +474,7 @@ class DatabaseHandler:
         return res
 
     def get_all_approved_lots(self, lot_filter):
+        s = "SELECT * FROM LiveLots" + self.__format_sql_lot_filter_string(lot_filter)
         self.cursor.execute(
             "SELECT * FROM LiveLots" + self.__format_sql_lot_filter_string(lot_filter)
         )
@@ -529,7 +530,7 @@ class DatabaseHandler:
 
     def get_favorites(self, email, lot_filter):
         self.cursor.execute(
-            f"SELECT `favorite_lots` FROM UsersLots WHERE `email` = ?" + self.__format_sql_lot_filter_string(lot_filter), 
+            f"SELECT `favorite_lots` FROM UsersLots WHERE `email` = ?" + self.__format_sql_lot_filter_string(lot_filter, where_is_already_used=True), 
             (email, )
         )
         
@@ -539,7 +540,7 @@ class DatabaseHandler:
 
     def get_personal(self, email, lot_filter):
         self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `user` = ? and `deleted` = 'False'" + self.__format_sql_lot_filter_string(lot_filter),
+            f"SELECT * FROM Lots WHERE `user` = ? and `deleted` = 'False'" + self.__format_sql_lot_filter_string(lot_filter, where_is_already_used=True),
             (email, )
         )
 
@@ -547,7 +548,7 @@ class DatabaseHandler:
 
     def get_personal_deleted(self, email, lot_filter):
         self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `user` = ? and `deleted` = 'True'" + self.__format_sql_lot_filter_string(lot_filter),
+            f"SELECT * FROM Lots WHERE `user` = ? and `deleted` = 'True'" + self.__format_sql_lot_filter_string(lot_filter, where_is_already_used=True),
             (email, )
         )
 

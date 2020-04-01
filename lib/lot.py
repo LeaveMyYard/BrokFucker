@@ -40,10 +40,19 @@ class Lot:
 
             result_filter['show_only'] = {}
 
-            for key in show_only:
-                result_filter['show_only'][key] = val = lot_filter['show_only'][key]
-                if not isinstance(val, list) or any([not isinstance(v, str) or v not in show_only.values() for v in val]):
+            for key, value in lot_filter['show_only'].items():
+                result_filter['show_only'][key] = value
+
+                if key not in show_only:
+                    raise APIExceptions.LotFiltrationError(f"{key} is not a valid group. Available groups are: {', '.join(show_only.keys())}")
+
+                if not isinstance(value, list) or any([not isinstance(v, str) for v in value]):
                     raise APIExceptions.LotFiltrationError(f"show_only field in lot filtration should be a Map[str, List[str]]")
+
+                for v in value:
+                    if v not in show_only[key]:
+                        raise APIExceptions.LotFiltrationError(f"{v} is not available for {key} group. Available values are: {', '.join(show_only[key])}")
+
         else:
             result_filter['show_only'] = None
 
