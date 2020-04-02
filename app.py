@@ -389,6 +389,13 @@ class RestAPI:
         return jsonify(Lot.get_personal_deleted(user.email(), lot_filter)), 200
 
     @staticmethod
+    @route('lots/personal/deleted/<int:lot_id>', methods=['DELETE'])
+    @user.login_required
+    def delete_lot_entirely():
+
+        raise NotImplementedError
+
+    @staticmethod
     @route('lots/subscription/<int:lot_id>', methods=['PUT'])
     @user.login_required
     def subscribe_to_lot(lot_id):
@@ -452,6 +459,14 @@ class RestAPI:
     def get_unapproved_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
         return jsonify(Lot.get_all_unapproved_lots(lot_filter)), 200
+
+    @staticmethod
+    @route('lots/unapproved/<int:lot_id>', methods=['DELETE'])
+    @moderator.login_required
+    def remove_unapproved_lot(lot_id):
+        required_fields = ['reason']
+
+        raise NotImplementedError
 
     @staticmethod
     @route('lots/subscription/approved', methods=['GET'])
