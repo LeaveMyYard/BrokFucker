@@ -57,3 +57,7 @@ class JSONValueException(IndexedException):
 class LotFiltrationError(IndexedException):
     def __init__(self, message):
         super().__init__(-1011, message)
+
+class PasswordChangeException(IndexedException):
+    def __init__(self, message):
+        super().__init__(-1012, message)

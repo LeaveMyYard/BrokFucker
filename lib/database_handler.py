@@ -132,7 +132,7 @@ class DatabaseHandler:
             (email, )
         )
         res = self.cursor.fetchone()
-        
+
         return res[0] == hashlib.sha256(password.encode('utf-8')).hexdigest()
 
     def is_moderator(self, email: str) -> bool:
@@ -219,6 +219,15 @@ class DatabaseHandler:
         self.conn.commit()
 
     def create_email_for_user_password_change(self, email, new_password):
+        if self.check_password(email, new_password):
+            raise APIExceptions.PasswordChangeException("Your new password could not be the same, as your old password.")
+
+        if len(new_password) < 8:
+            raise APIExceptions.PasswordChangeException('A password size is less than 8.')
+
+        if len(new_password) > 32:
+            raise APIExceptions.PasswordChangeException('A password size is bigger than 32.')
+
         password_hash = hashlib.sha256(new_password.encode('utf-8')).hexdigest()
         random_hash = self.generage_new_random_hash()
         date = datetime.now()
@@ -230,8 +239,12 @@ class DatabaseHandler:
         )
         self.conn.commit()
 
-        EmailSender.send_password_change_verification(email, random_hash)
-        self.logger.debug(f'New password confirmation with code `{random_hash}` was sent to `{email}`')
+        if email != 'admin':
+            EmailSender.send_password_change_verification(email, random_hash)
+            self.logger.debug(f'New password confirmation with code `{random_hash}` was sent to `{email}`')
+        else:
+            self.logger.warning(f'New password change requested for admin with code `{random_hash}`.')
+            self.logger.warning(f'Go to "{request.host_url}{Settings.get_new_password_verification_link_base()}?code={random_hash}" to confirm it.')
 
     def verify_email_for_user_password_change(self, code: str):
         self.cursor.execute(
@@ -243,14 +256,17 @@ class DatabaseHandler:
             (_, email, password, date) = self.cursor.fetchone()
         except TypeError:
             raise APIExceptions.EmailValidationError(-1204, 'No such verification code exists, it was already used or was already deleted.')
+        else:
+            if (datetime.now() - datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")) > timedelta(hours=24):
+                raise APIExceptions.EmailValidationError(-1203, 'Email verification time has passed.')
 
-        if (datetime.now() - datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")) > timedelta(hours=24):
-            raise APIExceptions.EmailValidationError(-1203, 'Email verification time has passed.')
-
-        self.cursor.execute(
-            f"UPDATE Users SET `password` = ? WHERE `email` = ?",
-            (password, email)
-        )
+            self.cursor.execute(
+                f"UPDATE Users SET `password` = ? WHERE `email` = ?",
+                (password, email)
+            )
+            self.conn.commit()
+        finally:
+            self.delete_email_for_password_change_confirmation_code(code)
 
     def delete_email_for_password_change_confirmation_code(self, code: str):
         self.cursor.execute(
@@ -474,7 +490,6 @@ class DatabaseHandler:
         return res
 
     def get_all_approved_lots(self, lot_filter):
-        s = "SELECT * FROM LiveLots" + self.__format_sql_lot_filter_string(lot_filter)
         self.cursor.execute(
             "SELECT * FROM LiveLots" + self.__format_sql_lot_filter_string(lot_filter)
         )
