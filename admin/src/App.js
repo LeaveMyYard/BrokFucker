@@ -1,10 +1,12 @@
 import React from "react";
 import LotsPage from "./components/LotsPage";
+import Sidebar from "./components/Sidebar";
 
 const App = () => {
   return (
     <div className="App">
-      <LotsPage></LotsPage>;
+      <Sidebar props={user}></Sidebar>
+      <LotsPage></LotsPage>
     </div>
   );
 };
