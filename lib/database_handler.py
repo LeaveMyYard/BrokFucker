@@ -437,7 +437,7 @@ class DatabaseHandler:
         self.conn.commit()
 
     def serialize_lot(self, lot: Tuple):
-        return {
+        res = {
             'id': lot[0],
             'date': lot[1],
             'name': lot[2],
@@ -457,6 +457,27 @@ class DatabaseHandler:
             'photos': self.get_lot_photos(lot[0]),
             'taken': self.check_taken(lot[0])
         }
+        
+        if self.is_lot_removed_by_a_moderator(lot[0]):
+            res['remove_reason'] = self.get_remove_reason(lot[0])
+
+        return res
+
+    def is_lot_removed_by_a_moderator(self, lot_id):
+        self.cursor.execute(
+            f"SELECT * FROM LotVerificationDeclines WHERE `lot` = ?",
+            (lot_id, )
+        )
+
+        return self.cursor.fetchall() != []
+
+    def get_remove_reason(self, lot_id):
+        self.cursor.execute(
+            f"SELECT `reason` FROM LotVerificationDeclines WHERE `lot` = ?",
+            (lot_id, )
+        )
+
+        return self.cursor.fetchone()[0]
 
     def check_taken(self, lot_id):
         self.cursor.execute(
@@ -605,15 +626,16 @@ class DatabaseHandler:
             'photos': [f'{request.host_url}image/lot/{photo}.jpg' for photo in photos]
         }
 
-    def get_lot_photos(self, lot_id):
+    def get_lot_photos_list(self, lot_id):
         self.cursor.execute(
             f"SELECT `photos` FROM Lots WHERE `id` = ?",
             (lot_id, )
         )
 
-        photos = eval(self.cursor.fetchone()[0])
+        return eval(self.cursor.fetchone()[0])
 
-        return self.jsonify_photos(lot_id, photos)
+    def get_lot_photos(self, lot_id):
+        return self.jsonify_photos(lot_id, self.get_lot_photos_list(lot_id))
 
     def add_photo(self, image, lot_id):
         self.create_directory_if_not_exists('data/images/temp')
@@ -665,6 +687,27 @@ class DatabaseHandler:
         self.conn.commit()
 
         return 'Photo is successfuly removed.'
+
+    def is_lot_in_archive(self, lot_id) -> bool:
+        self.cursor.execute(
+            f"SELECT `deleted` FROM Lots WHERE `id` = ?",
+            (lot_id, )
+        )
+
+        return self.cursor.fetchone()[0] == 'True'
+
+    def delete_lot_data(self, lot_id):
+        self.cursor.execute(
+            f"DELETE FROM LotVerificationDeclines WHERE `id` = ?",
+            (lot_id, )
+        )
+
+        self.cursor.execute(
+            f"DELETE FROM Lots WHERE `id` = ?",
+            (lot_id, )
+        )
+
+        self.conn.commit()
 
     def user_has_phone_number(self, user):
         return self.get_user_data(user)['phone_number'] is not None

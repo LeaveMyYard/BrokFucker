@@ -351,6 +351,7 @@ class RestAPI:
     @user.login_required
     def remove_lot_photo(lot_id, photo_id):
         lot = Lot(lot_id)
+
         if not lot.can_user_edit(user.email()):
             raise APIExceptions.NoPermissionError()
         
@@ -391,9 +392,15 @@ class RestAPI:
     @staticmethod
     @route('lots/personal/deleted/<int:lot_id>', methods=['DELETE'])
     @user.login_required
-    def delete_lot_entirely():
+    def delete_lot_entirely(lot_id):
+        lot = Lot(lot_id)
 
-        raise NotImplementedError
+        if not lot.can_user_edit(user.email()):
+            raise APIExceptions.NoPermissionError()
+
+        lot.delete_entirely()
+
+        return RestAPI.message(f'Lot {lot_id} is now deleted from archive.')
 
     @staticmethod
     @route('lots/subscription/<int:lot_id>', methods=['PUT'])

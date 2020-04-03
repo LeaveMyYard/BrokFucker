@@ -61,3 +61,7 @@ class LotFiltrationError(IndexedException):
 class PasswordChangeException(IndexedException):
     def __init__(self, message):
         super().__init__(-1012, message)
+
+class LotDeletionError(IndexedException):
+    def __init__(self):
+        super().__init__(-1013, 'You could not delete a lot that is not in an archive.')

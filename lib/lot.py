@@ -4,6 +4,7 @@ from lib.util.hash import sha256
 from lib.settings import Settings
 from typing import Dict
 import lib.util.exceptions as APIExceptions
+import os
 
 class Lot:
     @staticmethod
@@ -95,6 +96,17 @@ class Lot:
 
     def remove_photo(self, photo_id):
         return self.database.remove_photo(self.lot_id, photo_id)
+
+    def delete_entirely(self):
+        if not self.database.is_lot_in_archive(self.lot_id):
+            raise APIExceptions.LotDeletionError()
+
+        photos_list = self.database.get_lot_photos_list(self.lot_id)
+
+        for photo in photos_list:
+            os.remove(f'data/images/lots/{photo}.jpg')
+
+        self.database.delete_lot_data(self.lot_id)
 
     @staticmethod
     def get_favorites(user, lot_filter = None):

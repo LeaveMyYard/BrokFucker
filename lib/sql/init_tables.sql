@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS UsersLots (
     `email` TEXT PRIMARY KEY,
     `user_lots` TEXT NOT NULL DEFAULT '[]',
     `favorite_lots` TEXT NOT NULL DEFAULT '[]'
+    FOREIGN KEY (`email`) REFERENCES Users(`email`)
 );
 
 CREATE TRIGGER IF NOT EXISTS AddingUserToUsersLots
@@ -63,7 +64,14 @@ CREATE TABLE IF NOT EXISTS Lots (
     `confirmed` BOOLEAN NOT NULL DEFAULT 'False',
     `deleted` BOOLEAN NOT NULL DEFAULT 'False',
     `commentary` TEXT DEFAULT '',
-    `photos` TEXT DEFAULT '[]'
+    `photos` TEXT DEFAULT '[]',
+    FOREIGN KEY (`user`) REFERENCES Users(`email`)
+);
+
+CREATE TABLE IF NOT EXISTS LotVerificationDeclines (
+    `id` INTEGER PRIMARY KEY,
+    `reason` TEXT NOT NULL,
+    FOREIGN KEY (`id`) REFERENCES Lots(`id`)
 );
 
 CREATE VIEW IF NOT EXISTS LiveLots
