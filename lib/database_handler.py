@@ -544,7 +544,7 @@ class DatabaseHandler:
 
     def remove_moderator_delete_reason(self, lot_id):
         self.cursor.execute(
-            f"DELETE FROM LotVerificationDeclines WHERE `lot` = ?",
+            f"DELETE FROM LotVerificationDeclines WHERE `id` = ?",
             (lot_id, )
         )
 
@@ -552,7 +552,7 @@ class DatabaseHandler:
 
     def is_lot_removed_by_a_moderator(self, lot_id):
         self.cursor.execute(
-            f"SELECT * FROM LotVerificationDeclines WHERE `lot` = ?",
+            f"SELECT * FROM LotVerificationDeclines WHERE `id` = ?",
             (lot_id, )
         )
 
@@ -560,7 +560,7 @@ class DatabaseHandler:
 
     def get_remove_reason(self, lot_id):
         self.cursor.execute(
-            f"SELECT `reason` FROM LotVerificationDeclines WHERE `lot` = ?",
+            f"SELECT `reason` FROM LotVerificationDeclines WHERE `id` = ?",
             (lot_id, )
         )
 
