@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import {Link} from "react-router-dom";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import FormMessage from "./FormMessage";
 import setFormObj from "./FormUtils";
 
@@ -8,25 +8,25 @@ const initialData = {
   password: "",
 };
 
-const LoginForm = props => {
+const LoginForm = (props) => {
   const [data, setData] = useState(initialData);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  const validate = data => {
+  const validate = (data) => {
     const errors = {};
     if (!data.email) errors.email = "Email cannot be blank";
     if (!data.password) errors.password = "Password cannot be blank";
     return errors;
   };
 
-  const handleSubmit = e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     const errors = validate(data);
     setErrors(errors);
     if (Object.keys(errors).length === 0) {
       setLoading(true);
-      props.submit(data).catch(error => {
+      props.submit(data).catch((error) => {
         setErrors(error.response.data.errors);
         setLoading(false);
       });
