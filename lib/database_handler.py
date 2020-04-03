@@ -368,6 +368,9 @@ class DatabaseHandler:
         return lot_id
 
     def approve_lot(self, lot_id):
+        if self.is_lot_removed_by_a_moderator(lot_id):
+            self.remove_moderator_delete_reason(lot_id)
+            
         self.cursor.execute(
             f"UPDATE Lots SET `confirmed` = 'True' WHERE `id` = ?",
             (lot_id, )
@@ -462,6 +465,25 @@ class DatabaseHandler:
             res['remove_reason'] = self.get_remove_reason(lot[0])
 
         return res
+
+    def add_moderator_delete_reason(self, lot_id, moderator, reason):
+        if self.is_lot_removed_by_a_moderator(lot_id):
+            self.remove_moderator_delete_reason(lot_id)
+
+        self.cursor.execute(
+            f"INSERT INTO LotVerificationDeclines VALUES(?,?,?)",
+            (lot_id, reason, moderator)
+        )
+
+        self.conn.commit()
+
+    def remove_moderator_delete_reason(self, lot_id):
+        self.cursor.execute(
+            f"DELETE FROM LotVerificationDeclines WHERE `lot` = ?",
+            (lot_id, )
+        )
+
+        self.conn.commit()
 
     def is_lot_removed_by_a_moderator(self, lot_id):
         self.cursor.execute(

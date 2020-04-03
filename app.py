@@ -473,7 +473,13 @@ class RestAPI:
     def remove_unapproved_lot(lot_id):
         required_fields = ['reason']
 
-        raise NotImplementedError
+        RestAPI.check_required_fields(request.json, required_fields)
+
+        reason = request.json['reason']
+        lot = Lot(lot_id)
+        lot.delete_lot_by_moderator(user.email(), reason)
+
+        return RestAPI.message(f'Lot {lot_id} is now removed for a reason: {reason}')
 
     @staticmethod
     @route('lots/subscription/approved', methods=['GET'])

@@ -71,7 +71,9 @@ CREATE TABLE IF NOT EXISTS Lots (
 CREATE TABLE IF NOT EXISTS LotVerificationDeclines (
     `id` INTEGER PRIMARY KEY,
     `reason` TEXT NOT NULL,
-    FOREIGN KEY (`id`) REFERENCES Lots(`id`)
+    `removed_by` INTEGER NOT NULL,
+    FOREIGN KEY (`id`) REFERENCES Lots(`id`),
+    FOREIGN KEY (`removed_by`) REFERENCES Users(`email`)
 );
 
 CREATE VIEW IF NOT EXISTS LiveLots

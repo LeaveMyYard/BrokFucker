@@ -79,6 +79,10 @@ class Lot:
     def delete_lot(self):
         self.database.delete_lot(self.lot_id)
 
+    def delete_lot_by_moderator(self, moderator, reason):
+        self.database.add_moderator_delete_reason(self.lot_id, moderator, reason)
+        self.database.delete_lot(self.lot_id)
+
     def restore_lot(self):
         self.database.restore_lot(self.lot_id)
 
