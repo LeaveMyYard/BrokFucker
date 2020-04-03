@@ -65,3 +65,7 @@ class PasswordChangeException(IndexedException):
 class LotDeletionError(IndexedException):
     def __init__(self):
         super().__init__(-1013, 'You could not delete a lot that is not in an archive.')
+
+class AccountRestoreError(IndexedException):
+    def __init__(self, message):
+        super().__init__(-1014, message)

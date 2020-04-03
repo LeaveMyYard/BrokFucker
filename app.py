@@ -197,6 +197,18 @@ class RestAPI:
         return RestAPI.message(f'Password was successfuly changed.')
 
     @staticmethod
+    @route('user/restore/<string:email>')
+    def restore_account(email):
+        user.restore_account(email)
+        return RestAPI.message(f'Verification in sent to {email}')
+
+    @staticmethod
+    @route('user/restore/verify/<string:code>')
+    def verify_account_restore(code):
+        user.verify_account_restore(code)
+        return RestAPI.message(f'Temporary password is sent to your email.')
+
+    @staticmethod
     @route('user', methods=['PUT'])
     @user.login_required
     def edit_user_data():

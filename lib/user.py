@@ -47,6 +47,16 @@ class User:
                 pass
 
     @staticmethod
+    def restore_account(email):
+        database = DatabaseHandler()
+        database.create_account_restore_email(email)
+
+    @staticmethod
+    def verify_account_restore(code):
+        database = DatabaseHandler()
+        database.verify_account_restore(code)
+
+    @staticmethod
     def create(email, password):
         database = DatabaseHandler()
         database.create_user(email, password)

@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS Users (
 CREATE TABLE IF NOT EXISTS UsersLots (
     `email` TEXT PRIMARY KEY,
     `user_lots` TEXT NOT NULL DEFAULT '[]',
-    `favorite_lots` TEXT NOT NULL DEFAULT '[]'
+    `favorite_lots` TEXT NOT NULL DEFAULT '[]',
     FOREIGN KEY (`email`) REFERENCES Users(`email`)
 );
 
@@ -44,7 +44,15 @@ CREATE TABLE IF NOT EXISTS PasswordChangeVerification(
     `verification_hash` TEXT PRIMARY KEY,
     `email` TEXT NOT NULL,
     `password` TEXT NOT NULL,
-    `request_date` DATETIME NOT NULL
+    `request_date` DATETIME NOT NULL,
+    FOREIGN KEY (`email`) REFERENCES Users(`email`)
+);
+
+CREATE TABLE IF NOT EXISTS AccountRestoreVerification(
+    `verification_hash` TEXT PRIMARY KEY,
+    `email` TEXT NOT NULL,
+    `request_date` DATETIME NOT NULL,
+    FOREIGN KEY (`email`) REFERENCES Users(`email`)
 );
 
 CREATE TABLE IF NOT EXISTS Lots (

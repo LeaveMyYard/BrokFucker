@@ -96,7 +96,20 @@ class DatabaseHandler:
             if (datetime.now() - date) > duration_to_delete:
                 codes += 1
                 self.cursor.execute(
-                    f"DELETE FROM EmailVerification WHERE `verification_hash` = ?",
+                    f"DELETE FROM PasswordChangeVerification WHERE `verification_hash` = ?",
+                    (code, )
+                )
+
+        self.cursor.execute(
+            f"SELECT `verification_hash`, `request_date` FROM AccountRestoreVerification"
+        )
+
+        for code, date in self.cursor.fetchall():
+            date = datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")
+            if (datetime.now() - date) > duration_to_delete:
+                codes += 1
+                self.cursor.execute(
+                    f"DELETE FROM AccountRestoreVerification WHERE `verification_hash` = ?",
                     (code, )
                 )
 
@@ -194,7 +207,8 @@ class DatabaseHandler:
         '''
 
         self.cursor.execute(
-            f"SELECT * FROM EmailVerification WHERE `verification_hash` = '{code}'"
+            f"SELECT * FROM EmailVerification WHERE `verification_hash` = ?",
+            (code, )
         )
 
         try:
@@ -217,6 +231,57 @@ class DatabaseHandler:
             (code, )
         )
         self.conn.commit()
+
+    def create_account_restore_email(self, email):
+        if email == 'admin':
+            raise APIExceptions.AccountRestoreError('Restoring the admin account is not possible.')
+
+        if not self.check_user_exists(email):
+            raise APIExceptions.AccountRestoreError('No such user exist.')
+
+        random_hash = self.generage_new_random_hash()
+        date = datetime.now()
+
+        self.cursor.execute(
+            f"INSERT INTO AccountRestoreVerification (`email`, `verification_hash`, `request_date`)"
+            f"VALUES (?,?,?)",
+            (email, random_hash, date)
+        )
+        self.conn.commit()
+
+        EmailSender.send_account_restore_verification(email, random_hash)
+
+    def verify_account_restore(self, code: str):
+        '''
+            If the corresponding email verification exist, create such user.
+            If not - throws an exception
+        '''
+
+        self.cursor.execute(
+            f"SELECT * FROM AccountRestoreVerification WHERE `verification_hash` = ?",
+            (code, )
+        )
+
+        try:
+            (_, email, date) = self.cursor.fetchone()
+        except TypeError:
+            raise APIExceptions.EmailValidationError(-1204, 'No such verification code exists, it was already used or was already deleted.')
+        
+        if (datetime.now() - datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")) > timedelta(hours=24):
+            raise APIExceptions.EmailValidationError(-1203, 'Email verification time has passed.')
+
+        new_password = self.generage_new_random_hash()[:12]
+        new_password_hashed = hashlib.sha256(new_password.encode('utf-8')).hexdigest()
+
+        self.cursor.execute(
+            f"UPDATE Users SET `password` = ? WHERE `email` = ?",
+            (new_password_hashed, email)
+        )
+
+        self.conn.commit()
+        
+        EmailSender.send_new_password(email, new_password)
+        
 
     def create_email_for_user_password_change(self, email, new_password):
         if self.check_password(email, new_password):
@@ -370,7 +435,7 @@ class DatabaseHandler:
     def approve_lot(self, lot_id):
         if self.is_lot_removed_by_a_moderator(lot_id):
             self.remove_moderator_delete_reason(lot_id)
-            
+
         self.cursor.execute(
             f"UPDATE Lots SET `confirmed` = 'True' WHERE `id` = ?",
             (lot_id, )
