@@ -7,6 +7,7 @@ const pswInput = document.getElementsByName("psw");
 const mailInput = document.getElementsByName("email");
 const termsCheckbox = document.getElementById("terms");
 const errorContainer = document.getElementById("errorContainer");
+const pswReset = document.querySelector(".pswReset");
 
 let errorMsg = document.createElement("p");
 
@@ -42,7 +43,7 @@ const logIn = async () => {
   try {
     const response = await fetch(URL + "user", {
       method: "GET",
-      headers: { Authorization: `Basic ${encData}` }
+      headers: { Authorization: `Basic ${encData}` },
     });
     const result = await response.json();
     if (!response.ok) {
@@ -64,33 +65,40 @@ const logIn = async () => {
   }
 };
 
-document.querySelector(".inputEmail").addEventListener("input", e => {
+document.querySelector(".inputEmail").addEventListener("input", (e) => {
   e.target.value = e.target.value.replace(/[^a-z ]/i, "");
 });
 
-const validateForm = $(function() {
+const validateForm = $(function () {
   $("#loginForm").validate({
     rules: {
       email: {
-        required: true
+        required: true,
       },
       psw: {
-        required: true
-      }
+        required: true,
+      },
     },
     messages: {
       psw: "",
-      email: ""
-    }
+      email: "",
+    },
   });
 });
 
 loginBtn.addEventListener("change", validateForm);
 
-loginBtn.addEventListener("click", function(e) {
+loginBtn.addEventListener("click", function (e) {
   e.preventDefault();
   if ($("#loginForm").valid() == false) {
     return;
   }
   logIn();
+});
+
+const resetPswContainer = document.querySelector("#resetPsw_container");
+
+pswReset.addEventListener("click", function (e) {
+  e.preventDefault();
+  //restore fetch here
 });

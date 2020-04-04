@@ -35,7 +35,7 @@ const lotCurrency = document.getElementsByName("lot_currency")[0];
 const lotDescription = document.getElementsByName("lot_shortdesc")[0];
 const lotPercentage = document.getElementsByName("lot_percentage")[0];
 
-const encData = function() {
+const encData = function () {
   if (localStorage.getItem("email")) {
     return (
       window.btoa(localStorage.getItem("email") + ":") +
@@ -56,7 +56,7 @@ async function onReady() {
     try {
       const response = await fetch(URL + "user", {
         method: "GET",
-        headers: { Authorization: `Basic ${encData()}` }
+        headers: { Authorization: `Basic ${encData()}` },
       });
 
       if (!response.ok) {
@@ -79,7 +79,7 @@ vocabulary = {
   any: "Любой",
   every_month: "Ежемесячно",
   term_end: "Окончание срока",
-  other: "Другое"
+  other: "Другое",
 };
 
 function translate(data) {
@@ -101,7 +101,7 @@ async function dataOptions() {
   try {
     const response = await fetch(URL + "lots/settings", {
       method: "GET",
-      headers: { Authorization: `Basic ${encData()}` }
+      headers: { Authorization: `Basic ${encData()}` },
     });
 
     if (!response.ok) {
@@ -110,17 +110,17 @@ async function dataOptions() {
     const result = await response.json();
     console.log(result);
 
-    result.currency.forEach(curr => {
+    result.currency.forEach((curr) => {
       currencySelect.innerHTML += `<option value="${curr}">${curr}</option>`;
       currencySelectOptions.push(curr);
     });
-    result.form.forEach(form => {
+    result.form.forEach((form) => {
       formSelect.innerHTML += `<option value="${form}">${translate(
         form
       )}</option>`;
       formSelectOptions.push(form);
     });
-    result.return_way.forEach(way => {
+    result.return_way.forEach((way) => {
       returnSelect.innerHTML += `<option value="${way}">${translate(
         way
       )}</option>`;
@@ -132,19 +132,19 @@ async function dataOptions() {
 }
 dataOptions();
 
-lotProfilePic.addEventListener("click", function() {
+lotProfilePic.addEventListener("click", function () {
   location.href = "my_profile.html";
 });
 
-createLotBtn.addEventListener("click", function() {
+createLotBtn.addEventListener("click", function () {
   modalWindow.style.display = "block";
 });
 
-modalCloseBtn.addEventListener("click", function() {
+modalCloseBtn.addEventListener("click", function () {
   modalWindow.style.display = "none";
 });
 
-window.onclick = function(e) {
+window.onclick = function (e) {
   if (e.target == modalWindow) {
     modalWindow.style.display = "none";
   }
@@ -154,7 +154,7 @@ const profData = async () => {
   try {
     const response = await fetch(URL + "user", {
       method: "GET",
-      headers: { Authorization: `Basic ${encData()}` }
+      headers: { Authorization: `Basic ${encData()}` },
     });
 
     if (!response.ok) {
@@ -211,7 +211,7 @@ const createLotAndListeners = async (
             <label class="label lot_field" for="lot_currency"
               ><span>Валюта: </span>
                   <select id="selectLotCurrency">
-                    ${currencySelectOptions.map(curr => {
+                    ${currencySelectOptions.map((curr) => {
                       if (lot.currency == curr) {
                         return `<option selected value="${curr}">${curr}</option>`;
                       } else {
@@ -243,7 +243,7 @@ const createLotAndListeners = async (
             <label class="label lot_field" for="lot_method"
               ><span>Метод погашения: </span>
               <select id="selectReturnWayOption">
-              ${returnSelectOptions.map(way => {
+              ${returnSelectOptions.map((way) => {
                 if (lot.return_way == way) {
                   return `<option selected value="${way}">${translate(
                     way
@@ -266,7 +266,7 @@ const createLotAndListeners = async (
             <label class="label lot_field" for="lot_cred"
               ><span>Форма кредитирования: </span>
               <select id="selectLotForm">
-                    ${formSelectOptions.map(form => {
+                    ${formSelectOptions.map((form) => {
                       if (lot.form == form) {
                         return `<option selected value="${form}">${translate(
                           form
@@ -289,7 +289,7 @@ const createLotAndListeners = async (
             </form>
                 <div class="lotPhotosContainer">
                   ${lot.photos.photos
-                    .map(function(value, key) {
+                    .map(function (value, key) {
                       return `
                           <div class="swiper-container">
                             <img class="lot_photo" src="${value}"></img>
@@ -312,7 +312,7 @@ const createLotAndListeners = async (
 
   $(lotEl)
     .find("#updateLotPhoto")
-    .on("change", function() {
+    .on("change", function () {
       if ($(this).val() != "") {
         $(".addPhotoImg").hide();
         $(".addPhotoText").text("Выбрано фото: " + $(this)[0].files.length);
@@ -324,14 +324,14 @@ const createLotAndListeners = async (
 
   $(lotEl)
     .find(".deleteLotBtn")
-    .on("click", async function(event) {
+    .on("click", async function (event) {
       try {
         const response = await fetch(URL + `lots/${lot.id}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Basic ${encData()}`
-          }
+            Authorization: `Basic ${encData()}`,
+          },
         });
         if (response.ok) {
           onLotRemove(lot, lotEl, index);
@@ -344,7 +344,7 @@ const createLotAndListeners = async (
 
   $(lotEl)
     .find(".deletePhotoBtn")
-    .on("click", async function(event) {
+    .on("click", async function (event) {
       const photoID = Number($(event.target).attr("data-id"));
       const lotPhoto = lot.photos.photos[photoID];
       try {
@@ -352,8 +352,8 @@ const createLotAndListeners = async (
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Basic ${encData()}`
-          }
+            Authorization: `Basic ${encData()}`,
+          },
         });
         if (response.ok) {
           onPhotoRemove(lot, lotEl, index, lotPhoto, photoID);
@@ -366,7 +366,7 @@ const createLotAndListeners = async (
 
   $(lotEl)
     .find(".editLotBtn")
-    .on("click", async function(event) {
+    .on("click", async function (event) {
       const formData = new FormData();
       const photos = document.querySelector("#updateLotPhoto");
       for (let i = 0; i < photos.files.length; i++) {
@@ -384,16 +384,16 @@ const createLotAndListeners = async (
         security: $(lotEl).find("input[name=lot_security]")[0].value,
         form: $(lotEl).find("#selectLotForm")[0].value,
         percentage: $(lotEl).find("input[name=lot_percentage]")[0].value,
-        commentary: $(lotEl).find("textarea[name=lot_shortdesc]")[0].value
+        commentary: $(lotEl).find("textarea[name=lot_shortdesc]")[0].value,
       };
       try {
         const response = await fetch(URL + `lots/${lot.id}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Basic ${encData()}`
+            Authorization: `Basic ${encData()}`,
           },
-          body: JSON.stringify(value)
+          body: JSON.stringify(value),
         });
         if (response.ok) {
           console.log(response);
@@ -406,9 +406,9 @@ const createLotAndListeners = async (
         const response = await fetch(URL + `lots/${lot.id}/photos`, {
           method: "POST",
           headers: {
-            Authorization: `Basic ${encData()}`
+            Authorization: `Basic ${encData()}`,
           },
-          body: formData
+          body: formData,
         });
         if (response.ok) {
           console.log(response);
@@ -429,7 +429,7 @@ const createLotEls = async (lots, { onLotRemove, onPhotoRemove }) => {
         await createLotAndListeners(lot, index, {
           parent: myLotsContainer,
           onLotRemove,
-          onPhotoRemove
+          onPhotoRemove,
         })
     )
   );
@@ -437,19 +437,19 @@ const createLotEls = async (lots, { onLotRemove, onPhotoRemove }) => {
   return lotEls;
 };
 
-const manageLots = async sourceLots => {
+const manageLots = async (sourceLots) => {
   const lots = [...sourceLots];
 
   let lotEls = await createLotEls(lots, { onLotRemove, onPhotoRemove });
 
   async function onLotRemove(lot, lotEl, i) {
     lots.splice(i, 1);
-    lotEls.forEach(lotElToBeRemoved =>
+    lotEls.forEach((lotElToBeRemoved) =>
       myLotsContainer.removeChild(lotElToBeRemoved)
     );
 
     lotEls = await createLotEls(lots, { onLotRemove });
-    lotEls.forEach(lotEl => myLotsContainer.appendChild(lotEl));
+    lotEls.forEach((lotEl) => myLotsContainer.appendChild(lotEl));
   }
 
   async function onPhotoRemove(lot, lotEl, lotIndex, lotPhoto, lotPhotoIndex) {
@@ -474,7 +474,7 @@ const manageLots = async sourceLots => {
 
   // [ 0,1,2,3,4,5 ]
 
-  lotEls.forEach(lotEl => myLotsContainer.appendChild(lotEl));
+  lotEls.forEach((lotEl) => myLotsContainer.appendChild(lotEl));
 };
 
 const createArchiveLotAndListeners = async (
@@ -483,7 +483,7 @@ const createArchiveLotAndListeners = async (
   { parent: myArchiveLotsContainer, onLotRemove }
 ) => {
   const archiveLotEl = $(`
-          <div class="userLots" data-id="myLotForm__${index + 1}">
+          <div class="userLots" data-id="myArchiveLotForm__${index + 1}">
           <form>
           <br />
           <p><strong>${index + 1}</strong></p>
@@ -511,7 +511,7 @@ const createArchiveLotAndListeners = async (
             <label class="label lot_field" for="lot_currency"
               ><span>Валюта: </span>
                   <select disabled id="selectLotCurrency">
-                    ${currencySelectOptions.map(curr => {
+                    ${currencySelectOptions.map((curr) => {
                       if (lot.currency == curr) {
                         return `<option selected value="${curr}">${curr}</option>`;
                       } else {
@@ -543,7 +543,7 @@ const createArchiveLotAndListeners = async (
             <label class="label lot_field" for="lot_method"
               ><span>Метод погашения: </span>
               <select disabled id="selectReturnWayOption">
-              ${returnSelectOptions.map(way => {
+              ${returnSelectOptions.map((way) => {
                 if (lot.return_way == way) {
                   return `<option selected value="${way}">${translate(
                     way
@@ -566,7 +566,7 @@ const createArchiveLotAndListeners = async (
             <label class="label lot_field" for="lot_cred"
               ><span>Форма кредитирования: </span>
               <select disabled id="selectLotForm">
-                    ${formSelectOptions.map(form => {
+                    ${formSelectOptions.map((form) => {
                       if (lot.form == form) {
                         return `<option selected value="${form}">${translate(
                           form
@@ -590,29 +590,30 @@ const createArchiveLotAndListeners = async (
             
             <div class="swiper-archived-container">
             ${lot.photos.photos
-              .map(photo => {
+              .map((photo) => {
                 return `<img class="lot_photo" src="${photo}"></img>`;
               })
               .join("")}  
             </div>
             <button class="postLotBtn btn">Восстановить</button>
+            <button class="delLotBtn btn">Удалить</button>
             </div>
   `).get(0);
 
   $(archiveLotEl)
     .find(".postLotBtn")
-    .on("click", async function(event) {
+    .on("click", async function (event) {
       try {
         const response = await fetch(URL + `lots/${lot.id}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Basic ${encData()}`
-          }
+            Authorization: `Basic ${encData()}`,
+          },
         });
         if (response.ok) {
           console.log(response);
-          window.location.reload();
+          location.reload();
         } else throw new Error(error);
       } catch (error) {
         alert("Ошибка! Что-то пошло не так.");
@@ -620,6 +621,26 @@ const createArchiveLotAndListeners = async (
       }
     });
 
+  $(archiveLotEl)
+    .find(".delLotBtn")
+    .on("click", async function (event) {
+      try {
+        const response = await fetch(URL + `lots/personal/deleted/${lot.id}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${encData()}`,
+          },
+        });
+        if (response.ok) {
+          console.log(response);
+          location.reload();
+        } else throw new Error(error);
+      } catch (error) {
+        alert("Ошибка! Что-то пошло не так.");
+        console.log(error);
+      }
+    });
   return archiveLotEl;
 };
 
@@ -629,7 +650,7 @@ const createArchiveLotEls = async (lots, { onLotRemove }) => {
       async (lot, index) =>
         await createArchiveLotAndListeners(lot, index, {
           parent: myArchiveLotsContainer,
-          onLotRemove
+          onLotRemove,
         })
     )
   );
@@ -637,29 +658,29 @@ const createArchiveLotEls = async (lots, { onLotRemove }) => {
   return lotEls;
 };
 
-const manageArchiveLots = async sourceLots => {
+const manageArchiveLots = async (sourceLots) => {
   const lots = [...sourceLots];
 
   let lotEls = await createArchiveLotEls(lots, { onLotRemove });
 
   async function onLotRemove(lot, lotEl, i) {
     lots.splice(i, 1);
-    lotEls.forEach(lotElToBeRemoved =>
+    lotEls.forEach((lotElToBeRemoved) =>
       myArchiveLotsContainer.removeChild(lotElToBeRemoved)
     );
 
     lotEls = await createArchiveLotEls(lots, { onLotRemove });
-    lotEls.forEach(lotEl => myArchiveLotsContainer.appendChild(lotEl));
+    lotEls.forEach((lotEl) => myArchiveLotsContainer.appendChild(lotEl));
   }
 
-  lotEls.forEach(lotEl => myArchiveLotsContainer.appendChild(lotEl));
+  lotEls.forEach((lotEl) => myArchiveLotsContainer.appendChild(lotEl));
 };
 
 const getMyLots = async () => {
   try {
     const response = await fetch(URL + "lots/personal", {
       method: "GET",
-      headers: { Authorization: `Basic ${encData()}` }
+      headers: { Authorization: `Basic ${encData()}` },
     });
 
     if (!response.ok) {
@@ -678,7 +699,7 @@ const getMyLots = async () => {
   try {
     const response = await fetch(URL + "lots/personal/deleted", {
       method: "GET",
-      headers: { Authorization: `Basic ${encData()}` }
+      headers: { Authorization: `Basic ${encData()}` },
     });
 
     if (!response.ok) {
@@ -687,7 +708,7 @@ const getMyLots = async () => {
 
     const result = await response.json();
     if (result.length == 0) {
-      myLotsHeading.innerText = `Похоже, что у Вас нет архивных лотов!`;
+      myArchiveLotsHeading.innerText = `Похоже, что у Вас нет архивных лотов!`;
     } else {
       manageArchiveLots(result);
     }
@@ -699,14 +720,25 @@ const getMyLots = async () => {
 getMyLots();
 
 async function clearLots() {
-  let userLots = document.getElementsByClassName("userLots");
-
-  [...userLots].forEach(lot => {
-    lot.parentNode.removeChild(lot);
+  let userLots = $(".userLots");
+  userLots.each((lot) => {
+    lot.remove();
   });
 }
 
-createLotPublish.addEventListener("click", async function(e) {
+async function clearLot(id) {
+  let userLots = $(".userLots");
+  console.log(userLots);
+
+  let lotToBeDeleted = userLots.find(`[data-id=${id}]`);
+  userLots.each((lot) => {
+    if (lot == lotToBeDeleted) {
+      lot.remove();
+    }
+  });
+}
+
+createLotPublish.addEventListener("click", async function (e) {
   e.preventDefault();
   if ($("#createLotForm").valid() == false) {
     return;
@@ -723,7 +755,7 @@ createLotPublish.addEventListener("click", async function(e) {
     security: createLotSecurity.value,
     form: createLotCredForm.value,
     percentage: createLotPercentage.value,
-    commentary: createLotDescription.value
+    commentary: createLotDescription.value,
   };
 
   let newLotID = 0;
@@ -741,13 +773,12 @@ createLotPublish.addEventListener("click", async function(e) {
       body: JSON.stringify(value),
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Basic ${encData()}`
-      }
+        Authorization: `Basic ${encData()}`,
+      },
     });
     if (response.ok) {
       const result = await response.json();
       newLotID = result["lot_id"];
-      clearLots();
       myLotsHeading.innerHTML = `<strong>Мои лоты:</strong>`;
       modalWindow.style.display = "none";
       createLotName.value = "";
@@ -768,12 +799,13 @@ createLotPublish.addEventListener("click", async function(e) {
       method: "POST",
       body: formData,
       headers: {
-        Authorization: `Basic ${encData()}`
-      }
+        Authorization: `Basic ${encData()}`,
+      },
     });
     // for (let key of formData.keys()) {
     //   formData.delete(key);
     // }
+    clearLots();
     getMyLots();
   } catch (error) {
     alert("Ошибка! Что-то пошло не так.");
@@ -781,43 +813,43 @@ createLotPublish.addEventListener("click", async function(e) {
   }
 });
 
-const validateForm = $(function() {
+const validateForm = $(function () {
   $("#createLotForm").validate({
     rules: {
       create_lot_name: {
-        required: true
+        required: true,
       },
       create_lot_reqsum: {
         required: true,
-        number: true
+        number: true,
       },
       create_lot_currency: {
-        required: true
+        required: true,
       },
       create_lot_reqmonths: {
         required: true,
-        number: true
+        number: true,
       },
       create_lot_percentage: {
         required: true,
-        number: true
+        number: true,
       },
       create_lot_method: {
-        required: true
+        required: true,
       },
       create_lot_security: {
-        required: true
+        required: true,
       },
       create_lot_cred: {
-        required: true
-      }
-    }
+        required: true,
+      },
+    },
   });
 });
 
 createLotPublish.addEventListener("change", validateForm);
 
-archiveLotsBtn.addEventListener("click", function(e) {
+archiveLotsBtn.addEventListener("click", function (e) {
   e.preventDefault();
   myLotsBtn.classList.remove("btnActive");
   archiveLotsBtn.classList.add("btnActive");
@@ -825,7 +857,7 @@ archiveLotsBtn.addEventListener("click", function(e) {
   myArchiveLotsContainer.style.display = "block";
 });
 
-myLotsBtn.addEventListener("click", function(e) {
+myLotsBtn.addEventListener("click", function (e) {
   e.preventDefault();
   archiveLotsBtn.classList.remove("btnActive");
   myLotsBtn.classList.add("btnActive");

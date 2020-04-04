@@ -548,3 +548,14 @@ main {
 .swiper-container:hover .deletePhotoBtn {
   opacity: 1;
 }
+
+.myprof_errorMsg {
+  margin-top: 15px;
+  max-width: 250px;
+  color: red;
+}
+.myprof_successMsg {
+  margin-top: 15px;
+  max-width: 250px;
+  color: green;
+}

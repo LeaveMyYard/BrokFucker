@@ -6,8 +6,10 @@ const myprofPhone = document.getElementById("myprofPhone");
 const myprofName = document.getElementById("myprofName");
 const myprofRegDate = document.getElementById("myprofRegDate");
 const profilePic = document.getElementById("profilePic");
+const docMessage = document.querySelector("#doc_message");
+const docMessageInfo = document.querySelector("#doc_message_info");
 
-const encData = function() {
+const encData = function () {
   if (localStorage.getItem("email")) {
     return (
       window.btoa(localStorage.getItem("email") + ":") +
@@ -29,7 +31,7 @@ function onReady() {
       try {
         const response = await fetch(URL + "user", {
           method: "GET",
-          headers: { Authorization: `Basic ${encData()}` }
+          headers: { Authorization: `Basic ${encData()}` },
         });
 
         if (!response.ok) {
@@ -47,7 +49,7 @@ function onReady() {
 }
 onReady();
 
-myLotsBtn.addEventListener("click", function() {
+myLotsBtn.addEventListener("click", function () {
   location.href = "my_lots.html";
 });
 
@@ -55,7 +57,7 @@ const profData = async () => {
   try {
     const response = await fetch(URL + "user", {
       method: "GET",
-      headers: { Authorization: `Basic ${encData()}` }
+      headers: { Authorization: `Basic ${encData()}` },
     });
 
     if (!response.ok) {
@@ -75,28 +77,76 @@ const profData = async () => {
 };
 profData();
 
+const myprofPsw = document.querySelector("#myprofPsw");
+
 const updateProfData = async () => {
   const value = {
     name: myprofName.value,
-    phone: myprofPhone.value
+    phone: myprofPhone.value,
+  };
+  const pswValue = {
+    password: myprofPsw.value,
   };
   try {
     const response = await fetch(URL + "user", {
       method: "PUT",
       headers: {
         Authorization: `Basic ${encData()}`,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(value)
+      body: JSON.stringify(value),
     });
 
     if (!response.ok) {
       throw new Error("Unsuccessfull response");
     } else {
-      location.reload();
+      if (myprofPsw.value.length === 0) {
+        docMessageInfo.innerHTML = `<p class="myprof_successMsg">Данные обновлены!</p>`;
+        setTimeout(() => {
+          docMessageInfo.innerHTML = "";
+        }, 5000);
+      }
     }
   } catch (error) {
     console.error(error);
+    return;
+  }
+  if (
+    myprofPsw.value !== "" &&
+    myprofPsw.value.length >= 8 &&
+    myprofPsw.value.length <= 32
+  ) {
+    try {
+      const response = await fetch(URL + "user/password", {
+        method: "PUT",
+        headers: {
+          Authorization: `Basic ${encData()}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(pswValue),
+      });
+      if (!response.ok) {
+        throw new Error("Не удалось сменить пароль.");
+      } else {
+        docMessage.innerHTML = `<p class="myprof_successMsg">Письмо с подтверждением отправлено на Вашу почту</p>`;
+        setTimeout(() => {
+          docMessage.innerHTML = "";
+        }, 5000);
+      }
+    } catch (error) {
+      console.error(error.message);
+      docMessage.innerHTML = `<p class="myprof_errorMsg">${error.message}</p>`;
+    }
+  } else {
+    if (myprofPsw.value.length !== 0 && myprofPsw.value.length < 8) {
+      docMessage.innerHTML = `<p class="myprof_errorMsg">Пароль не может быть меньше 8 символов!</p>`;
+    } else if (myprofPsw.value.length !== 0 && myprofPsw.value.length > 32) {
+      docMessage.innerHTML = `<p class="myprof_errorMsg">Пароль не может быть больше 32 символов!</p>`;
+    }
+    setTimeout(() => {
+      docMessage.innerHTML = "";
+    }, 5000);
+    return;
   }
 };
 
@@ -113,7 +163,7 @@ const uploadProfPic = async () => {
     const response = await fetch(URL + "user/avatar", {
       method: "POST",
       headers: { Authorization: `Basic ${encData()}` },
-      body: formData
+      body: formData,
     });
 
     const result = await response.json();
@@ -129,7 +179,7 @@ const deleteProfPic = async () => {
   try {
     const response = await fetch(URL + "user/avatar", {
       method: "DELETE",
-      headers: { Authorization: `Basic ${encData()}` }
+      headers: { Authorization: `Basic ${encData()}` },
     });
 
     const result = await response.json();
