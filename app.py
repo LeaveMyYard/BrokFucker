@@ -180,6 +180,9 @@ class RestAPI:
     @route('user/password', methods=['PUT'])
     @user.login_required
     def change_password():
+        if not request.json:
+            raise APIExceptions.NoJsonError()
+
         data_required = [
             'password'
         ]
