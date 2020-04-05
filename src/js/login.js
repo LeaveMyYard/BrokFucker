@@ -1,5 +1,7 @@
 const URL = "http://localhost:5000/api/v1/";
 
+const pswMessage = window.location.search.split("psw=")[1];
+
 const loginBtn = document.querySelector(".loginBtn");
 const loginForm = document.querySelector("#loginForm");
 const showPswButton = document.querySelector(".showPswIcon");
@@ -10,6 +12,27 @@ const errorContainer = document.getElementById("errorContainer");
 const pswReset = document.querySelector(".pswReset");
 
 let errorMsg = document.createElement("p");
+const pswInfoContainer = document.getElementById("pswInfoContainer");
+function checkPswErr() {
+  let className;
+  let messageText;
+  if (pswMessage === "error") {
+    className = "errorMsg";
+    messageText =
+      "Не удалось восстановить пароль, проверьте подключение к интернету и попробуйте снова.";
+  } else if (pswMessage === "success") {
+    className = "successMsg";
+    messageText = "На Вашу почту был выслан временный пароль.";
+  } else {
+    return;
+  }
+  pswInfoContainer.innerHTML = `<p class="${className}">${messageText}</p>`;
+  setTimeout(() => {
+    pswInfoContainer.innerHTML = "";
+  }, 5000);
+}
+
+checkPswErr();
 
 function onReady() {
   if (localStorage.getItem("email") || sessionStorage.getItem("email")) {

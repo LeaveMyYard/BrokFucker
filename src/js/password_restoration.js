@@ -1,12 +1,12 @@
 const URL = "http://localhost:5000/api/v1/";
 
-const verification = window.location.search.split("code=")[1];
+let verification = window.location.search.split("code=")[1];
 
 let errorValue = 0;
 
 async function pswRestoration() {
   try {
-    const response = await fetch(URL + "user/password/verify/" + verification, {
+    const response = await fetch(URL + "user/restore/verify/" + verification, {
       method: "GET",
     });
     const result = await response.json();
@@ -14,15 +14,10 @@ async function pswRestoration() {
     if (!response.ok) {
       throw new Error(result.msg);
     } else {
-      location.href = "login.html";
+      location.href = "login.html?psw=success";
     }
-  } catch (error) {
-    console.error(error);
-    if (error.message == "") {
-      errorValue = 3;
-    }
-    location.href = `registration.html?error=${errorValue}`;
-  }
+  } catch (error) {}
+  location.href = `login.html?psw=error`;
 }
 
 pswRestoration();

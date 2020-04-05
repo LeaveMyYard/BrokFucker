@@ -1,6 +1,6 @@
 const URL = "http://localhost:5000/api/v1/";
 
-const verification = window.location.search.split("code=")[1];
+let verification = window.location.search.split("code=")[1];
 
 let errorValue = 0;
 
