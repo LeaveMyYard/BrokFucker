@@ -2,16 +2,18 @@ const URL = "http://localhost:5000/api/v1/";
 
 const lotTable = document.getElementById("lotTable");
 
-const encData = function() {
+const encData = function () {
   if (localStorage.getItem("email")) {
-    return (
-      window.btoa(localStorage.getItem("email") + ":") +
-      localStorage.getItem("password")
+    return window.btoa(
+      localStorage.getItem("email") +
+        ":" +
+        window.atob(localStorage.getItem("password"))
     );
   } else {
-    return (
-      window.btoa(sessionStorage.getItem("email") + ":") +
-      sessionStorage.getItem("password")
+    return window.btoa(
+      sessionStorage.getItem("email") +
+        ":" +
+        window.atob(sessionStorage.getItem("password"))
     );
   }
 };
@@ -23,7 +25,7 @@ async function onReady() {
     try {
       const response = await fetch(URL + "user", {
         method: "GET",
-        headers: { Authorization: `Basic ${encData()}` }
+        headers: { Authorization: `Basic ${encData()}` },
       });
 
       if (!response.ok) {
@@ -43,7 +45,7 @@ onReady();
 const getLots = async () => {
   try {
     const response = await fetch(URL + "lots", {
-      method: "GET"
+      method: "GET",
       // headers: { Authorization: `Basic ${encData()}` }
     });
 
@@ -52,7 +54,7 @@ const getLots = async () => {
     } else {
       const result = await response.json();
       const lotArr = [];
-      result.forEach(item => {
+      result.forEach((item) => {
         item = `
       <tr>
       <td>${dateFix(item.date)}</td>

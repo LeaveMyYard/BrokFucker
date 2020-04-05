@@ -11,14 +11,16 @@ const docMessageInfo = document.querySelector("#doc_message_info");
 
 const encData = function () {
   if (localStorage.getItem("email")) {
-    return (
-      window.btoa(localStorage.getItem("email") + ":") +
-      localStorage.getItem("password")
+    return window.btoa(
+      localStorage.getItem("email") +
+        ":" +
+        window.atob(localStorage.getItem("password"))
     );
   } else {
-    return (
-      window.btoa(sessionStorage.getItem("email") + ":") +
-      sessionStorage.getItem("password")
+    return window.btoa(
+      sessionStorage.getItem("email") +
+        ":" +
+        window.atob(sessionStorage.getItem("password"))
     );
   }
 };

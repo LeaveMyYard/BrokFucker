@@ -19,16 +19,18 @@ const lotCurrency = document.getElementsByName("lot_currency")[0];
 const lotDescription = document.getElementsByName("lot_shortdesc")[0];
 const lotPercentage = document.getElementsByName("lot_percentage")[0];
 
-const encData = function() {
+const encData = function () {
   if (localStorage.getItem("email")) {
-    return (
-      window.btoa(localStorage.getItem("email") + ":") +
-      localStorage.getItem("password")
+    return window.btoa(
+      localStorage.getItem("email") +
+        ":" +
+        window.atob(localStorage.getItem("password"))
     );
   } else {
-    return (
-      window.btoa(sessionStorage.getItem("email") + ":") +
-      sessionStorage.getItem("password")
+    return window.btoa(
+      sessionStorage.getItem("email") +
+        ":" +
+        window.atob(sessionStorage.getItem("password"))
     );
   }
 };
@@ -40,7 +42,7 @@ async function onReady() {
     try {
       const response = await fetch(URL + "user", {
         method: "GET",
-        headers: { Authorization: `Basic ${encData()}` }
+        headers: { Authorization: `Basic ${encData()}` },
       });
 
       if (!response.ok) {
@@ -57,7 +59,7 @@ async function onReady() {
 }
 onReady();
 
-lotProfilePic.addEventListener("click", function() {
+lotProfilePic.addEventListener("click", function () {
   location.href = "my_profile.html";
 });
 
@@ -65,7 +67,7 @@ const profData = async () => {
   try {
     const response = await fetch(URL + "user", {
       method: "GET",
-      headers: { Authorization: `Basic ${encData()}` }
+      headers: { Authorization: `Basic ${encData()}` },
     });
 
     if (!response.ok) {
@@ -184,7 +186,7 @@ const createLotAndListeners = async (
               </textarea>
             </label>
             </form>
-              ${lot.photos.photos.map(photo => {
+              ${lot.photos.photos.map((photo) => {
                 return `
                 <div class="lot_photo">
                     <img height="100%" width="100%" src="${photo}"></img>
@@ -196,14 +198,14 @@ const createLotAndListeners = async (
 
   $(lotEl)
     .find(".deleteLotBtn")
-    .on("click", async function(event) {
+    .on("click", async function (event) {
       try {
         const response = await fetch(URL + `lots/favorites/${lot.id}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Basic ${encData()}`
-          }
+            Authorization: `Basic ${encData()}`,
+          },
         });
         if (response.ok) {
           onLotRemove(lot, lotEl, index);
@@ -222,7 +224,7 @@ const createLotEls = async (lots, { onLotRemove }) => {
       async (lot, index) =>
         await createLotAndListeners(lot, index, {
           parent: myLotsContainer,
-          onLotRemove
+          onLotRemove,
         })
     )
   );
@@ -230,29 +232,29 @@ const createLotEls = async (lots, { onLotRemove }) => {
   return lotEls;
 };
 
-const manageLots = async sourceLots => {
+const manageLots = async (sourceLots) => {
   const lots = [...sourceLots];
 
   let lotEls = await createLotEls(lots, { onLotRemove });
 
   async function onLotRemove(lot, lotEl, i) {
     lots.splice(i, 1);
-    lotEls.forEach(lotElToBeRemoved =>
+    lotEls.forEach((lotElToBeRemoved) =>
       myLotsContainer.removeChild(lotElToBeRemoved)
     );
 
     lotEls = await createLotEls(lots, { onLotRemove });
-    lotEls.forEach(lotEl => myLotsContainer.appendChild(lotEl));
+    lotEls.forEach((lotEl) => myLotsContainer.appendChild(lotEl));
   }
 
-  lotEls.forEach(lotEl => myLotsContainer.appendChild(lotEl));
+  lotEls.forEach((lotEl) => myLotsContainer.appendChild(lotEl));
 };
 
 const getMyFavLots = async () => {
   try {
     const response = await fetch(URL + "lots/favorites", {
       method: "GET",
-      headers: { Authorization: `Basic ${encData()}` }
+      headers: { Authorization: `Basic ${encData()}` },
     });
 
     if (!response.ok) {
@@ -275,7 +277,7 @@ getMyFavLots();
 async function clearLots() {
   let userLots = document.getElementsByClassName("userLots");
 
-  [...userLots].forEach(lot => {
+  [...userLots].forEach((lot) => {
     lot.parentNode.removeChild(lot);
   });
 }
