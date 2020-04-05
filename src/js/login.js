@@ -140,20 +140,14 @@ pswReset.addEventListener("click", async function (e) {
       throw new Error(result.msg);
     } else {
       sessionStorage.removeItem("email");
-      console.log("Success!");
-      errorMsg.classList.add("successMsg");
-      errorMsg.innerText = "Письмо с подтверждением отправлено на Вашу почту.";
+      errorContainer.innerHTML = `<p class="successMsg">Письмо с подтверждением отправлено на Вашу почту.</p>`;
       setTimeout(() => {
-        errorMsg.innerText = "";
-        errorMsg.classList.remove("successMsg");
+        errorContainer.innerHTML = "";
       }, 7000);
     }
   } catch (error) {
-    errorMsg.remove();
-    errorMsg.classList.add("errorMsg");
-    errorMsg.innerText =
-      "Ошибка. Пожалуйста, введите Вашу почту и попробуйте снова.";
-    errorContainer.prepend(errorMsg);
+    errorContainer.innerHTML = `<p class="errorMsg">
+      Ошибка. Пожалуйста, введите Вашу почту и попробуйте снова.</p>`;
     console.error(error);
   }
 });
