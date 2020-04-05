@@ -16,8 +16,9 @@ async function pswRestoration() {
     } else {
       location.href = "login.html?psw=success";
     }
-  } catch (error) {}
-  location.href = `login.html?psw=error`;
+  } catch (error) {
+    location.href = `login.html?psw=error`;
+  }
 }
 
 pswRestoration();
