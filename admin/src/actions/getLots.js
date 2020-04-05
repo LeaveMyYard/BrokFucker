@@ -1,9 +1,9 @@
-import { URL } from "../constants";
+import { URL, encData } from "../constants";
 
 export const getLots = async () => {
-  try {
     const response = await fetch(URL + "lots/unapproved", {
-      method: "GET"
+      method: "GET",
+      headers: { Authorization: `Basic ${encData}` },
     });
 
     if (!response.ok) {

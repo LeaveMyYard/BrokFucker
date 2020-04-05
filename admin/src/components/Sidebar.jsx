@@ -1,16 +1,19 @@
 import React from "react";
-import { Router, Switch, Route, Link } from "react-router-dom";
-import { LotsPage } from "LotsPage";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import LotsPage from "./LotsPage";
+import ModeratorsPage from "./ModeratorsPage";
 import "../Admin.css";
 
+/**
+ * TODO: restruct all `Route`s and `history` usage as following
+ * https://reacttraining.com/react-router/web/example/nesting
+ */
 const Sidebar = (user) => {
   return user === "admin" ? (
     <Router>
       <ul>
         <li>
-          <Link to="/">
-            <div className="logoAdmin"></div>
-          </Link>
+          <div className="logoAdmin"></div>
         </li>
         <li>
           <Link to="/lots/unapproved">Неподтвержденные Лоты</Link>
@@ -20,30 +23,22 @@ const Sidebar = (user) => {
         </li>
       </ul>
       <Switch>
-        <Route path="/lots/unapproved">
-          <LotsPage />
-        </Route>
-        <Route path="/moderators">
-          <Moderators />
-        </Route>
+        <Route exact path="/lots/unapproved" component={LotsPage}></Route>
+        <Route path="/moderators" component={ModeratorsPage}></Route>
       </Switch>
     </Router>
   ) : (
     <Router>
       <ul>
         <li>
-          <Link to="/">
-            <div className="logoAdmin"></div>
-          </Link>
+          <div className="logoAdmin"></div>
         </li>
         <li>
           <Link to="/lots/unapproved">Неподтвержденные Лоты</Link>
         </li>
       </ul>
       <Switch>
-        <Route path="/lots/unapproved">
-          <LotsPage />
-        </Route>
+        <Route exact path="/lots/unapproved" component={LotsPage}></Route>
       </Switch>
     </Router>
   );

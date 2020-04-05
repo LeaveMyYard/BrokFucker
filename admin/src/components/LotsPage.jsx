@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
+
 import { LotsList } from "./LotsList";
-import { getLots } from "../actions/getLots";
+import lotsService from "../services/Lots";
 
 const createMockLots = () => {
   const mockLot = {
@@ -16,7 +17,7 @@ const createMockLots = () => {
     percentage: "0",
     form: 1,
     security_checked: false,
-    guarantee_percentage: 90
+    guarantee_percentage: 90,
   };
 
   let it = 1;
@@ -48,7 +49,7 @@ const createMockLots = () => {
   return mockLots;
 };
 
-function LotsPage() {
+const LotsPage = () => {
   const [loading, setLoading] = useState(true);
   const [lots, setLots] = useState();
 
@@ -56,8 +57,7 @@ function LotsPage() {
     setLoading(true);
 
     try {
-      const lots = await getLots();
-
+      const lots = await lotsService.getLots();
       setLots(lots);
     } catch (error) {
       setLots();
@@ -79,6 +79,6 @@ function LotsPage() {
       )}
     </div>
   );
-}
+};
 
 export default LotsPage;

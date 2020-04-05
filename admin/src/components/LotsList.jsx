@@ -11,7 +11,7 @@ function dateFix(date) {
 }
 
 export function LotsList({ list, refreshList }) {
-  const onLotApprove = async lot => {
+  const onLotApprove = async (lot) => {
     try {
       // ... await api request
     } catch (error) {
@@ -20,7 +20,7 @@ export function LotsList({ list, refreshList }) {
     }
   };
 
-  const onLotRemove = async lot => {
+  const onLotRemove = async (lot) => {
     try {
       // ... await api request
     } catch (error) {
@@ -48,7 +48,7 @@ export function LotsList({ list, refreshList }) {
         <th>Гарантия клуба</th>
         <th>Подтвердить</th>
       </tr>
-      {list.map(item => (
+      {list.map((item) => (
         <tr>
           <td>{dateFix(item.date)}</td>
           <td>{item.name}</td>
@@ -75,9 +75,9 @@ export function LotsList({ list, refreshList }) {
 }
 
 LotsList.propTypes = {
-  list: PropTypes.arrayOf(PropTypes.object).isRequired
+  list: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
 LotsList.defaultProps = {
-  list: []
+  list: [],
 };

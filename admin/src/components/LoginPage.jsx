@@ -1,20 +1,60 @@
-import React from "react";
-import LoginForm from "LoginForm";
+import React, { useState, useEffect } from "react";
+import { Redirect, useHistory } from "react-router-dom";
+import { Button, FormGroup, FormControl, FormLabel } from "react-bootstrap";
 
-const LoginPage = props => {
-  const submit = user =>
-    api.users
-      .login(user)
-      .then(token => props.login(token))
-      .then(() => props.history.push("/films"));
+import "../Login.css";
+import authService from "../services/Auth";
+
+export default function Login(props) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const history = useHistory();
+
+  if (authService.isAuthenticated()) {
+    return <Redirect to="/dashboard" />;
+  }
+
+  function validateForm() {
+    return email.length > 0 && password.length > 7;
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+
+    try {
+      await authService.login({ email, password });
+      history.push("/dashboard");
+    } catch (error) {
+      // happens ¯\_(ツ)_/¯
+      console.error(error);
+    }
+  }
 
   return (
-    <div>
-      <div>
-        <LoginForm submit={submit} />
-      </div>
+    <div className="Login">
+      <h1>Login</h1>
+      <form onSubmit={handleSubmit}>
+        <FormGroup controlId="email">
+          <FormLabel>Email</FormLabel>
+          <FormControl
+            autoFocus
+            type="text"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </FormGroup>
+        <FormGroup controlId="password">
+          <FormLabel>Password</FormLabel>
+          <FormControl
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            type="password"
+          />
+        </FormGroup>
+        <Button block disabled={!validateForm()} type="submit">
+          Login
+        </Button>
+      </form>
     </div>
   );
-};
-
-export default LoginPage;
+}
