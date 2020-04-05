@@ -57,6 +57,7 @@ const logIn = async () => {
       location.href = "index.html";
     }
   } catch (error) {
+    sessionStorage.setItem("email", mailInput[0].value);
     errorMsg.remove();
     errorMsg.classList.add("errorMsg");
     errorMsg.innerText = "Неправильные данные для входа.";
@@ -66,7 +67,7 @@ const logIn = async () => {
 };
 
 document.querySelector(".inputEmail").addEventListener("input", (e) => {
-  e.target.value = e.target.value.replace(/[^a-z ]/i, "");
+  e.target.value = e.target.value.replace(/[^a-z, 0-9, \@, \. ]/i, "");
 });
 
 const validateForm = $(function () {
@@ -98,7 +99,38 @@ loginBtn.addEventListener("click", function (e) {
 
 const resetPswContainer = document.querySelector("#resetPsw_container");
 
-pswReset.addEventListener("click", function (e) {
+pswReset.addEventListener("click", async function (e) {
   e.preventDefault();
-  //restore fetch here
+  const mail = () => {
+    if (!sessionStorage.getItem("email")) {
+      return mailInput[0].value;
+    } else {
+      return sessionStorage.getItem("email");
+    }
+  };
+  try {
+    const response = await fetch(URL + "user/restore/" + mail(), {
+      method: "GET",
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.msg);
+    } else {
+      sessionStorage.removeItem("email");
+      console.log("Success!");
+      errorMsg.classList.add("successMsg");
+      errorMsg.innerText = "Письмо с подтверждением отправлено на Вашу почту.";
+      setTimeout(() => {
+        errorMsg.innerText = "";
+        errorMsg.classList.remove("successMsg");
+      }, 7000);
+    }
+  } catch (error) {
+    errorMsg.remove();
+    errorMsg.classList.add("errorMsg");
+    errorMsg.innerText =
+      "Ошибка. Пожалуйста, введите Вашу почту и попробуйте снова.";
+    errorContainer.prepend(errorMsg);
+    console.error(error);
+  }
 });

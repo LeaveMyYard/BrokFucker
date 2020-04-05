@@ -7,14 +7,14 @@ let errorValue = 0;
 async function emailVerification() {
   try {
     const response = await fetch(URL + "register/verify/" + verification, {
-      method: "GET"
+      method: "GET",
     });
     const result = await response.json();
 
     if (!response.ok) {
       throw new Error(result.msg);
     } else {
-      location.href = "index.html";
+      location.href = "login.html";
     }
   } catch (error) {
     console.error(error);
