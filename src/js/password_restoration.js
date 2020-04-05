@@ -4,7 +4,7 @@ const verification = window.location.search.split("code=")[1];
 
 let errorValue = 0;
 
-async function pswChange() {
+async function pswRestoration() {
   try {
     const response = await fetch(URL + "user/password/verify/" + verification, {
       method: "GET",
@@ -19,10 +19,10 @@ async function pswChange() {
   } catch (error) {
     console.error(error);
     if (error.message == "") {
-      errorValue = 2;
+      errorValue = 3;
     }
     location.href = `registration.html?error=${errorValue}`;
   }
 }
 
-pswChange();
+pswRestoration();
