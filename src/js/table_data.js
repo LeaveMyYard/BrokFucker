@@ -4,7 +4,6 @@ const lotTable = document.getElementById("lotTable");
 
 const encData = function () {
   if (localStorage.getItem("email")) {
-<<<<<<< HEAD
     return window.btoa(
       localStorage.getItem("email") +
         ":" +
@@ -15,16 +14,6 @@ const encData = function () {
       sessionStorage.getItem("email") +
         ":" +
         window.atob(sessionStorage.getItem("password"))
-=======
-    return (
-      window.btoa(localStorage.getItem("email") + ":" +
-      window.atob(localStorage.getItem("password")))
-    );
-  } else {
-    return (
-      window.btoa(sessionStorage.getItem("email") + ":" +
-      window.atob(sessionStorage.getItem("password")))
->>>>>>> 212370d1b1f0c4d99837c9bbc714aa6f0cd36a75
     );
   }
 };
