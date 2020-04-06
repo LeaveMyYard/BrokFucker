@@ -529,7 +529,54 @@ class DatabaseHandler:
         if self.is_lot_removed_by_a_moderator(lot[0]):
             res['remove_reason'] = self.get_remove_reason(lot[0])
 
+        res['verification_requested'] = self.check_lot_security_verification_requested(lot[0])
+        res['club_guarantee_requested'] = self.check_club_guarantee_requested(lot[0])
+
         return res
+
+    def set_lot_security_verification_requested(self, lot_id, requested: bool = True):
+        if requested:
+            self.cursor.execute(
+                f"INSERT INTO LotSecurityVerificationRequests VALUES(?)",
+                (lot_id, )
+            )
+        else:
+            self.cursor.execute(
+                f"DELETE FROM LotSecurityVerificationRequests WHERE `id` = ?",
+                (lot_id, )
+            )
+
+        self.conn.commit()
+
+    def check_lot_security_verification_requested(self, lot_id):
+        self.cursor.execute(
+            f"SELECT * FROM LotSecurityVerificationRequests WHERE `id` = ?",
+            (lot_id,)
+        )
+
+        return self.cursor.fetchone() != []
+
+    def set_lot_guarantee_requested(self, lot_id, requested: bool = True):
+        if requested:
+            self.cursor.execute(
+                f"INSERT INTO LotGuaranteeRequests VALUES(?)",
+                (lot_id, )
+            )
+        else:
+            self.cursor.execute(
+                f"DELETE FROM LotGuaranteeRequests WHERE `id` = ?",
+                (lot_id, )
+            )
+
+        self.conn.commit()
+
+    def check_club_guarantee_requested(self, lot_id):
+        self.cursor.execute(
+            f"SELECT * FROM LotGuaranteeRequests WHERE `id` = ?",
+            (lot_id,)
+        )
+
+        return self.cursor.fetchone() != []
 
     def add_moderator_delete_reason(self, lot_id, moderator, reason):
         if self.is_lot_removed_by_a_moderator(lot_id):
@@ -856,3 +903,25 @@ class DatabaseHandler:
         )
 
         self.conn.commit()
+
+    def set_lot_guarantee_value(self, lot_id, value):
+        self.cursor.execute(
+            f"UPDATE Users SET `guarantee_percentage` = ? WHERE `user` = ?",
+            (value, lot_id)
+        )
+
+        self.conn.commit()
+
+    def get_lots_with_guarantee_requested(self, lot_filter):
+        self.cursor.execute(
+            "SELECT * FROM LotsWithGuaranteeRequested" + self.__format_sql_lot_filter_string(lot_filter)
+        )
+
+        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
+
+    def get_lots_with_security_verification_requested(self, lot_filter):
+        self.cursor.execute(
+            "SELECT * FROM LotsWithSecurityVerificationRequested" + self.__format_sql_lot_filter_string(lot_filter)
+        )
+
+        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]

@@ -76,6 +76,32 @@ CREATE TABLE IF NOT EXISTS Lots (
     FOREIGN KEY (`user`) REFERENCES Users(`email`)
 );
 
+CREATE TABLE IF NOT EXISTS LotGuaranteeRequests (
+    `id` INTEGER PRIMARY KEY,
+    FOREIGN KEY (`id`) REFERENCES Lots(`id`)
+)
+
+CREATE VIEW IF NOT EXISTS LotsWithGuaranteeRequested 
+AS
+    SELECT *
+    FROM `Lots`
+    WHERE `id` IN (
+        SELECT `id` from LotGuaranteeRequests
+    )
+
+CREATE TABLE IF NOT EXISTS LotSecurityVerificationRequests (
+    `id` INTEGER PRIMARY KEY,
+    FOREIGN KEY (`id`) REFERENCES Lots(`id`)
+)
+
+CREATE VIEW IF NOT EXISTS LotsWithSecurityVerificationRequested 
+AS
+    SELECT *
+    FROM `Lots`
+    WHERE `id` IN (
+        SELECT `id` from LotGuaranteeRequests
+    )
+
 CREATE TABLE IF NOT EXISTS LotVerificationDeclines (
     `id` INTEGER PRIMARY KEY,
     `reason` TEXT NOT NULL,

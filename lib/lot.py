@@ -112,6 +112,29 @@ class Lot:
 
         self.database.delete_lot_data(self.lot_id)
 
+    def set_guarantee_value(self, value):
+        self.database.set_lot_guarantee_value(self.lot_id, value)
+
+    def request_for_guarantee(self):
+        self.database.set_lot_guarantee_requested(self.lot_id)
+
+    def request_for_security_verification(self):
+        self.database.set_lot_security_verification_requested(self.lot_id)
+
+    def remove_request_for_guarantee(self):
+        self.database.set_lot_guarantee_requested(self.lot_id, requested=False)
+
+    def remove_request_for_security_verification(self):
+        self.database.set_lot_security_verification_requested(self.lot_id, requested=False)
+
+    @staticmethod
+    def get_requested_for_guarantee(self, lot_filter = None):
+        return self.database.get_lots_with_guarantee_requested(lot_filter=Lot.check_filter(lot_filter))
+
+    @staticmethod
+    def get_requested_for_security_verification(self, lot_filter = None):
+        self.database.get_lots_with_security_verification_requested(lot_filter=Lot.check_filter(lot_filter))
+
     @staticmethod
     def get_favorites(user, lot_filter = None):
         database = DatabaseHandler()

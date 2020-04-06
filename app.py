@@ -418,6 +418,30 @@ class RestAPI:
         return RestAPI.message(f'Lot {lot_id} is now deleted from archive.')
 
     @staticmethod
+    @route('lots/personal/<int:lot_id>/request/guarantee', methods=['PUT'])
+    @user.login_required
+    def request_club_garantee(lot_id):
+        lot = Lot(lot_id)
+
+        if not lot.can_user_edit(user.email()):
+            raise APIExceptions.NoPermissionError()
+        
+        lot.request_for_guarantee()
+        return RestAPI.message('A request for a club garantee is sent.'), 201
+
+    @staticmethod
+    @route('lots/personal/<int:lot_id>/request/verify_security', methods=['PUT'])
+    @user.login_required
+    def request_security_verification(lot_id):
+        lot = Lot(lot_id)
+
+        if not lot.can_user_edit(user.email()):
+            raise APIExceptions.NoPermissionError()
+        
+        lot.request_for_security_verification()
+        return RestAPI.message('A request for a security verification is sent.'), 201
+
+    @staticmethod
     @route('lots/subscription/<int:lot_id>', methods=['PUT'])
     @user.login_required
     def subscribe_to_lot(lot_id):
@@ -474,6 +498,43 @@ class RestAPI:
         if request.type == 'DELETE':
             lot.set_security_checked(False)
             return RestAPI.message('Lot\'s security is no more checked'), 201
+
+    @staticmethod
+    @route('lots/<int:lot_id>/guarantee', methods=['PUT'])
+    @moderator.login_required
+    def set_guarantee(lot_id):
+        if not request.json:
+            raise APIExceptions.NoJsonError()
+
+        RestAPI.check_required_fields(request.json, ['value'])
+
+        value = request.json['value']
+        lot = Lot(lot_id)
+        lot.set_guarantee_value(value)
+        lot.remove_request_for_guarantee()
+        return RestAPI.message(f'Lot\'s guarantee is now {value}%'), 201
+
+    @staticmethod
+    @route('lots/<int:lot_id>/guarantee', methods=['DELETE'])
+    @moderator.login_required
+    def remove_guarantee(lot_id):
+        lot = Lot(lot_id)
+        lot.set_guarantee_value(0)
+        return RestAPI.message('Lot\'s guarantee is now 0%'), 201
+
+    @staticmethod
+    @route('lots/requested/guarantee')
+    @moderator.login_required
+    def get_guarantee_requested_lots():
+        lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
+        return jsonify(Lot.get_requested_for_guarantee(lot_filter)), 200
+
+    @staticmethod
+    @route('lots/requested/security_verification')
+    @moderator.login_required
+    def get_guarantee_requested_lots():
+        lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
+        return jsonify(Lot.get_requested_for_security_verification(lot_filter)), 200
 
     @staticmethod
     @route('lots/unapproved', methods=['GET'])
