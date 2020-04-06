@@ -656,7 +656,7 @@ class DatabaseHandler:
             f"SELECT * FROM LiveUnacceptedLots" + self.__format_sql_lot_filter_string(lot_filter)
         )
 
-        return [self.serialize_lot for lot in self.cursor.fetchall()]
+        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
 
     def set_security_checked(self, lot_id, checked):
         self.cursor.execute(
