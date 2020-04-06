@@ -88,6 +88,8 @@ body {
 }
 
 label.error {
+  display: block;
+  margin: 5px auto;
   border: none;
   color: red;
   font-weight: 600;

@@ -1,6 +1,11 @@
 const URL = "http://localhost:5000/api/v1/";
 
 const lotTable = document.getElementById("lotTable");
+const filterBtn = document.getElementById("filterBtn");
+// const lotOptions = window.location.search.split("?")[1];
+const orderBy = document.getElementById("order_by");
+const orderType = document.getElementById("order_type");
+const showOnly = document.getElementById("show_only");
 
 const encData = function () {
   if (localStorage.getItem("email")) {
@@ -43,10 +48,15 @@ async function onReady() {
 onReady();
 
 const getLots = async () => {
+  let options = {
+    order_by: orderBy.value,
+    order_type: orderType.value,
+  };
   try {
-    const response = await fetch(URL + "lots", {
-      method: "GET",
-      // headers: { Authorization: `Basic ${encData()}` }
+    const response = await fetch(URL + "lots/approved", {
+      method: "POST",
+      // headers: { Authorization: `Basic ${encData()}` },
+      body: JSON.stringify(options),
     });
 
     if (!response.ok) {
@@ -77,13 +87,40 @@ const getLots = async () => {
 
       lotTable.innerHTML += lotArr.join("");
     }
-  } catch (error) {
-    errorMsg.remove();
-    errorMsg.classList.add("errorMsg");
-    errorMsg.innerText = "Неправильные данные для входа.";
-    errorContainer.prepend(errorMsg);
-    console.error(error);
-  }
+  } catch (error) {}
 };
 
 getLots();
+
+filterBtn.addEventListener("click", getLots);
+
+function showOnlyValues() {
+  if (orderBy.value === "currency") {
+    showOnly.innerHTML = `
+    <option value="UAH">UAH</option>
+    <option value="USD">USD</option>
+    <option value="EUR">EUR</option>
+    <option value="BTC">BTC</option>
+    <option value="ETH">ETH</option>
+    `;
+    showOnly.style.display = "inline-block";
+  } else if (orderBy.value === "return_way") {
+    showOnly.innerHTML = `
+    <option value="every_month">Ежемесячно</option>
+    <option value="term_end">Окончание срока</option>
+    <option value="other">Другое</option>
+    `;
+    showOnly.style.display = "inline-block";
+  } else if (orderBy.value === "form") {
+    showOnly.innerHTML = `
+    <option value="cash">Наличные</option>
+    <option value="cashless">Безналичные</option>
+    <option value="any">Любой</option>
+    `;
+    showOnly.style.display = "inline-block";
+  } else {
+    showOnly.style.display = "none";
+  }
+}
+
+orderBy.addEventListener("change", showOnlyValues);

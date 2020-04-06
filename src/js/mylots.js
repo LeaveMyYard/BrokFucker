@@ -724,7 +724,7 @@ getMyLots();
 async function clearLots() {
   let userLots = $(".userLots");
   userLots.each((lot) => {
-    lot.remove();
+    userLots.remove(lot);
   });
 }
 

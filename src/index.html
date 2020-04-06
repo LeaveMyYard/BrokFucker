@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" href="images/letter-b.svg" type="image/x-icon" />
     <link rel="stylesheet" href="style.css" />
-    <title>BrockFucker | Main</title>
+    <title>BrokFucker | Main</title>
   </head>
   <body>
     <header>
@@ -36,7 +36,7 @@
           </div>
           <div id="menuIfLogged">
             <ul>
-              <a href="index.html" class="fixed-header__menu-item ">
+              <a href="index.html" class="fixed-header__menu-item">
                 <li>Лоты</li>
               </a>
               <a
@@ -66,6 +66,34 @@
           <span>Broker Fucker Club</span>
         </p>
         <table id="lotTable">
+          <div class="lots_filters">
+            <label for="order_by">Сортировать: </label>
+            <select id="order_by">
+              <option value="date">Дата</option>
+              <option value="name">Название</option>
+              <option value="user">Имя пользователя</option>
+              <option value="amount">Сумма</option>
+              <option value="currency">Валюта</option>
+              <option value="term">Срок</option>
+              <option value="return_way">Метод погашения</option>
+              <option value="security">Обеспечение</option>
+              <option value="percentage">Ставка годовых</option>
+              <option value="form">Форма кредитирования</option>
+              <option value="security_checked">Проверенное обеспечение</option>
+              <option value="guarantee_percentage">Гарантия клуба</option>
+            </select>
+            <select id="order_type">
+              <option value="asc">По возрастанию</option>
+              <option value="desc">По убыванию</option>
+            </select>
+            <select multiple size="2" id="show_only" style="display: none;">
+              <option value="none">Все</option>
+              <option value="today">Сегодня</option>
+              <option value="this_month">Этот месяц</option>
+              <option value="this_year">Этот год</option>
+            </select>
+            <button class="filter_btn" id="filterBtn">Фильтровать</button>
+          </div>
           <tr>
             <th>Дата</th>
             <th>Название лота</th>
