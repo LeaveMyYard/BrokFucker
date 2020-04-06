@@ -66,7 +66,7 @@ const getLots = async () => {
       const lotArr = [];
       result.forEach((item) => {
         item = `
-      <tr>
+      <tr class="lot-list_item">
       <td>${dateFix(item.date)}</td>
       <td><a class="linkToPage" href="${"lot.html?id=" + item.id}">${
           item.name
@@ -92,7 +92,15 @@ const getLots = async () => {
 
 getLots();
 
-filterBtn.addEventListener("click", getLots);
+function clearLots() {
+  let lotItems = document.querySelectorAll("lot-list_item");
+  lotItems.forEach((lot) => lot.remove());
+}
+
+filterBtn.addEventListener("click", () => {
+  clearLots;
+  getLots;
+});
 
 function showOnlyValues() {
   if (orderBy.value === "currency") {
