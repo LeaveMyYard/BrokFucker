@@ -280,8 +280,8 @@ class RestAPI:
         return jsonify({'lot_id': user.create_lot(*[request_json[data] for data in data_required]) }), 201
 
     @staticmethod
-    @route('lots/approved', methods=['GET'])
-    @route('lots', methods=['GET'])
+    @route('lots/approved', methods=['GET', 'POST'])
+    @route('lots', methods=['GET', 'POST'])
     def get_approved_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
         return jsonify(Lot.get_all_approved_lots(lot_filter)), 200
@@ -384,21 +384,21 @@ class RestAPI:
             return RestAPI.message('A lot is removed from favorites'), 201
 
     @staticmethod
-    @route('lots/favorites', methods=['GET'])
+    @route('lots/favorites', methods=['GET', 'POST'])
     @user.login_required
     def get_favorite_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
         return jsonify(Lot.get_favorites(user.email(), lot_filter)), 200
 
     @staticmethod
-    @route('lots/personal', methods=['GET'])
+    @route('lots/personal', methods=['GET', 'POST'])
     @user.login_required
     def get_personal_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
         return jsonify(Lot.get_personal(user.email(), lot_filter)), 200
 
     @staticmethod
-    @route('lots/personal/deleted', methods=['GET'])
+    @route('lots/personal/deleted', methods=['GET', 'POST'])
     @user.login_required
     def get_personal_deleted_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
@@ -523,21 +523,21 @@ class RestAPI:
         return RestAPI.message('Lot\'s guarantee is now 0%'), 201
 
     @staticmethod
-    @route('lots/requested/guarantee')
+    @route('lots/requested/guarantee', methods=['GET', 'POST'])
     @moderator.login_required
     def get_guarantee_requested_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
         return jsonify(Lot.get_requested_for_guarantee(lot_filter)), 200
 
     @staticmethod
-    @route('lots/requested/security_verification')
+    @route('lots/requested/security_verification', methods=['GET', 'POST'])
     @moderator.login_required
     def get_security_requested_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
         return jsonify(Lot.get_requested_for_security_verification(lot_filter)), 200
 
     @staticmethod
-    @route('lots/unapproved', methods=['GET'])
+    @route('lots/unapproved', methods=['GET', 'POST'])
     @moderator.login_required
     def get_unapproved_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
