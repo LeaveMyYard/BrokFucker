@@ -532,7 +532,7 @@ class RestAPI:
     @staticmethod
     @route('lots/requested/security_verification')
     @moderator.login_required
-    def get_guarantee_requested_lots():
+    def get_security_requested_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
         return jsonify(Lot.get_requested_for_security_verification(lot_filter)), 200
 
