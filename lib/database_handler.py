@@ -521,6 +521,7 @@ class DatabaseHandler:
             'form': lot[10],
             'security_checked': eval(lot[11]),
             'guarantee_percentage': lot[12],
+            'confirmed': eval(lot[13]),
             'commentary': lot[15],
             'photos': self.get_lot_photos(lot[0]),
             'taken': self.check_taken(lot[0])
