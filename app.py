@@ -14,11 +14,88 @@ import lib.util.exceptions as APIExceptions
 import re
 import copy
 
+from lib.util.logger import init_logger
+
+from datetime import datetime, timedelta
+from threading import Timer
+
 app = Flask(__name__)
 CORS(app)
 
+logger = init_logger(__name__)
+
 app.config['UPLOAD_FOLDER'] = 'data/images/upload'
 app.config['MAX_CONTENT_PATH'] = Settings.get_maximum_image_size()
+
+ip_weights = {
+    '1s': {},
+    '1m': {},
+    '1h': {}
+}
+
+ban_list = {}
+
+max_weights = Settings.get_max_weights()
+
+def remove_1s():
+    ip_weights['1s'] = {}
+    t = Timer(1.0, remove_1s)
+    t.start()
+
+def remove_1m():
+    ip_weights['1m'] = {}
+    t = Timer(60.0, remove_1m)
+    t.start()
+
+def remove_1h():
+    ip_weights['1s'] = {}
+    t = Timer(3600.0, remove_1h)
+    t.start()
+
+remove_1s()
+remove_1m()
+remove_1h()
+
+def weighted(weight):
+    def decorator(func):
+        def res_func(*args, **kwargs):
+            request_ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+
+            logger.debug(f"Request from {request_ip} with weight {weight}.")
+
+            if request_ip in ban_list:
+                duration = ban_list[request_ip][0] - datetime.now()
+                if duration < timedelta(seconds=0):
+                    ban_list.pop(request_ip)
+                else:
+                    raise APIExceptions.MaximumRequestsTimeout(time_to_end=int((ban_list[request_ip][0] - datetime.now()).total_seconds()))
+
+            ban_durations = [timedelta(minutes=5), timedelta(minutes=15), timedelta(hours=1), timedelta(days=1)]
+            
+            for key, values in ip_weights.items():
+                if request_ip not in values:
+                    values[request_ip] = 0
+                if values[request_ip] > max_weights[key]:
+                    ban_list[request_ip] = [..., (ban_list[request_ip][1] if request_ip in ban_list else []) + [datetime.now()]]
+                    ban_list[request_ip][1] = ban_cases = list(filter(lambda time: time > datetime.now() - timedelta(days=1), ban_list[request_ip][1]))
+
+                    ban_time = ban_durations[len(ban_cases) - 1]
+                    ban_list[request_ip][0] = datetime.now() + ban_time
+
+                    logger.info(f"User {request_ip} was banned for {ban_time}")
+
+                    raise APIExceptions.MaximumRequestsTimeout(int(ban_time.total_seconds()))
+                values[request_ip] += weight
+
+            logger.debug(f"Stats: (1s: {ip_weights['1s'][request_ip]}, 1m: {ip_weights['1m'][request_ip]}, 1h: {ip_weights['1h'][request_ip]})")
+
+            return func(*args, *kwargs)
+
+        res_func.__name__ = func.__name__
+
+        return res_func
+    return decorator
+
 
 class WebApp:
     # This one redirects main page to index.html
@@ -130,6 +207,7 @@ class RestAPI:
 
     @staticmethod
     @route('ping', methods=['GET'])
+    @weighted(weight=1)
     def ping():
         return RestAPI.message('pong'), 200
 
@@ -139,6 +217,7 @@ class RestAPI:
 
     @staticmethod
     @route('register', methods=['POST'])
+    @weighted(weight=10)
     def register():
         if not request.json:
             raise APIExceptions.NoJsonError()
@@ -163,6 +242,7 @@ class RestAPI:
 
     @staticmethod
     @route('register/verify/<string:verification_hash>')
+    @weighted(weight=2)
     def confirm_verification(verification_hash):
         return user.verify_email_from_code(verification_hash), 201
 
@@ -173,12 +253,14 @@ class RestAPI:
     @staticmethod
     @route('user', methods=['GET'])
     @user.login_required
+    @weighted(weight=1)
     def check_user():
         return jsonify(user.get_data()), 200
 
     @staticmethod
     @route('user/password', methods=['PUT'])
     @user.login_required
+    @weighted(weight=10)
     def change_password():
         if not request.json:
             raise APIExceptions.NoJsonError()
@@ -195,18 +277,21 @@ class RestAPI:
 
     @staticmethod
     @route('user/password/verify/<string:code>')
+    @weighted(weight=2)
     def verify_password_code(code):
         user.verify_password_change(code)
         return RestAPI.message(f'Password was successfuly changed.')
 
     @staticmethod
     @route('user/restore/<string:email>')
+    @weighted(weight=10)
     def restore_account(email):
         user.restore_account(email)
         return RestAPI.message(f'Verification in sent to {email}')
 
     @staticmethod
     @route('user/restore/verify/<string:code>')
+    @weighted(weight=2)
     def verify_account_restore(code):
         user.verify_account_restore(code)
         return RestAPI.message(f'Temporary password is sent to your email.')
@@ -214,6 +299,7 @@ class RestAPI:
     @staticmethod
     @route('user', methods=['PUT'])
     @user.login_required
+    @weighted(weight=2)
     def edit_user_data():
         try:
             request_json = json.loads(request.data)
@@ -236,6 +322,7 @@ class RestAPI:
     @staticmethod
     @route('user/avatar', methods=['GET', 'POST', 'DELETE'])
     @user.login_required
+    @weighted(weight=2)
     def edit_avatar():
         if request.method == 'GET':
             user.get_avatar_link()
@@ -253,12 +340,14 @@ class RestAPI:
 
     @staticmethod
     @route('lots/settings', methods=['GET'])
+    @weighted(weight=1)
     def get_lot_settings():
         return jsonify(Lot.get_settings()), 200
 
     @staticmethod
     @route('lots', methods=['POST'])
     @user.login_required
+    @weighted(weight=1)
     def create_lot():
         request_json = RestAPI.request_data_to_json(request.data)
 
@@ -281,19 +370,22 @@ class RestAPI:
 
     @staticmethod
     @route('lots/approved', methods=['GET', 'POST'])
-    @route('lots', methods=['GET', 'POST'])
+    @route('lots', methods=['GET'])
+    @weighted(weight=5)
     def get_approved_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
         return jsonify(Lot.get_all_approved_lots(lot_filter)), 200
 
     @staticmethod
     @route('lots/<int:lot_id>', methods=['GET'])
+    @weighted(weight=1)
     def get_lot(lot_id):
         return jsonify(Lot(lot_id).get_lot_data()), 200
 
     @staticmethod
     @route('lots/<int:lot_id>', methods=['PUT'])
     @user.login_required
+    @weighted(weight=3)
     def update_lot(lot_id):
         lot = Lot(lot_id)
         if not lot.can_user_edit(user.email()):
@@ -325,6 +417,7 @@ class RestAPI:
     @staticmethod
     @route('lots/<int:lot_id>', methods=['DELETE'])
     @user.login_required
+    @weighted(weight=2)
     def delete_lot(lot_id):
         lot = Lot(lot_id)
         if not lot.can_user_edit(user.email()):
@@ -336,6 +429,7 @@ class RestAPI:
     @staticmethod
     @route('lots/<int:lot_id>', methods=['POST'])
     @user.login_required
+    @weighted(weight=2)
     def restore_lot(lot_id):
         lot = Lot(lot_id)
         if not lot.can_user_edit(user.email()):
@@ -346,12 +440,14 @@ class RestAPI:
 
     @staticmethod
     @route('lots/<int:lot_id>/photos', methods=['GET'])
+    @weighted(weight=2)
     def get_lot_photo(lot_id):
         return jsonify({'link': Lot(lot_id).get_photos()}), 200
 
     @staticmethod
     @route('lots/<int:lot_id>/photos', methods=['POST'])
     @user.login_required
+    @weighted(weight=3)
     def add_lot_photo(lot_id):
         lot = Lot(lot_id)
         if not lot.can_user_edit(user.email()):
@@ -364,6 +460,7 @@ class RestAPI:
     @staticmethod
     @route('lots/<int:lot_id>/photos/<int:photo_id>', methods=['DELETE'])
     @user.login_required
+    @weighted(weight=2)
     def remove_lot_photo(lot_id, photo_id):
         lot = Lot(lot_id)
 
@@ -375,6 +472,7 @@ class RestAPI:
     @staticmethod
     @route('lots/favorites/<int:lot_id>', methods=['PUT', 'DELETE'])
     @user.login_required
+    @weighted(weight=1)
     def update_favorite_lots(lot_id):
         if request.method == 'PUT':
             user.add_lot_to_favorites(lot_id)
@@ -386,6 +484,7 @@ class RestAPI:
     @staticmethod
     @route('lots/favorites', methods=['GET', 'POST'])
     @user.login_required
+    @weighted(weight=3)
     def get_favorite_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
         return jsonify(Lot.get_favorites(user.email(), lot_filter)), 200
@@ -393,6 +492,7 @@ class RestAPI:
     @staticmethod
     @route('lots/personal', methods=['GET', 'POST'])
     @user.login_required
+    @weighted(weight=3)
     def get_personal_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
         return jsonify(Lot.get_personal(user.email(), lot_filter)), 200
@@ -400,6 +500,7 @@ class RestAPI:
     @staticmethod
     @route('lots/personal/deleted', methods=['GET', 'POST'])
     @user.login_required
+    @weighted(weight=3)
     def get_personal_deleted_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
         return jsonify(Lot.get_personal_deleted(user.email(), lot_filter)), 200
@@ -407,6 +508,7 @@ class RestAPI:
     @staticmethod
     @route('lots/personal/deleted/<int:lot_id>', methods=['DELETE'])
     @user.login_required
+    @weighted(weight=1)
     def delete_lot_entirely(lot_id):
         lot = Lot(lot_id)
 
@@ -420,6 +522,7 @@ class RestAPI:
     @staticmethod
     @route('lots/personal/<int:lot_id>/request/guarantee', methods=['PUT'])
     @user.login_required
+    @weighted(weight=1)
     def request_club_garantee(lot_id):
         lot = Lot(lot_id)
 
@@ -432,6 +535,7 @@ class RestAPI:
     @staticmethod
     @route('lots/personal/<int:lot_id>/request/verify_security', methods=['PUT'])
     @user.login_required
+    @weighted(weight=1)
     def request_security_verification(lot_id):
         lot = Lot(lot_id)
 
@@ -444,6 +548,7 @@ class RestAPI:
     @staticmethod
     @route('lots/subscription/<int:lot_id>', methods=['PUT'])
     @user.login_required
+    @weighted(weight=1)
     def subscribe_to_lot(lot_id):
         request_json = RestAPI.request_data_to_json(request.data)
 
@@ -463,6 +568,7 @@ class RestAPI:
     @staticmethod
     @route('lots/subscription/<int:lot_id>', methods=['DELETE'])
     @user.login_required
+    @weighted(weight=1)
     def unsubscribe_from_lot(lot_id):
         try:
             user.unsubscribe_from_lot(lot_id)
@@ -473,6 +579,7 @@ class RestAPI:
     @staticmethod
     @route('lots/subscription', methods=['GET'])
     @user.login_required
+    @weighted(weight=2)
     def get_subscribed_lots():
         return jsonify({'lots': user.get_subscriptions()}), 200
 
@@ -483,6 +590,7 @@ class RestAPI:
     @staticmethod
     @route('lots/<int:lot_id>/approve', methods=['PUT'])
     @moderator.login_required
+    @weighted(weight=1)
     def approve_lot(lot_id):
         Lot(lot_id).approve()
         return RestAPI.message('A lot is now approved'), 201
@@ -490,6 +598,7 @@ class RestAPI:
     @staticmethod
     @route('lots/<int:lot_id>/security', methods=['PUT', 'DELETE'])
     @moderator.login_required
+    @weighted(weight=1)
     def set_security_checked(lot_id):
         lot = Lot(lot_id)
         if request.type == 'PUT':
@@ -502,6 +611,7 @@ class RestAPI:
     @staticmethod
     @route('lots/<int:lot_id>/guarantee', methods=['PUT'])
     @moderator.login_required
+    @weighted(weight=1)
     def set_guarantee(lot_id):
         if not request.json:
             raise APIExceptions.NoJsonError()
@@ -517,6 +627,7 @@ class RestAPI:
     @staticmethod
     @route('lots/<int:lot_id>/guarantee', methods=['DELETE'])
     @moderator.login_required
+    @weighted(weight=1)
     def remove_guarantee(lot_id):
         lot = Lot(lot_id)
         lot.set_guarantee_value(0)
@@ -525,6 +636,7 @@ class RestAPI:
     @staticmethod
     @route('lots/requested/guarantee', methods=['GET', 'POST'])
     @moderator.login_required
+    @weighted(weight=3)
     def get_guarantee_requested_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
         return jsonify(Lot.get_requested_for_guarantee(lot_filter)), 200
@@ -532,6 +644,7 @@ class RestAPI:
     @staticmethod
     @route('lots/requested/security_verification', methods=['GET', 'POST'])
     @moderator.login_required
+    @weighted(weight=3)
     def get_security_requested_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
         return jsonify(Lot.get_requested_for_security_verification(lot_filter)), 200
@@ -539,6 +652,7 @@ class RestAPI:
     @staticmethod
     @route('lots/unapproved', methods=['GET', 'POST'])
     @moderator.login_required
+    @weighted(weight=3)
     def get_unapproved_lots():
         lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
         return jsonify(Lot.get_all_unapproved_lots(lot_filter)), 200
@@ -546,6 +660,7 @@ class RestAPI:
     @staticmethod
     @route('lots/unapproved/<int:lot_id>', methods=['DELETE'])
     @moderator.login_required
+    @weighted(weight=1)
     def remove_unapproved_lot(lot_id):
         required_fields = ['reason']
 
@@ -560,12 +675,14 @@ class RestAPI:
     @staticmethod
     @route('lots/subscription/approved', methods=['GET'])
     @moderator.login_required
+    @weighted(weight=1)
     def get_approved_subscriptions():
         return jsonify({'lots': Lot.get_approved_subscriptions()}), 200
 
     @staticmethod
     @route('lots/subscription/unapproved', methods=['GET'])
     @moderator.login_required
+    @weighted(weight=1)
     def get_unapproved_subscriptions():
         return jsonify({'lots': Lot.get_unapproved_subscriptions()}), 200
 
@@ -576,6 +693,7 @@ class RestAPI:
     @staticmethod
     @route('user/<string:email>/moderator', methods=['PUT', 'POST'])
     @administrator.login_required
+    @weighted(weight=1)
     def give_moderator_rights(email):
         moderator.add(email)
         return RestAPI.message(f'{email} is now a moderator.')
@@ -583,6 +701,7 @@ class RestAPI:
     @staticmethod
     @route('user/<string:email>/moderator', methods=['DELETE'])
     @administrator.login_required
+    @weighted(weight=1)
     def remove_moderator_rights(email):
         moderator.remove(email)
         return RestAPI.message(f'{email} is no longer a moderator.')

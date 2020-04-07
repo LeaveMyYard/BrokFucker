@@ -35,3 +35,7 @@ class Settings:
     @staticmethod
     def get_lot_filter_settings() -> Dict:
         return Settings.__load_settings()['lot_filter_settings']
+
+    @staticmethod
+    def get_max_weights() -> Dict:
+        return Settings.__load_settings()['max_request_weights']

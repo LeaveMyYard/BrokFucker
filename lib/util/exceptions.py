@@ -69,3 +69,7 @@ class LotDeletionError(IndexedException):
 class AccountRestoreError(IndexedException):
     def __init__(self, message):
         super().__init__(-1014, message)
+
+class MaximumRequestsTimeout(IndexedException):
+    def __init__(self, time_to_end: int):
+        super().__init__(-1015, f'You made to much requests, wait at least {time_to_end} seconds to continue.')
