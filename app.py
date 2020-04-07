@@ -221,8 +221,7 @@ class RestAPI:
     @route('register', methods=['POST'])
     @weighted(weight=10)
     def register():
-        if not request.json:
-            raise APIExceptions.NoJsonError()
+        request_json = RestAPI.request_data_to_json(request.data)
 
         data_required = [
             'email',
@@ -230,17 +229,17 @@ class RestAPI:
         ]
 
         for data in data_required:
-            if data not in request.json:
-                raise APIExceptions.NotEnoughDataError(data_required, request.json.keys())
+            if data not in request_json:
+                raise APIExceptions.NotEnoughDataError(data_required, request_json.keys())
 
-        RestAPI.check_fields_values(request.json, "register")
+        RestAPI.check_fields_values(request_json, "register")
 
         user.begin_email_verification(
-            request.json['email'],
-            request.json['password'],
+            request_json['email'],
+            request_json['password'],
         )
 
-        return RestAPI.message(f"Verification is sent to {request.json['email']}"), 201
+        return RestAPI.message(f"Verification is sent to {request_json['email']}"), 201
 
     @staticmethod
     @route('register/verify/<string:verification_hash>')
@@ -264,17 +263,16 @@ class RestAPI:
     @user.login_required
     @weighted(weight=10)
     def change_password():
-        if not request.json:
-            raise APIExceptions.NoJsonError()
+        request_json = RestAPI.request_data_to_json(request.data)
 
         data_required = [
             'password'
         ]
 
-        RestAPI.check_required_fields(request.json, data_required)
-        RestAPI.check_fields_values(request.json, "register")
+        RestAPI.check_required_fields(request_json, data_required)
+        RestAPI.check_fields_values(request_json, "register")
 
-        user.change_password(request.json['password'])
+        user.change_password(request_json['password'])
         return RestAPI.message(f'Verification in sent to {user.email()}')
 
     @staticmethod
@@ -303,10 +301,7 @@ class RestAPI:
     @user.login_required
     @weighted(weight=2)
     def edit_user_data():
-        try:
-            request_json = json.loads(request.data)
-        except json.decoder.JSONDecodeError:
-            raise APIExceptions.NoJsonError()
+        request_json = RestAPI.request_data_to_json(request.data)
 
         data_required = {
             'phone': 'phone_number',
@@ -375,7 +370,13 @@ class RestAPI:
     @route('lots', methods=['GET'])
     @weighted(weight=5)
     def get_approved_lots():
-        lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
+        try:
+            request_json = RestAPI.request_data_to_json(request.data)
+        except APIExceptions.NoJsonError:
+            lot_filter = {}
+        else:
+            lot_filter = request_json['filter'] if 'filter' in request_json else {}
+            
         return jsonify(Lot.get_all_approved_lots(lot_filter)), 200
 
     @staticmethod
@@ -393,8 +394,7 @@ class RestAPI:
         if not lot.can_user_edit(user.email()):
             raise APIExceptions.NoPermissionError()
 
-        if not request.json:
-            raise APIExceptions.NoJsonError()
+        request_json = RestAPI.request_data_to_json(request.data)
 
         data_available = [
             'name',
@@ -408,11 +408,11 @@ class RestAPI:
             'commentary'
         ]
 
-        RestAPI.check_fields_values(request.json, "lot")
+        RestAPI.check_fields_values(request_json, "lot")
 
         for data in data_available:
-            if data in request.json:
-                lot.update_data(data, request.json[data])
+            if data in request_json:
+                lot.update_data(data, request_json[data])
 
         return RestAPI.message('A lot is changed'), 201
 
@@ -488,7 +488,13 @@ class RestAPI:
     @user.login_required
     @weighted(weight=3)
     def get_favorite_lots():
-        lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
+        try:
+            request_json = RestAPI.request_data_to_json(request.data)
+        except APIExceptions.NoJsonError:
+            lot_filter = {}
+        else:
+            lot_filter = request_json['filter'] if 'filter' in request_json else {}
+            
         return jsonify(Lot.get_favorites(user.email(), lot_filter)), 200
 
     @staticmethod
@@ -496,7 +502,13 @@ class RestAPI:
     @user.login_required
     @weighted(weight=3)
     def get_personal_lots():
-        lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
+        try:
+            request_json = RestAPI.request_data_to_json(request.data)
+        except APIExceptions.NoJsonError:
+            lot_filter = {}
+        else:
+            lot_filter = request_json['filter'] if 'filter' in request_json else {}
+            
         return jsonify(Lot.get_personal(user.email(), lot_filter)), 200
 
     @staticmethod
@@ -504,7 +516,13 @@ class RestAPI:
     @user.login_required
     @weighted(weight=3)
     def get_personal_deleted_lots():
-        lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
+        try:
+            request_json = RestAPI.request_data_to_json(request.data)
+        except APIExceptions.NoJsonError:
+            lot_filter = {}
+        else:
+            lot_filter = request_json['filter'] if 'filter' in request_json else {}
+            
         return jsonify(Lot.get_personal_deleted(user.email(), lot_filter)), 200
 
     @staticmethod
@@ -615,7 +633,7 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def set_guarantee(lot_id):
-        if not request.json:
+        if not request.json or not request.content_type.startswith('application/json'):
             raise APIExceptions.NoJsonError()
 
         RestAPI.check_required_fields(request.json, ['value'])
@@ -640,7 +658,13 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=3)
     def get_guarantee_requested_lots():
-        lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
+        try:
+            request_json = RestAPI.request_data_to_json(request.data)
+        except APIExceptions.NoJsonError:
+            lot_filter = {}
+        else:
+            lot_filter = request_json['filter'] if 'filter' in request_json else {}
+            
         return jsonify(Lot.get_requested_for_guarantee(lot_filter)), 200
 
     @staticmethod
@@ -648,7 +672,13 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=3)
     def get_security_requested_lots():
-        lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
+        try:
+            request_json = RestAPI.request_data_to_json(request.data)
+        except APIExceptions.NoJsonError:
+            lot_filter = {}
+        else:
+            lot_filter = request_json['filter'] if 'filter' in request_json else {}
+            
         return jsonify(Lot.get_requested_for_security_verification(lot_filter)), 200
 
     @staticmethod
@@ -656,7 +686,13 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=3)
     def get_unapproved_lots():
-        lot_filter = request.json['filter'] if request.json and 'filter' in request.json else {}
+        try:
+            request_json = RestAPI.request_data_to_json(request.data)
+        except APIExceptions.NoJsonError:
+            lot_filter = {}
+        else:
+            lot_filter = request_json['filter'] if 'filter' in request_json else {}
+            
         return jsonify(Lot.get_all_unapproved_lots(lot_filter)), 200
 
     @staticmethod
