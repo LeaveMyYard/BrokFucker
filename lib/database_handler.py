@@ -890,7 +890,7 @@ class DatabaseHandler:
 
     def set_moderator_rights(self, email):
         self.cursor.execute(
-            f"UPDATE Users SET `type` = 1 WHERE `user` = ?",
+            f"UPDATE Users SET `type` = 1 WHERE `email` = ?",
             (email, )
         )
 
@@ -898,7 +898,7 @@ class DatabaseHandler:
 
     def remove_moderator_rights(self, email):
         self.cursor.execute(
-            f"UPDATE Users SET `type` = 0 WHERE `user` = ?",
+            f"UPDATE Users SET `type` = 0 WHERE `email` = ?",
             (email, )
         )
 
@@ -906,7 +906,7 @@ class DatabaseHandler:
 
     def set_lot_guarantee_value(self, lot_id, value):
         self.cursor.execute(
-            f"UPDATE Users SET `guarantee_percentage` = ? WHERE `user` = ?",
+            f"UPDATE Users SET `guarantee_percentage` = ? WHERE `email` = ?",
             (value, lot_id)
         )
 
