@@ -376,7 +376,7 @@ class RestAPI:
             lot_filter = {}
         else:
             lot_filter = request_json['filter'] if 'filter' in request_json else {}
-            
+
         return jsonify(Lot.get_all_approved_lots(lot_filter)), 200
 
     @staticmethod
@@ -494,7 +494,7 @@ class RestAPI:
             lot_filter = {}
         else:
             lot_filter = request_json['filter'] if 'filter' in request_json else {}
-            
+
         return jsonify(Lot.get_favorites(user.email(), lot_filter)), 200
 
     @staticmethod
@@ -508,7 +508,7 @@ class RestAPI:
             lot_filter = {}
         else:
             lot_filter = request_json['filter'] if 'filter' in request_json else {}
-            
+
         return jsonify(Lot.get_personal(user.email(), lot_filter)), 200
 
     @staticmethod
@@ -522,7 +522,7 @@ class RestAPI:
             lot_filter = {}
         else:
             lot_filter = request_json['filter'] if 'filter' in request_json else {}
-            
+
         return jsonify(Lot.get_personal_deleted(user.email(), lot_filter)), 200
 
     @staticmethod
@@ -664,7 +664,7 @@ class RestAPI:
             lot_filter = {}
         else:
             lot_filter = request_json['filter'] if 'filter' in request_json else {}
-            
+
         return jsonify(Lot.get_requested_for_guarantee(lot_filter)), 200
 
     @staticmethod
@@ -678,7 +678,7 @@ class RestAPI:
             lot_filter = {}
         else:
             lot_filter = request_json['filter'] if 'filter' in request_json else {}
-            
+
         return jsonify(Lot.get_requested_for_security_verification(lot_filter)), 200
 
     @staticmethod
@@ -692,7 +692,7 @@ class RestAPI:
             lot_filter = {}
         else:
             lot_filter = request_json['filter'] if 'filter' in request_json else {}
-            
+
         return jsonify(Lot.get_all_unapproved_lots(lot_filter)), 200
 
     @staticmethod
