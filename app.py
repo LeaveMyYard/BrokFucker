@@ -548,9 +548,19 @@ class RestAPI:
 
         if not lot.can_user_edit(user.email()):
             raise APIExceptions.NoPermissionError()
+
+        try:
+            value = RestAPI.request_data_to_json(request.data)['value']
+        except APIExceptions.NoJsonError, KeyError:
+            value = True
         
-        lot.request_for_guarantee()
-        return RestAPI.message('A request for a club garantee is sent.'), 201
+        if value:
+            lot.request_for_guarantee()
+            return RestAPI.message('A request for a club garantee is sent.'), 201
+        else:
+            lot.remove_request_for_guarantee()
+            return RestAPI.message('A request for a club garantee is now removed.'), 201
+        
 
     @staticmethod
     @route('lots/personal/<int:lot_id>/request/verify_security', methods=['PUT'])
@@ -561,9 +571,18 @@ class RestAPI:
 
         if not lot.can_user_edit(user.email()):
             raise APIExceptions.NoPermissionError()
+
+        try:
+            value = RestAPI.request_data_to_json(request.data)['value']
+        except APIExceptions.NoJsonError, KeyError:
+            value = True
         
-        lot.request_for_security_verification()
-        return RestAPI.message('A request for a security verification is sent.'), 201
+        if value:
+            lot.request_for_security_verification()
+            return RestAPI.message('A request for a security verification is sent.'), 201
+        else:
+            lot.remove_request_for_security_verification()
+            return RestAPI.message('A request for a security verification is now removed.'), 201
 
     @staticmethod
     @route('lots/subscription/<int:lot_id>', methods=['PUT'])
