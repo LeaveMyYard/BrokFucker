@@ -566,3 +566,7 @@ main {
   max-width: 250px;
   color: green;
 }
+
+.mylots_label_container {
+  margin: 20px 0;
+}

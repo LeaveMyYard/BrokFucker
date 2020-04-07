@@ -300,6 +300,16 @@ const createLotAndListeners = async (
                     })
                     .join("")}
                 </div>
+                <div class="mylots_label_container">
+                <span>Заказать: </span>
+                <input type="checkbox" id="club_guarantee_req">
+                <label for="club_guarantee_req">ГАРАНТИЯ КЛУБА</label>
+                </div>
+                <div class="mylots_label_container">
+                <span>Заказать: </span>
+                <input type="checkbox" id="verification_req">
+                <label for="verification_req">ПРОВЕРЕННОЕ ОБЕСПЕЧЕНИЕ</label>
+                </div>
                 <div class="btnContainer">
                   <button class="deleteLotBtn btn">Удалить</button>
                   <button class="editLotBtn btn">Обновить</button>
@@ -369,6 +379,12 @@ const createLotAndListeners = async (
   $(lotEl)
     .find(".editLotBtn")
     .on("click", async function (event) {
+      const verificationReq = {
+        value: document.getElementById("verification_req").checked,
+      };
+      const clubGuaranteeReq = {
+        value: document.getElementById("club_guarantee_req").checked,
+      };
       const formData = new FormData();
       const photos = document.querySelector("#updateLotPhoto");
       for (let i = 0; i < photos.files.length; i++) {
@@ -392,8 +408,8 @@ const createLotAndListeners = async (
         const response = await fetch(URL + `lots/${lot.id}`, {
           method: "PUT",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Basic ${encData()}`,
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(value),
         });
@@ -409,9 +425,50 @@ const createLotAndListeners = async (
           method: "POST",
           headers: {
             Authorization: `Basic ${encData()}`,
+            "Content-Type": "application/json",
           },
           body: formData,
         });
+        if (response.ok) {
+          console.log(response);
+          window.location.reload();
+        } else throw new Error(error);
+      } catch (error) {
+        alert("Ошибка! Что-то пошло не так.");
+        console.log(error);
+      }
+      try {
+        const response = await fetch(
+          URL + `lots/personal/${lot.id}/request/guarantee`,
+          {
+            method: "PUT",
+            headears: {
+              Authorization: `Basic ${encData()}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(clubGuaranteeReq),
+          }
+        );
+        if (response.ok) {
+          console.log(response);
+          window.location.reload();
+        } else throw new Error(error);
+      } catch (error) {
+        alert("Ошибка! Что-то пошло не так.");
+        console.log(error);
+      }
+      try {
+        const response = await fetch(
+          URL + `lots/personal/${lot.id}/request/verify_security`,
+          {
+            method: "PUT",
+            headears: {
+              Authorization: `Basic ${encData()}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(verificationReq),
+          }
+        );
         if (response.ok) {
           console.log(response);
           window.location.reload();
@@ -802,6 +859,7 @@ createLotPublish.addEventListener("click", async function (e) {
       body: formData,
       headers: {
         Authorization: `Basic ${encData()}`,
+        "Content-Type": "application/json",
       },
     });
     // for (let key of formData.keys()) {
