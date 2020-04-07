@@ -47,6 +47,23 @@ async function onReady() {
 }
 onReady();
 
+vocabulary = {
+  cash: "Наличные",
+  cashless: "Безналичные",
+  any: "Любой",
+  every_month: "Ежемесячно",
+  term_end: "Окончание срока",
+  other: "Другое",
+};
+
+function translate(data) {
+  for (let word in vocabulary) {
+    if (word == data) {
+      return vocabulary[word];
+    }
+  }
+}
+
 const getLots = async () => {
   let options = {
     order_by: orderBy.value,
@@ -55,7 +72,9 @@ const getLots = async () => {
   try {
     const response = await fetch(URL + "lots/approved", {
       method: "POST",
-      // headers: { Authorization: `Basic ${encData()}` },
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(options),
     });
 
@@ -63,6 +82,7 @@ const getLots = async () => {
       return new Error("Unsuccessfull response");
     } else {
       const result = await response.json();
+      console.log(result);
       const lotArr = [];
       result.forEach((item) => {
         item = `
@@ -75,10 +95,10 @@ const getLots = async () => {
       <td>${item.amount}</td>
       <td>${item.currency}</td>
       <td>${item.term}</td>
-      <td>${item.return_way}</td>
+      <td>${translate(item.return_way)}</td>
       <td>${item.security}</td>
       <td>${item.percentage}</td>
-      <td>${item.form}</td>
+      <td>${translate(item.form)}</td>
       <td>${item.security_checked ? "Да" : "Нет"}</td>
       <td>${item.guarantee_percentage}</td>
       </tr>`;
@@ -86,6 +106,7 @@ const getLots = async () => {
       });
 
       lotTable.innerHTML += lotArr.join("");
+      console.log(options);
     }
   } catch (error) {}
 };
@@ -93,13 +114,15 @@ const getLots = async () => {
 getLots();
 
 function clearLots() {
-  let lotItems = document.querySelectorAll("lot-list_item");
+  let lotItems = document.querySelectorAll(".lot-list_item");
+  console.log(lotItems);
+
   lotItems.forEach((lot) => lot.remove());
 }
 
 filterBtn.addEventListener("click", () => {
-  clearLots;
-  getLots;
+  clearLots();
+  getLots();
 });
 
 function showOnlyValues() {

@@ -178,7 +178,10 @@ document
     try {
       const response = await fetch(URL + `lots/favorites/${lotID}`, {
         method: "PUT",
-        headers: { Authorization: `Basic ${encData()}` },
+        headers: {
+          Authorization: `Basic ${encData()}`,
+          "Content-Type": "application/json",
+        },
       });
       if (!response.ok) {
         throw new Error("Unsuccessfull response");
@@ -202,7 +205,10 @@ lotSubBtn.addEventListener("click", async function () {
     try {
       const response = await fetch(URL + `user`, {
         method: "PUT",
-        headers: { Authorization: `Basic ${encData()}` },
+        headers: {
+          Authorization: `Basic ${encData()}`,
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(upd),
       });
       if (!response.ok) {
@@ -218,7 +224,10 @@ lotSubBtn.addEventListener("click", async function () {
   try {
     const response = await fetch(URL + `lots/subscription/${lotID}`, {
       method: "PUT",
-      headers: { Authorization: `Basic ${encData()}` },
+      headers: {
+        Authorization: `Basic ${encData()}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify(value),
     });
     if (!response.ok) {
