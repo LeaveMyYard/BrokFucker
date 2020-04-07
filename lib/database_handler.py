@@ -368,7 +368,7 @@ class DatabaseHandler:
 
         return {
             'email': res[0],
-            'type': 'moderator' if res[2] == 1 else 'user',
+            'type': 'moderator' if res[2] == 1 else 'admin' if res[2] == 2 else 'user',
             'registration_date': res[3],
             'name': res[4],
             'phone_number': res[5],
