@@ -57,26 +57,30 @@ vocabulary = {
 };
 
 function translate(data) {
-  for (let word in vocabulary) {
-    if (word == data) {
-      return vocabulary[word];
-    }
-  }
+  return vocabulary[data];
 }
 
-// todo 75 line change currency to current selected order_by
-// lock filterBtn for 2 sec after each filtration
-
 const getLots = async () => {
-  let options = {
+  const myDynamicKey = orderBy.value;
+
+  const options = {
     filter: {
-      order_by: orderBy.value,
+      order_by: myDynamicKey,
       order_type: orderType.value,
-      // show_only: {
-      //   currency: [showOnly.value ? showOnly.value : ""],
-      // },
+      show_only: {},
     },
   };
+
+  if (showOnly.value) {
+    const selected = document.querySelectorAll("#show_only option:checked");
+    const values = Array.from(selected).map((el) => el.value);
+    options.filter.show_only = {
+      [myDynamicKey]: values,
+    };
+  } else {
+    options.filter.show_only = "";
+  }
+
   try {
     const response = await fetch(URL + "lots/approved", {
       method: "POST",
@@ -163,7 +167,11 @@ function showOnlyValues() {
     showOnly.style.display = "inline-block";
   } else {
     showOnly.style.display = "none";
+    showOnly.value = "";
   }
+  myDynamiceKey = orderBy.value;
 }
 
-orderBy.addEventListener("change", showOnlyValues);
+orderBy.addEventListener("change", () => {
+  showOnlyValues();
+});
