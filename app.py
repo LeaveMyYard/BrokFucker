@@ -551,7 +551,7 @@ class RestAPI:
 
         try:
             value = RestAPI.request_data_to_json(request.data)['value']
-        except APIExceptions.NoJsonError, KeyError:
+        except (APIExceptions.NoJsonError, KeyError):
             value = True
         
         if value:
@@ -574,7 +574,7 @@ class RestAPI:
 
         try:
             value = RestAPI.request_data_to_json(request.data)['value']
-        except APIExceptions.NoJsonError, KeyError:
+        except (APIExceptions.NoJsonError, KeyError):
             value = True
         
         if value:

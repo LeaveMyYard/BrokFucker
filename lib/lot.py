@@ -17,7 +17,7 @@ class Lot:
         result_filter = {}
 
         available_types = settings['available_types']
-        available_types['order_by'] = lot_settings.keys()
+        available_types['order_by'] = list(lot_settings.keys()) + ['user', 'date']
         available_types['order_type'] = ['ASC', 'DESC']
 
         for value in available_types:
@@ -37,7 +37,7 @@ class Lot:
 
         if 'show_only' in lot_filter:
             if not isinstance(lot_filter['show_only'], dict):
-                raise APIExceptions.LotFiltrationError(f"show_only field in lot filtration should be a Map[str, List[str]]")
+                raise APIExceptions.LotFiltrationError(f"show_only field in lot filtration should be a Map[str, List[str]], but got `{lot_filter['show_only']}`")
 
             result_filter['show_only'] = {}
 
@@ -48,7 +48,7 @@ class Lot:
                     raise APIExceptions.LotFiltrationError(f"{key} is not a valid group. Available groups are: {', '.join(show_only.keys())}")
 
                 if not isinstance(value, list) or any([not isinstance(v, str) for v in value]):
-                    raise APIExceptions.LotFiltrationError(f"show_only field in lot filtration should be a Map[str, List[str]]")
+                    raise APIExceptions.LotFiltrationError(f"show_only field in lot filtration should be a Map[str, List[str]], but got `{lot_filter['show_only']}`")
 
                 for v in value:
                     if v not in show_only[key]:
