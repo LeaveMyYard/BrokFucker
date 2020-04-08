@@ -14,9 +14,9 @@ import Sidebar from "./components/Sidebar";
 import LotsPage from "./components/LotsPage";
 import { BASE_HREF } from "./constants";
 
+// TODO: in Auth change 'user' to 'admin' when ready
+// TODO: change 'user' to 'admin' in Sidebar return
 function App() {
-  const user = localStorage.getItem("role");
-
   return (
     <BrowserRouter basename={BASE_HREF}>
       <Switch>

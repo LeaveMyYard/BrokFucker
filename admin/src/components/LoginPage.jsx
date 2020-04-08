@@ -23,16 +23,15 @@ export default function Login(props) {
 
     try {
       await authService.login({ email, password });
-      history.push("/dashboard");
+      history.push("/dashboard/lots/unapproved");
     } catch (error) {
-      // happens ¯\_(ツ)_/¯
       console.error(error);
     }
   }
 
   return (
     <div className="Login">
-      <h1>Login</h1>
+      <h1 className="login_heading">Login</h1>
       <form onSubmit={handleSubmit}>
         <FormGroup controlId="email">
           <FormLabel>Email</FormLabel>
@@ -51,7 +50,12 @@ export default function Login(props) {
             type="password"
           />
         </FormGroup>
-        <Button block disabled={!validateForm()} type="submit">
+        <Button
+          className="login-btn"
+          block
+          disabled={!validateForm()}
+          type="submit"
+        >
           Login
         </Button>
       </form>

@@ -1,6 +1,8 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import authService from "../services/Auth";
+import Translate from "../services/Translate";
+import { URL } from "../constants";
 
 function dateFix(date) {
   let givenDate = new Date(date.replace(/ /g, "T"));
@@ -13,7 +15,21 @@ function dateFix(date) {
 export function LotsList({ list, refreshList }) {
   const onLotApprove = async (lot) => {
     try {
-      // ... await api request
+      const authToken = authService.getAuthToken();
+
+      const response = await fetch(URL + `lots/${lot.id}/approve`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Basic ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+
+      return await response.json();
     } catch (error) {
     } finally {
       await refreshList();
@@ -22,7 +38,21 @@ export function LotsList({ list, refreshList }) {
 
   const onLotRemove = async (lot) => {
     try {
-      // ... await api request
+      const authToken = authService.getAuthToken();
+
+      const response = await fetch(URL + `lots/unapproved/${lot.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Basic ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+
+      return await response.json();
     } catch (error) {
     } finally {
       await refreshList();
@@ -30,9 +60,9 @@ export function LotsList({ list, refreshList }) {
   };
 
   return !list.length ? (
-    "No lots found"
+    <h1>По данному запросу нет лотов.</h1>
   ) : (
-    <table id="lotTable">
+    <table className="lot-table" id="lotTable">
       <tr>
         <th>Дата</th>
         <th>Название лота</th>
@@ -56,16 +86,14 @@ export function LotsList({ list, refreshList }) {
           <td>{item.amount}</td>
           <td>{item.currency}</td>
           <td>{item.term}</td>
-          <td>{item.return_way}</td>
+          <td>{Translate(item.return_way)}</td>
           <td>{item.security}</td>
           <td>{item.percentage}</td>
-          <td>{item.form}</td>
+          <td>{Translate(item.form)}</td>
           <td>{item.security_checked ? "Да" : "Нет"}</td>
           <td>{item.guarantee_percentage}</td>
           <td>
             <button onClick={() => onLotApprove(item)}>Approve</button>
-          </td>
-          <td>
             <button onClick={() => onLotRemove(item)}>Remove</button>
           </td>
         </tr>

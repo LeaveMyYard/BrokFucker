@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { LotsList } from "./LotsList";
 import lotsService from "../services/Lots";
 
-const LotsPage = () => {
+const GuaranteePage = () => {
   const [loading, setLoading] = useState(true);
   const [lots, setLots] = useState();
 
@@ -11,7 +11,7 @@ const LotsPage = () => {
     setLoading(true);
 
     try {
-      const lots = await lotsService.getLots();
+      const lots = await lotsService.guaranteeLots();
       setLots(lots);
     } catch (error) {
       setLots();
@@ -35,4 +35,4 @@ const LotsPage = () => {
   );
 };
 
-export default LotsPage;
+export default GuaranteePage;

@@ -31,7 +31,7 @@ class AuthService {
       if (!response.ok) {
         throw new Error(result.msg);
       }
-      if (result.type === "user" || result.type === "moderator") {
+      if (result.type === "admin" || result.type === "moderator") {
         localStorage.setItem("role", result.type);
         localStorage.setItem("email", result.email);
         localStorage.setItem("password", window.btoa(password));
@@ -43,7 +43,9 @@ class AuthService {
     }
   }
 
-  async logout() {}
+  async logout() {
+    localStorage.clear();
+  }
 }
 
 export default new AuthService();
