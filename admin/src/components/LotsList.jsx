@@ -12,53 +12,7 @@ function dateFix(date) {
   return `${day}.${month + 1}.${year}`;
 }
 
-export function LotsList({ list, refreshList }) {
-  const onLotApprove = async (lot) => {
-    try {
-      const authToken = authService.getAuthToken();
-
-      const response = await fetch(URL + `lots/${lot.id}/approve`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Basic ${authToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Unsuccessfull response");
-      }
-
-      return await response.json();
-    } catch (error) {
-    } finally {
-      await refreshList();
-    }
-  };
-
-  const onLotRemove = async (lot) => {
-    try {
-      const authToken = authService.getAuthToken();
-
-      const response = await fetch(URL + `lots/unapproved/${lot.id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Basic ${authToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Unsuccessfull response");
-      }
-
-      return await response.json();
-    } catch (error) {
-    } finally {
-      await refreshList();
-    }
-  };
-
+export function LotsList({ list, refreshList, onApprove, onRemove }) {
   return !list.length ? (
     <h1>По данному запросу нет лотов.</h1>
   ) : (
@@ -93,8 +47,8 @@ export function LotsList({ list, refreshList }) {
           <td>{item.security_checked ? "Да" : "Нет"}</td>
           <td>{item.guarantee_percentage}</td>
           <td>
-            <button onClick={() => onLotApprove(item)}>Approve</button>
-            <button onClick={() => onLotRemove(item)}>Remove</button>
+            <button onClick={() => onApprove(item)}>Approve</button>
+            <button onClick={() => onRemove(item)}>Remove</button>
           </td>
         </tr>
       ))}

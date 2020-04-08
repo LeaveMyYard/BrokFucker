@@ -2,16 +2,63 @@ import React, { useState, useEffect } from "react";
 
 import { LotsList } from "./LotsList";
 import lotsService from "../services/Lots";
+import authService from "../services/Auth";
 
-const VerificationPage = () => {
+const VerificationLots = () => {
   const [loading, setLoading] = useState(true);
   const [lots, setLots] = useState();
+
+  const onVerifyApprove = async (lot) => {
+    try {
+      const authToken = authService.getAuthToken();
+
+      const response = await fetch(URL + `lots/${lot.id}/approve`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Basic ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+
+      return await response.json();
+    } catch (error) {
+    } finally {
+      await refreshList();
+    }
+  };
+
+  const onVerifyRemove = async (lot) => {
+    try {
+      const authToken = authService.getAuthToken();
+
+      const response = await fetch(URL + `lots/unapproved/${lot.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Basic ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+
+      return await response.json();
+    } catch (error) {
+    } finally {
+      await refreshList();
+    }
+  };
 
   const refreshList = async () => {
     setLoading(true);
 
     try {
-      const lots = await lotsService.verificationLots();
+      const lots = await lotsService.getLots();
       setLots(lots);
     } catch (error) {
       setLots();
@@ -29,10 +76,15 @@ const VerificationPage = () => {
       {loading ? (
         <h1 className="heading">Loading...</h1>
       ) : (
-        <LotsList list={lots} refreshList={refreshList} />
+        <LotsList
+          list={lots}
+          refreshList={refreshList}
+          onApprove={onVerifyApprove}
+          onRemove={onVerifyRemove}
+        />
       )}
     </div>
   );
 };
 
-export default VerificationPage;
+export default VerificationLots;

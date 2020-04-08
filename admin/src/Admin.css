@@ -46,6 +46,22 @@
   background: #ff4747;
 }
 
+.sidebar button {
+  display: block;
+  max-width: 160px;
+  padding: 6px 2px;
+  margin: auto;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  font-size: 1rem;
+  font-family: "Press Start 2P", cursive;
+  text-align: center;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #000;
+  background: #ff4747;
+}
+
 .sidebar a:hover {
   color: #f1f1f1;
 }

@@ -30,9 +30,7 @@ const Sidebar = (props) => {
           <Link to="/admin/dashboard/moderators">Модераторы</Link>
           <Link to="/admin/dashboard/guarantee">Гарантия</Link>
           <Link to="/admin/dashboard/verification">Обеспечение</Link>
-          <a href="-1" onClick={handleLogout}>
-            Выйти
-          </a>
+          <button onClick={handleLogout}>Выйти</button>
         </div>
         <Switch>
           <Route
@@ -63,12 +61,23 @@ const Sidebar = (props) => {
             <img className="sidebar__logo" src={logo} alt="BrokAdmin"></img>
           </div>
           <Link to="/admin/dashboard/lots/unapproved">Лоты</Link>
+          <Link to="/admin/dashboard/guarantee">Гарантия</Link>
+          <Link to="/admin/dashboard/verification">Обеспечение</Link>
+          <button onClick={handleLogout}>Выйти</button>
         </div>
         <Switch>
           <Route
             exact
             path="/admin/dashboard/lots/unapproved"
             component={LotsPage}
+          ></Route>
+          <Route
+            path="/admin/dashboard/guarantee"
+            component={GuaranteeLots}
+          ></Route>
+          <Route
+            path="/admin/dashboard/verification"
+            component={VerificationLots}
           ></Route>
         </Switch>
       </div>
