@@ -181,6 +181,11 @@ const createLotAndListeners = async (
           <br />
           <p><strong>${index + 1}</strong></p>
           <br />
+          ${
+            lot.confirmed
+              ? `<p style="color:green">Этот лот подтверждён</p>`
+              : `<p style="color:red">Этот лох</p>`
+          }
           <a class="linkToLotPage" href="lot.html?id=${
             lot.id
           }">Страница лота</a>
@@ -298,12 +303,20 @@ const createLotAndListeners = async (
                 </div>
                 <div class="mylots_label_container">
                 <span>Заказать: </span>
-                <input type="checkbox" id="club_guarantee_req">
+                ${
+                  lot.club_guarantee_requested
+                    ? `<input checked type="checkbox" id="club_guarantee_req">`
+                    : `<input type="checkbox" id="club_guarantee_req">`
+                }
                 <label for="club_guarantee_req">ГАРАНТИЯ КЛУБА</label>
                 </div>
                 <div class="mylots_label_container">
                 <span>Заказать: </span>
-                <input type="checkbox" id="verification_req">
+                ${
+                  lot.verification_requested
+                    ? `<input checked type="checkbox" id="verification_req">`
+                    : `<input type="checkbox" id="verification_req">`
+                }
                 <label for="verification_req">ПРОВЕРЕННОЕ ОБЕСПЕЧЕНИЕ</label>
                 </div>
                 <div class="btnContainer">
