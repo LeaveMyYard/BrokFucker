@@ -48,6 +48,8 @@
 
 .sidebar button {
   display: block;
+  border: 0;
+  min-width: 160px;
   max-width: 160px;
   padding: 6px 2px;
   margin: auto;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { LotsList } from "./LotsList";
+import { URL } from "../constants";
 import lotsService from "../services/Lots";
 import authService from "../services/Auth";
 
@@ -11,14 +12,16 @@ const GuaranteeLots = () => {
   const onGuaranteeApprove = async (lot) => {
     try {
       const authToken = authService.getAuthToken();
-      const value = 100;
+      const guarantee = {
+        guarantee: document.querySelector("#guaranteeValue").value,
+      };
       const response = await fetch(URL + `lots/${lot.id}/guarantee`, {
         method: "PUT",
         headers: {
           Authorization: `Basic ${authToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(value),
+        body: JSON.stringify(guarantee),
       });
 
       if (!response.ok) {
@@ -59,7 +62,7 @@ const GuaranteeLots = () => {
     setLoading(true);
 
     try {
-      const lots = await lotsService.getLots();
+      const lots = await lotsService.guaranteeLots();
       setLots(lots);
     } catch (error) {
       setLots();
@@ -77,12 +80,16 @@ const GuaranteeLots = () => {
       {loading ? (
         <h1 className="heading">Loading...</h1>
       ) : (
-        <LotsList
-          list={lots}
-          refreshList={refreshList}
-          onApprove={onGuaranteeApprove}
-          onRemove={onGuaranteeRemove}
-        />
+        <div>
+          <h1 className="heading">Гарантия</h1>
+          <LotsList
+            list={lots}
+            refreshList={refreshList}
+            onApprove={onGuaranteeApprove}
+            onRemove={onGuaranteeRemove}
+            isGuaranteeList={true}
+          />
+        </div>
       )}
     </div>
   );

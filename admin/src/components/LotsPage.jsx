@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { LotsList } from "./LotsList";
+import { URL } from "../constants";
 import lotsService from "../services/Lots";
 import authService from "../services/Auth";
 
@@ -76,12 +77,15 @@ const LotsPage = () => {
       {loading ? (
         <h1 className="heading">Loading...</h1>
       ) : (
-        <LotsList
-          list={lots}
-          refreshList={refreshList}
-          onApprove={onLotApprove}
-          onRemove={onLotRemove}
-        />
+        <div>
+          <h1 className="heading">Лоты</h1>
+          <LotsList
+            list={lots}
+            refreshList={refreshList}
+            onApprove={onLotApprove}
+            onRemove={onLotRemove}
+          />
+        </div>
       )}
     </div>
   );

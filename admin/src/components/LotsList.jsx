@@ -12,7 +12,13 @@ function dateFix(date) {
   return `${day}.${month + 1}.${year}`;
 }
 
-export function LotsList({ list, refreshList, onApprove, onRemove }) {
+export function LotsList({
+  list,
+  refreshList,
+  onApprove,
+  onRemove,
+  isGuaranteeList,
+}) {
   return !list.length ? (
     <h1>По данному запросу нет лотов.</h1>
   ) : (
@@ -45,7 +51,13 @@ export function LotsList({ list, refreshList, onApprove, onRemove }) {
           <td>{item.percentage}</td>
           <td>{Translate(item.form)}</td>
           <td>{item.security_checked ? "Да" : "Нет"}</td>
-          <td>{item.guarantee_percentage}</td>
+          <td>
+            {isGuaranteeList ? (
+              <input id="guaranteeValue" type="number"></input>
+            ) : (
+              item.guarantee_percentage
+            )}
+          </td>
           <td>
             <button onClick={() => onApprove(item)}>Approve</button>
             <button onClick={() => onRemove(item)}>Remove</button>

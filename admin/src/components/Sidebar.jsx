@@ -1,5 +1,11 @@
 import React from "react";
-import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  useHistory,
+} from "react-router-dom";
 import LotsPage from "./LotsPage";
 import VerificationLots from "./VerificationLots";
 import GuaranteeLots from "./GuaranteeLots";
@@ -7,15 +13,12 @@ import ModeratorsPage from "./ModeratorsPage";
 import AuthService from "../services/Auth";
 import "../Admin.css";
 import logo from "../letter-a.png";
-/**
- * TODO: restruct all `Route`s and `history` usage as following
- * https://reacttraining.com/react-router/web/example/nesting
- */
 
 const Sidebar = (props) => {
+  const history = useHistory();
   const handleLogout = () => {
     AuthService.logout();
-    window.location.reload();
+    history.push("/login");
   };
   const user = localStorage.getItem("role");
 

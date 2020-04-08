@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { LotsList } from "./LotsList";
+import { URL } from "../constants";
 import lotsService from "../services/Lots";
 import authService from "../services/Auth";
 
@@ -58,7 +59,7 @@ const VerificationLots = () => {
     setLoading(true);
 
     try {
-      const lots = await lotsService.getLots();
+      const lots = await lotsService.verificationLots();
       setLots(lots);
     } catch (error) {
       setLots();
@@ -76,12 +77,15 @@ const VerificationLots = () => {
       {loading ? (
         <h1 className="heading">Loading...</h1>
       ) : (
-        <LotsList
-          list={lots}
-          refreshList={refreshList}
-          onApprove={onVerifyApprove}
-          onRemove={onVerifyRemove}
-        />
+        <div>
+          <h1 className="heading">Обеспечение</h1>
+          <LotsList
+            list={lots}
+            refreshList={refreshList}
+            onApprove={onVerifyApprove}
+            onRemove={onVerifyRemove}
+          />
+        </div>
       )}
     </div>
   );
