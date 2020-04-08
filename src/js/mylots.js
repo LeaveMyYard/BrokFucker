@@ -184,7 +184,7 @@ const createLotAndListeners = async (
           ${
             lot.confirmed
               ? `<p style="color:green">Этот лот подтверждён</p>`
-              : `<p style="color:red">Этот лох</p>`
+              : `<p style="color:red">Этот лот не подтверждён</p>`
           }
           <a class="linkToLotPage" href="lot.html?id=${
             lot.id
