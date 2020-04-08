@@ -17,7 +17,7 @@ class Lot:
         result_filter = {}
 
         available_types = settings['available_types']
-        available_types['order_by'] = lot_settings.keys()
+        available_types['order_by'] = list(lot_settings.keys())
         available_types['order_type'] = ['ASC', 'DESC']
 
         for value in available_types:
