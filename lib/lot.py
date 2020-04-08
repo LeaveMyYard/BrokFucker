@@ -53,7 +53,9 @@ class Lot:
                 for v in value:
                     if v not in show_only[key]:
                         raise APIExceptions.LotFiltrationError(f"{v} is not available for {key} group. Available values are: {', '.join(show_only[key])}")
-
+            
+            if result_filter['show_only'] == {}:
+                result_filter['show_only'] = None
         else:
             result_filter['show_only'] = None
 

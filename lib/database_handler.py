@@ -638,7 +638,7 @@ class DatabaseHandler:
                 [' OR '.join([f"`{type}` = '{value}'" for value in lot_filter['show_only'][type]]) for type in lot_filter['show_only']]
             )
         if lot_filter['order_by'] is not None:
-            res += f" ORDER BY {lot_filter['order_by']} {lot_filter['order_type'] if lot_filter['order_type'] is not None else ''}"
+            res += f" ORDER BY `{lot_filter['order_by']}` {lot_filter['order_type'] if lot_filter['order_type'] is not None else ''}"
         if lot_filter['limit'] is not None:
             res += f" LIMIT {lot_filter['limit']}"
         if lot_filter['offset'] is not None:
