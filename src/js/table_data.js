@@ -64,10 +64,18 @@ function translate(data) {
   }
 }
 
+// todo 75 line change currency to current selected order_by
+// lock filterBtn for 2 sec after each filtration
+
 const getLots = async () => {
   let options = {
-    order_by: orderBy.value,
-    order_type: orderType.value,
+    filter: {
+      order_by: orderBy.value,
+      order_type: orderType.value,
+      // show_only: {
+      //   currency: [showOnly.value ? showOnly.value : ""],
+      // },
+    },
   };
   try {
     const response = await fetch(URL + "lots/approved", {
@@ -121,8 +129,12 @@ function clearLots() {
 }
 
 filterBtn.addEventListener("click", () => {
+  filterBtn.disabled = true;
   clearLots();
   getLots();
+  setTimeout(() => {
+    filterBtn.disabled = false;
+  }, 1000);
 });
 
 function showOnlyValues() {

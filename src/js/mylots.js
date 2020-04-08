@@ -364,7 +364,6 @@ const createLotAndListeners = async (
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Basic ${encData()}`,
           },
         });
         if (response.ok) {
@@ -425,7 +424,6 @@ const createLotAndListeners = async (
           method: "POST",
           headers: {
             Authorization: `Basic ${encData()}`,
-            "Content-Type": "application/json",
           },
           body: formData,
         });
