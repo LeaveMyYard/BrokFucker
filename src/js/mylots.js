@@ -85,11 +85,7 @@ vocabulary = {
 };
 
 function translate(data) {
-  for (let word in vocabulary) {
-    if (word == data) {
-      return vocabulary[word];
-    }
-  }
+  return vocabulary[data];
 }
 
 const currencySelect = document.getElementById("currencySelect");

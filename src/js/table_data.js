@@ -2,7 +2,6 @@ const URL = "http://localhost:5000/api/v1/";
 
 const lotTable = document.getElementById("lotTable");
 const filterBtn = document.getElementById("filterBtn");
-// const lotOptions = window.location.search.split("?")[1];
 const orderBy = document.getElementById("order_by");
 const orderType = document.getElementById("order_type");
 const showOnly = document.getElementById("show_only");
@@ -78,7 +77,7 @@ const getLots = async () => {
       [myDynamicKey]: values,
     };
   } else {
-    options.filter.show_only = "";
+    options.filter.show_only = {};
   }
 
   try {
