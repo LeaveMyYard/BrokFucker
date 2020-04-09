@@ -77,7 +77,7 @@ def weighted(weight):
                 if request_ip not in values:
                     values[request_ip] = 0
                 if values[request_ip] > max_weights[key]:
-                    ban_list[request_ip] = [..., (ban_list[request_ip][1] if request_ip in ban_list else []) + [datetime.now()]]
+                    ban_list[request_ip] = [datetime.now(), (ban_list[request_ip][1] if request_ip in ban_list else []) + [datetime.now()]]
                     ban_list[request_ip][1] = ban_cases = list(filter(lambda time: time > datetime.now() - timedelta(days=1), ban_list[request_ip][1]))
 
                     for stats in ip_weights:
@@ -553,7 +553,7 @@ class RestAPI:
     @route('lots/personal/<int:lot_id>/request/guarantee', methods=['PUT'])
     @user.login_required
     @weighted(weight=1)
-    def request_club_garantee(lot_id):
+    def request_club_guarantee(lot_id):
         lot = Lot(lot_id)
 
         if not lot.can_user_edit(user.email()):
