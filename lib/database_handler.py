@@ -545,7 +545,7 @@ class DatabaseHandler:
     def set_lot_security_verification_requested(self, lot_id, requested: bool = True):
         if requested:
             self.cursor.execute(
-                f"INSERT INTO LotSecurityVerificationRequests VALUES(?)",
+                f"INSERT OR IGNORE INTO LotSecurityVerificationRequests VALUES(?)",
                 (lot_id, )
             )
         else:
@@ -567,7 +567,7 @@ class DatabaseHandler:
     def set_lot_guarantee_requested(self, lot_id, requested: bool = True):
         if requested:
             self.cursor.execute(
-                f"INSERT INTO LotGuaranteeRequests VALUES(?)",
+                f"INSERT OR IGNORE INTO LotGuaranteeRequests VALUES(?)",
                 (lot_id, )
             )
         else:
