@@ -555,7 +555,7 @@ class DatabaseHandler:
             (lot_id,)
         )
 
-        return self.cursor.fetchone() != []
+        return self.cursor.fetchone() is not None
 
     def set_lot_guarantee_requested(self, lot_id, requested: bool = True):
         if requested:
@@ -577,7 +577,7 @@ class DatabaseHandler:
             (lot_id,)
         )
 
-        return self.cursor.fetchone() != []
+        return self.cursor.fetchone() is not None
 
     def add_moderator_delete_reason(self, lot_id, moderator, reason):
         if self.is_lot_removed_by_a_moderator(lot_id):
