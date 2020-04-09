@@ -183,8 +183,10 @@ const createLotAndListeners = async (
           <br />
           ${
             lot.confirmed
-              ? `<p style="color:green">Этот лот подтверждён</p>`
-              : `<p style="color:red">Этот лот не подтверждён</p>`
+              ? `<p style="color:green">Этот лот подтверждён</p>
+                  <br />
+                 <p style="color:red">Редактирование этого лота приведёт к снятию с главной страницы и повторной проверке.</p> <br />`
+              : `<p style="color:red">Этот лот не подтверждён</p> <br />`
           }
           <a class="linkToLotPage" href="lot.html?id=${
             lot.id
@@ -373,7 +375,6 @@ const createLotAndListeners = async (
           method: "DELETE",
           headers: {
             Authorization: `Basic ${encData()}`,
-            "Content-Type": "application/json",
           },
         });
         if (response.ok) {
@@ -865,12 +866,10 @@ createLotPublish.addEventListener("click", async function (e) {
       body: formData,
       headers: {
         Authorization: `Basic ${encData()}`,
-        "Content-Type": "application/json",
       },
     });
-    // for (let key of formData.keys()) {
-    //   formData.delete(key);
-    // }
+    console.log(response);
+
     clearLots();
     getMyLots();
   } catch (error) {

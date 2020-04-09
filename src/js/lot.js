@@ -125,7 +125,9 @@ const getTheLot = async () => {
   try {
     const response = await fetch(URL + `lots/${lotID}`, {
       method: "GET",
-      headers: { Authorization: `Basic ${encData()}` },
+      headers: {
+        Authorization: `Basic ${encData()}`,
+      },
     });
 
     if (!response.ok) {
@@ -157,9 +159,9 @@ const getTheLot = async () => {
     clubProven.innerText = result["security_checked"] == false ? "Нет" : "Да";
 
     result["photos"]["photos"].map((photo) => {
-      ` <div class="lot_photo">
-            <img height="300" src="${photo}" />
-        </div>`;
+      lotPhotos.innerHTML += ` <div class="lot_photo">
+      <img height="300" src="${photo}" />
+      </div>`;
     });
   } catch (error) {
     console.error(error);
