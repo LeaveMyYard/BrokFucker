@@ -754,6 +754,22 @@ class RestAPI:
     def get_unapproved_subscriptions():
         return jsonify({'lots': Lot.get_unapproved_subscriptions()}), 200
 
+    @staticmethod
+    @route('lots/subscription/<int:id>/approve', methods=['GET'])
+    @moderator.login_required
+    @weighted(weight=1)
+    def approve_subscription(id):
+        Lot.set_subscription_approved(id)
+        return RestAPI.message(f'Subscription {id} is now approved.'), 201
+
+    @staticmethod
+    @route('lots/subscription/<int:id>/unapprove', methods=['GET'])
+    @moderator.login_required
+    @weighted(weight=1)
+    def unapprove_subscription(id):
+        Lot.set_subscription_approved(id, approved=False)
+        return RestAPI.message(f'Subscription {id} is now unapproved.'), 201
+
     # -------------------------------------------------------------------------
     # Admin stuff
     # -------------------------------------------------------------------------

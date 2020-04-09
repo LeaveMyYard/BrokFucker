@@ -178,3 +178,8 @@ class Lot:
     def get_unapproved_subscriptions():
         database = DatabaseHandler()
         return database.get_unapproved_subscriptions()
+
+    @staticmethod
+    def set_subscription_approved(id, approved=True):
+        database = DatabaseHandler()
+        database.approve_subscription(id, approve=approved)
