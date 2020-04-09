@@ -350,8 +350,8 @@ const createLotAndListeners = async (
         const response = await fetch(URL + `lots/${lot.id}`, {
           method: "DELETE",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Basic ${encData()}`,
+            "Content-Type": "application/json",
           },
         });
         if (response.ok) {
@@ -372,6 +372,7 @@ const createLotAndListeners = async (
         const response = await fetch(URL + `lots/${lot.id}/photos/${photoID}`, {
           method: "DELETE",
           headers: {
+            Authorization: `Basic ${encData()}`,
             "Content-Type": "application/json",
           },
         });
@@ -425,7 +426,7 @@ const createLotAndListeners = async (
           console.log(response);
         } else throw new Error(error);
       } catch (error) {
-        alert("Ошибка! Что-то пошло не так.");
+        // alert("Ошибка! Что-то пошло не так.");
         console.log(error);
       }
       try {
@@ -438,10 +439,9 @@ const createLotAndListeners = async (
         });
         if (response.ok) {
           console.log(response);
-          window.location.reload();
         } else throw new Error(error);
       } catch (error) {
-        alert("Ошибка! Что-то пошло не так.");
+        // alert("Ошибка! Что-то пошло не так.");
         console.log(error);
       }
       try {
@@ -458,10 +458,8 @@ const createLotAndListeners = async (
         );
         if (response.ok) {
           console.log(response);
-          window.location.reload();
         } else throw new Error(error);
       } catch (error) {
-        alert("Ошибка! Что-то пошло не так.");
         console.log(error);
       }
       try {
@@ -478,11 +476,12 @@ const createLotAndListeners = async (
         );
         if (response.ok) {
           console.log(response);
-          window.location.reload();
         } else throw new Error(error);
       } catch (error) {
         alert("Ошибка! Что-то пошло не так.");
         console.log(error);
+      } finally {
+        // window.location.reload();
       }
     });
   return lotEl;
