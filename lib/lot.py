@@ -72,6 +72,9 @@ class Lot:
     def approve(self):
         self.database.approve_lot(self.lot_id)
 
+    def unapprove(self):
+        self.database.unapprove_lot(self.lot_id)
+
     def set_security_checked(self, checked: bool):
         self.database.set_security_checked(self.lot_id, checked)
 
@@ -89,6 +92,7 @@ class Lot:
         self.database.restore_lot(self.lot_id)
 
     def update_data(self, field, value):
+        self.unapprove()
         self.database.update_data(self.lot_id, field, value)
 
     def can_user_edit(self, user):
@@ -98,6 +102,7 @@ class Lot:
         return self.database.get_lot_photos(self.lot_id)
         
     def add_photo(self, image):
+        self.unapprove()
         return self.database.add_photo(image, self.lot_id)
 
     def remove_photo(self, photo_id):

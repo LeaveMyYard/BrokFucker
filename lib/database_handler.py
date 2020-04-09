@@ -443,6 +443,13 @@ class DatabaseHandler:
         self.conn.commit()
         self.logger.info(f'New lot with id `{lot_id}` was approved')
 
+    def unapprove_lot(self, lot_id):
+        self.cursor.execute(
+            f"UPDATE Lots SET `confirmed` = 'False' WHERE `id` = ?",
+            (lot_id, )
+        )
+        self.conn.commit()
+
     def get_user_display_name(self, user):
         data = self.get_user_data(user)
         return data['name'] or data['email']
