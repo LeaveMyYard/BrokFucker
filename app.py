@@ -755,7 +755,7 @@ class RestAPI:
         return jsonify({'lots': Lot.get_unapproved_subscriptions()}), 200
 
     @staticmethod
-    @route('lots/subscription/<int:id>/approve', methods=['GET'])
+    @route('lots/subscription/<string:id>/approve', methods=['GET'])
     @moderator.login_required
     @weighted(weight=1)
     def approve_subscription(id):
@@ -763,7 +763,7 @@ class RestAPI:
         return RestAPI.message(f'Subscription {id} is now approved.'), 201
 
     @staticmethod
-    @route('lots/subscription/<int:id>/unapprove', methods=['GET'])
+    @route('lots/subscription/<string:id>/unapprove', methods=['GET'])
     @moderator.login_required
     @weighted(weight=1)
     def unapprove_subscription(id):
