@@ -20,7 +20,7 @@ from lib.util.logger import init_logger
 from datetime import datetime, timedelta
 from threading import Timer
 
-app = Flask(__name__, static_folder='admin-panel-test\static')
+app = Flask(__name__, static_folder='admin-panel-test/static')
 CORS(app)
 
 logger = init_logger(__name__)
