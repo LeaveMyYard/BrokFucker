@@ -884,6 +884,14 @@ class DatabaseHandler:
         )
         return [{'lot': lot, 'type': SubscriptionTypes(type).name, 'message': message, 'confirmed': eval(confirmed)} for lot, confirmed, type, message in self.cursor.fetchall()]
 
+    def approve_subscription(self, id, approve=True):
+        self.cursor.execute(
+            f"UPDATE SubscriptionRequests SET `confirmed` = ? WHERE `id` = ?",
+            (str(approve), id)
+        )
+
+        self.conn.commit()
+
     def get_approved_subscriptions(self):
         self.cursor.execute(
             f"SELECT * FROM ConfirmedSubscriptions"
