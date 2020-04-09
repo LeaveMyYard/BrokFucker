@@ -449,7 +449,7 @@ const createLotAndListeners = async (
           URL + `lots/personal/${lot.id}/request/guarantee`,
           {
             method: "PUT",
-            headears: {
+            headers: {
               Authorization: `Basic ${encData()}`,
               "Content-Type": "application/json",
             },
@@ -467,7 +467,7 @@ const createLotAndListeners = async (
           URL + `lots/personal/${lot.id}/request/verify_security`,
           {
             method: "PUT",
-            headears: {
+            headers: {
               Authorization: `Basic ${encData()}`,
               "Content-Type": "application/json",
             },
@@ -481,7 +481,7 @@ const createLotAndListeners = async (
         alert("Ошибка! Что-то пошло не так.");
         console.log(error);
       } finally {
-        // window.location.reload();
+        window.location.reload();
       }
     });
   return lotEl;
