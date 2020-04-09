@@ -19,7 +19,7 @@ class User:
     @auth.verify_password
     def verify_password(email, password):
         database = DatabaseHandler()
-        print(f'  Login made: {email}|{password}')
+        # print(f'  Login made: {email}|{password}')
         return database.check_password(email, password)
 
     @staticmethod
