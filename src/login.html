@@ -11,7 +11,8 @@
     <form id="loginForm">
       <div class="container">
         <h1 class="titleReg">Вход</h1>
-
+        <div id="pswInfoContainer"></div>
+        <div id="errorContainer"></div>
         <label class="label label_email" for="email"
           ><span>E-Mail: </span></label
         >
@@ -32,10 +33,13 @@
             Войти
           </button>
           <a class="regLink" href="registration.html">Зарегистрироваться</a>
+          <a class="regLink pswReset" href="#">Восстановить пароль</a>
         </div>
       </div>
     </form>
 
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/jquery.validate.min.js"></script>
     <script src="js/login.js"></script>
   </body>
 </html>

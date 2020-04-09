@@ -55,3 +55,14 @@ class EmailSender:
                 action_url = f"{request.host_url}{Settings.get_account_restore_verification_link_base()}?code={code}"
             )
         )
+
+    @staticmethod
+    def send_new_password(email: str, code: str):
+        EmailSender.send(
+            email,
+            "Temporary password",
+            render_template(
+                'account_restored_password.html',
+                new_password = code
+            )
+        )

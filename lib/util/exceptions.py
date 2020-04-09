@@ -53,3 +53,23 @@ class ModeratorAddingError(IndexedException):
 class JSONValueException(IndexedException):
     def __init__(self, param, avaited, got):
         super().__init__(-1010, f'Strange value got for {param}. Waited for {avaited} but got "{got}"')
+
+class LotFiltrationError(IndexedException):
+    def __init__(self, message):
+        super().__init__(-1011, message)
+
+class PasswordChangeException(IndexedException):
+    def __init__(self, message):
+        super().__init__(-1012, message)
+
+class LotDeletionError(IndexedException):
+    def __init__(self):
+        super().__init__(-1013, 'You could not delete a lot that is not in an archive.')
+
+class AccountRestoreError(IndexedException):
+    def __init__(self, message):
+        super().__init__(-1014, message)
+
+class MaximumRequestsTimeout(IndexedException):
+    def __init__(self, time_to_end: int):
+        super().__init__(-1015, f'You made to much requests, wait at least {time_to_end} seconds to continue.')

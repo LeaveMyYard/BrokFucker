@@ -43,7 +43,8 @@ const validateForm = $(function() {
       },
       psw: {
         required: true,
-        minlength: 8
+        minlength: 8,
+        maxlength: 32
       },
       psw_repeat: {
         equalTo: "#psw"
@@ -53,15 +54,27 @@ const validateForm = $(function() {
     messages: {
       psw: {
         required: "Это обязательное поле!",
-        minlength: "Пароль не может быть меньше 8 символов"
+        minlength: "Пароль не может быть меньше 8 символов",
+        maxlength: "Пароль не может быть больше 32 символов"
       },
-      email: "Пожалуйста, укажите действительный email"
+      email: {
+        email: "Пожалуйста, укажите действительный email",
+        required: "Это обязательное поле!"
+      },
+      psw_repeat: {
+        equalTo: "Пароли должны совпадать!",
+        required: "Это обязательное поле!"
+      }
+    },
+    errorPlacement: function(error, element) {
+      let placement = $(element).data("error");
+      if (placement) {
+        $(placement).append(error);
+      } else {
+        error.insertAfter(element);
+      }
     }
   });
 });
 
-registerBtn.addEventListener("change", handleReg);
-
-function handleReg() {
-  validateForm();
-}
+registerBtn.addEventListener("change", validateForm);

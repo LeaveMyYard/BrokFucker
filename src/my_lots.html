@@ -36,7 +36,7 @@
           </div>
           <div id="menuIfLogged">
             <ul>
-              <a href="index.html" class="fixed-header__menu-item ">
+              <a href="index.html" class="fixed-header__menu-item">
                 <li>Лоты</li>
               </a>
               <a
@@ -71,7 +71,7 @@
           <p>
             <span id="myprofEmail"></span>
           </p>
-          <p style="width:250px">
+          <p style="width: 250px;">
             Зарегистрирован:
             <span id="myprofRegDate"></span>
           </p>
@@ -144,6 +144,17 @@
                   ><span>Короткое описание: </span>
                   <textarea name="create_lot_desc"> </textarea>
                 </label>
+                <br />
+                <br />
+                <div>
+                  <input type="checkbox" id="create_club_guarantee_req" />
+                  <label for="club_guarantee_req">ГАРАНТИЯ КЛУБА</label>
+                </div>
+                <br />
+                <div>
+                  <input type="checkbox" id="create_verification_req" />
+                  <label for="verification_req">ПРОВЕРЕННОЕ ОБЕСПЕЧЕНИЕ</label>
+                </div>
                 <div class="create_lot_photo">
                   <input type="file" name="file" id="createLotPhoto" multiple />
                 </div>
@@ -162,7 +173,7 @@
           <p id="myLotsHeading"><strong>Мои лоты:</strong></p>
         </div>
         <div class="my-lots-archived">
-          <p id="myLotsHeading"><strong>Архивные лоты:</strong></p>
+          <p id="myArchiveLotsHeading"><strong>Архивные лоты:</strong></p>
         </div>
       </div>
     </div>

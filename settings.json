@@ -8,8 +8,20 @@
         "username": "brokfcker.noreply@gmail.com",
         "password": "testpassword!14"
     },
+    "max_request_weights":{
+        "1s": 40,
+        "1m": 400,
+        "1h": 4000
+    },
     "server_settings": {
         "maximum_upload_file_size": 262144
+    },
+    "lot_filter_settings": {
+        "maximum_length": 1000,
+        "available_types": {
+            "limit": "^\\d+$", 
+            "offset": "^\\d+$"
+        }
     },
     "user_entered_values": {
         "lot": {

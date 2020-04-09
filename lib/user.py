@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 from PIL import Image
 from os import path, remove
 from lib.util.enums import SubscriptionTypes
+import sqlite3
 
 class User:
     auth = HTTPBasicAuth()
@@ -18,6 +19,7 @@ class User:
     @auth.verify_password
     def verify_password(email, password):
         database = DatabaseHandler()
+        # print(f'  Login made: {email}|{password}')
         return database.check_password(email, password)
 
     @staticmethod
@@ -34,8 +36,8 @@ class User:
     def verify_email_from_code(code):
         database = DatabaseHandler()
         try:
-            link = database.verify_email_confirmation(code)
-        except EmailValidationError as e:
+            database.verify_email_confirmation(code)
+        except EmailValidationError:
             raise
         else:
             return jsonify({'msg': 'Email was succesfully confirmed.'})
@@ -44,6 +46,16 @@ class User:
                 database.delete_email_confirmation_code(code)
             except sqlite3.Error:
                 pass
+
+    @staticmethod
+    def restore_account(email):
+        database = DatabaseHandler()
+        database.create_account_restore_email(email)
+
+    @staticmethod
+    def verify_account_restore(code):
+        database = DatabaseHandler()
+        database.verify_account_restore(code)
 
     @staticmethod
     def create(email, password):
@@ -106,21 +118,6 @@ class User:
     def remove_lot_from_favorites(lot_id):
         database = DatabaseHandler()
         database.remove_lot_from_favorites(User.email(), lot_id)
-
-    @staticmethod
-    def get_favorites():
-        database = DatabaseHandler()
-        return database.get_favorites(User.email())
-
-    @staticmethod
-    def get_personal():
-        database = DatabaseHandler()
-        return database.get_personal(User.email())
-
-    @staticmethod
-    def get_personal_deleted():
-        database = DatabaseHandler()
-        return database.get_personal_deleted(User.email())
 
     @staticmethod
     def add_avatar(image):

@@ -1,6 +1,4 @@
-// const URL = "http://localhost:5000/api/v1/";
-const host = window.location.host;
-const URL = `/api/v1/`;
+const URL = "http://localhost:5000/api/v1/";
 
 const myLotsHeading = document.getElementById("myLotsHeading");
 const lotProfilePic = document.getElementById("lotProfilePic");
@@ -37,16 +35,18 @@ const lotCurrency = document.getElementsByName("lot_currency")[0];
 const lotDescription = document.getElementsByName("lot_shortdesc")[0];
 const lotPercentage = document.getElementsByName("lot_percentage")[0];
 
-const encData = function() {
+const encData = function () {
   if (localStorage.getItem("email")) {
-    return (
-      window.btoa(localStorage.getItem("email") + ":") +
-      localStorage.getItem("password")
+    return window.btoa(
+      localStorage.getItem("email") +
+        ":" +
+        window.atob(localStorage.getItem("password"))
     );
   } else {
-    return (
-      window.btoa(sessionStorage.getItem("email") + ":") +
-      sessionStorage.getItem("password")
+    return window.btoa(
+      sessionStorage.getItem("email") +
+        ":" +
+        window.atob(sessionStorage.getItem("password"))
     );
   }
 };
@@ -58,7 +58,7 @@ async function onReady() {
     try {
       const response = await fetch(URL + "user", {
         method: "GET",
-        headers: { Authorization: `Basic ${encData()}` }
+        headers: { Authorization: `Basic ${encData()}` },
       });
 
       if (!response.ok) {
@@ -81,15 +81,11 @@ vocabulary = {
   any: "Любой",
   every_month: "Ежемесячно",
   term_end: "Окончание срока",
-  other: "Другое"
+  other: "Другое",
 };
 
 function translate(data) {
-  for (let word in vocabulary) {
-    if (word == data) {
-      return vocabulary[word];
-    }
-  }
+  return vocabulary[data];
 }
 
 const currencySelect = document.getElementById("currencySelect");
@@ -103,7 +99,7 @@ async function dataOptions() {
   try {
     const response = await fetch(URL + "lots/settings", {
       method: "GET",
-      headers: { Authorization: `Basic ${encData()}` }
+      headers: { Authorization: `Basic ${encData()}` },
     });
 
     if (!response.ok) {
@@ -112,16 +108,20 @@ async function dataOptions() {
     const result = await response.json();
     console.log(result);
 
-    result.currency.forEach(curr => {
+    result.currency.forEach((curr) => {
       currencySelect.innerHTML += `<option value="${curr}">${curr}</option>`;
       currencySelectOptions.push(curr);
     });
-    result.form.forEach(form => {
-      formSelect.innerHTML += `<option value="${form}">${translate(form)}</option>`;
+    result.form.forEach((form) => {
+      formSelect.innerHTML += `<option value="${form}">${translate(
+        form
+      )}</option>`;
       formSelectOptions.push(form);
     });
-    result.return_way.forEach(way => {
-      returnSelect.innerHTML += `<option value="${way}">${translate(way)}</option>`;
+    result.return_way.forEach((way) => {
+      returnSelect.innerHTML += `<option value="${way}">${translate(
+        way
+      )}</option>`;
       returnSelectOptions.push(way);
     });
   } catch (error) {
@@ -130,19 +130,19 @@ async function dataOptions() {
 }
 dataOptions();
 
-lotProfilePic.addEventListener("click", function() {
+lotProfilePic.addEventListener("click", function () {
   location.href = "my_profile.html";
 });
 
-createLotBtn.addEventListener("click", function() {
+createLotBtn.addEventListener("click", function () {
   modalWindow.style.display = "block";
 });
 
-modalCloseBtn.addEventListener("click", function() {
+modalCloseBtn.addEventListener("click", function () {
   modalWindow.style.display = "none";
 });
 
-window.onclick = function(e) {
+window.onclick = function (e) {
   if (e.target == modalWindow) {
     modalWindow.style.display = "none";
   }
@@ -152,7 +152,7 @@ const profData = async () => {
   try {
     const response = await fetch(URL + "user", {
       method: "GET",
-      headers: { Authorization: `Basic ${encData()}` }
+      headers: { Authorization: `Basic ${encData()}` },
     });
 
     if (!response.ok) {
@@ -173,15 +173,26 @@ profData();
 const createLotAndListeners = async (
   lot,
   index,
-  { parent: myLotsContainer, onLotRemove }
+  { parent: myLotsContainer, onLotRemove, onPhotoRemove }
 ) => {
   const lotEl = $(`
         <div class="userLots" data-id="myLotForm__${index + 1}">
           <form>
+          <br />
           <p><strong>${index + 1}</strong></p>
+          <br />
+          ${
+            lot.confirmed
+              ? `<p style="color:green">Этот лот подтверждён</p>
+                  <br />
+                 <p style="color:red">Редактирование этого лота приведёт к снятию с главной страницы и повторной проверке.</p> <br />`
+              : `<p style="color:red">Этот лот не подтверждён</p> <br />`
+          }
           <a class="linkToLotPage" href="lot.html?id=${
             lot.id
           }">Страница лота</a>
+          <br />
+          <br />
           <label class="label lot_field" for="lot_name"
               ><span>Название лота: </span>
               <input
@@ -205,7 +216,7 @@ const createLotAndListeners = async (
             <label class="label lot_field" for="lot_currency"
               ><span>Валюта: </span>
                   <select id="selectLotCurrency">
-                    ${currencySelectOptions.map(curr => {
+                    ${currencySelectOptions.map((curr) => {
                       if (lot.currency == curr) {
                         return `<option selected value="${curr}">${curr}</option>`;
                       } else {
@@ -237,7 +248,7 @@ const createLotAndListeners = async (
             <label class="label lot_field" for="lot_method"
               ><span>Метод погашения: </span>
               <select id="selectReturnWayOption">
-              ${returnSelectOptions.map(way => {
+              ${returnSelectOptions.map((way) => {
                 if (lot.return_way == way) {
                   return `<option selected value="${way}">${translate(
                     way
@@ -260,7 +271,7 @@ const createLotAndListeners = async (
             <label class="label lot_field" for="lot_cred"
               ><span>Форма кредитирования: </span>
               <select id="selectLotForm">
-                    ${formSelectOptions.map(form => {
+                    ${formSelectOptions.map((form) => {
                       if (lot.form == form) {
                         return `<option selected value="${form}">${translate(
                           form
@@ -281,28 +292,69 @@ const createLotAndListeners = async (
               </textarea>
             </label>
             </form>
-            <div class="lot_photo">
-            ${lot.photos.photos
-              .map(photo => {
-                return `<img height="300" src="${photo}"></img>`;
-              })
-              .join("")}  
-            </div>
-            <button class="deleteLotBtn btn">Remove</button>
-            <button class="editLotBtn btn">Update</button>
+                <div class="lotPhotosContainer">
+                  ${lot.photos.photos
+                    .map(function (value, key) {
+                      return `
+                          <div class="swiper-container">
+                            <img class="lot_photo" src="${value}"></img>
+                              <button data-id="${key}" class="btn deletePhotoBtn">Удалить фото</button>
+                          </div>`;
+                    })
+                    .join("")}
+                </div>
+                <div class="mylots_label_container">
+                <span>Заказать: </span>
+                ${
+                  lot.club_guarantee_requested
+                    ? `<input checked type="checkbox" id="club_guarantee_req">`
+                    : `<input type="checkbox" id="club_guarantee_req">`
+                }
+                <label for="club_guarantee_req">ГАРАНТИЯ КЛУБА</label>
+                </div>
+                <div class="mylots_label_container">
+                <span>Заказать: </span>
+                ${
+                  lot.verification_requested
+                    ? `<input checked type="checkbox" id="verification_req_${lot.id}">`
+                    : `<input type="checkbox" id="verification_req_${lot.id}">`
+                }
+                <label for="verification_req">ПРОВЕРЕННОЕ ОБЕСПЕЧЕНИЕ</label>
+                </div>
+                <div class="btnContainer">
+                  <button class="deleteLotBtn btn">Удалить</button>
+                  <button class="editLotBtn btn">Обновить</button>
+                  <label for="updateLotPhoto" class="addPhotoBtn btn">
+                  <input style="display:none" type="file" name="file" id="updateLotPhoto" multiple/>
+                    <img class="addPhotoImg" src="images/addphoto.png" />
+                    <label for="updateLotPhoto" class="addPhotoText">Добавить</label>
+                  </label>
+                </div>
             </div>
   `).get(0);
 
   $(lotEl)
+    .find("#updateLotPhoto")
+    .on("change", function () {
+      if ($(this).val() != "") {
+        $(".addPhotoImg").hide();
+        $(".addPhotoText").text("Выбрано фото: " + $(this)[0].files.length);
+      } else {
+        $(".addPhotoImg").show();
+        $(".addPhotoText").text("Выберите файлы");
+      }
+    });
+
+  $(lotEl)
     .find(".deleteLotBtn")
-    .on("click", async function(event) {
+    .on("click", async function (event) {
       try {
         const response = await fetch(URL + `lots/${lot.id}`, {
           method: "DELETE",
           headers: {
+            Authorization: `Basic ${encData()}`,
             "Content-Type": "application/json",
-            Authorization: `Basic ${encData()}`
-          }
+          },
         });
         if (response.ok) {
           onLotRemove(lot, lotEl, index);
@@ -314,8 +366,43 @@ const createLotAndListeners = async (
     });
 
   $(lotEl)
+    .find(".deletePhotoBtn")
+    .on("click", async function (event) {
+      const photoID = Number($(event.target).attr("data-id"));
+      const lotPhoto = lot.photos.photos[photoID];
+      try {
+        const response = await fetch(URL + `lots/${lot.id}/photos/${photoID}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Basic ${encData()}`,
+          },
+        });
+        if (response.ok) {
+          onPhotoRemove(lot, lotEl, index, lotPhoto, photoID);
+        } else throw new Error(error);
+      } catch (error) {
+        alert("Ошибка! Что-то пошло не так.");
+        console.log(error);
+      }
+    });
+
+  $(lotEl)
     .find(".editLotBtn")
-    .on("click", async function(event) {
+    .on("click", async function (event) {
+      const verificationReq = {
+        value: document.getElementById(`verification_req_${lot.id}`).checked,
+      };
+      const clubGuaranteeReq = {
+        value: document.getElementById(`club_guarantee_req_${lot.id}`).checked,
+      };
+      const formData = new FormData();
+      const photos = document.querySelector("#updateLotPhoto");
+      for (let i = 0; i < photos.files.length; i++) {
+        formData.append(
+          `file${(Math.random() * 100000).toFixed(0)}`,
+          photos.files[i]
+        );
+      }
       const value = {
         name: $(lotEl).find("input[name=lot_name]")[0].value,
         amount: $(lotEl).find("input[name=lot_reqsum]")[0].value,
@@ -325,38 +412,90 @@ const createLotAndListeners = async (
         security: $(lotEl).find("input[name=lot_security]")[0].value,
         form: $(lotEl).find("#selectLotForm")[0].value,
         percentage: $(lotEl).find("input[name=lot_percentage]")[0].value,
-        commentary: $(lotEl).find("textarea[name=lot_shortdesc]")[0].value
+        commentary: $(lotEl).find("textarea[name=lot_shortdesc]")[0].value,
       };
       try {
         const response = await fetch(URL + `lots/${lot.id}`, {
           method: "PUT",
           headers: {
+            Authorization: `Basic ${encData()}`,
             "Content-Type": "application/json",
-            Authorization: `Basic ${encData()}`
           },
-          body: JSON.stringify(value)
+          body: JSON.stringify(value),
         });
         if (response.ok) {
           console.log(response);
-
-          window.location.reload();
+        } else throw new Error(error);
+      } catch (error) {
+        // alert("Ошибка! Что-то пошло не так.");
+        console.log(error);
+      }
+      try {
+        const response = await fetch(URL + `lots/${lot.id}/photos`, {
+          method: "POST",
+          headers: {
+            Authorization: `Basic ${encData()}`,
+          },
+          body: formData,
+        });
+        if (response.ok) {
+          console.log(response);
+        } else throw new Error(error);
+      } catch (error) {
+        // alert("Ошибка! Что-то пошло не так.");
+        console.log(error);
+      }
+      try {
+        const response = await fetch(
+          URL + `lots/personal/${lot.id}/request/guarantee`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Basic ${encData()}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(clubGuaranteeReq),
+          }
+        );
+        if (response.ok) {
+          console.log(response);
+        } else throw new Error(error);
+      } catch (error) {
+        console.log(error);
+      }
+      try {
+        const response = await fetch(
+          URL + `lots/personal/${lot.id}/request/verify_security`,
+          {
+            method: "PUT",
+            headers: {
+              Authorization: `Basic ${encData()}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(verificationReq),
+          }
+        );
+        if (response.ok) {
+          console.log(response);
         } else throw new Error(error);
       } catch (error) {
         alert("Ошибка! Что-то пошло не так.");
         console.log(error);
+      } finally {
+        window.location.reload();
       }
     });
-
   return lotEl;
 };
 
-const createLotEls = async (lots, { onLotRemove }) => {
+const createLotEls = async (lots, { onLotRemove, onPhotoRemove }) => {
   const lotEls = await Promise.all(
     lots.map(
       async (lot, index) =>
         await createLotAndListeners(lot, index, {
           parent: myLotsContainer,
-          onLotRemove
+          onLotRemove,
+          onPhotoRemove,
         })
     )
   );
@@ -364,22 +503,44 @@ const createLotEls = async (lots, { onLotRemove }) => {
   return lotEls;
 };
 
-const manageLots = async sourceLots => {
+const manageLots = async (sourceLots) => {
   const lots = [...sourceLots];
 
-  let lotEls = await createLotEls(lots, { onLotRemove });
+  let lotEls = await createLotEls(lots, { onLotRemove, onPhotoRemove });
 
   async function onLotRemove(lot, lotEl, i) {
     lots.splice(i, 1);
-    lotEls.forEach(lotElToBeRemoved =>
+    lotEls.forEach((lotElToBeRemoved) =>
       myLotsContainer.removeChild(lotElToBeRemoved)
     );
 
     lotEls = await createLotEls(lots, { onLotRemove });
-    lotEls.forEach(lotEl => myLotsContainer.appendChild(lotEl));
+    lotEls.forEach((lotEl) => myLotsContainer.appendChild(lotEl));
   }
 
-  lotEls.forEach(lotEl => myLotsContainer.appendChild(lotEl));
+  async function onPhotoRemove(lot, lotEl, lotIndex, lotPhoto, lotPhotoIndex) {
+    const lotPhotosContainer = lotEl.querySelector(".lotPhotosContainer");
+    const swiperContainerEls = lotPhotosContainer.querySelectorAll(
+      ".swiper-container"
+    );
+
+    for (let i = lotPhotoIndex + 1; i < swiperContainerEls.length; i++) {
+      const currentSwiperContainerEl = [...swiperContainerEls][i];
+      const currentPhotoDeleteButtonEl = currentSwiperContainerEl.querySelector(
+        "button.deletePhotoBtn"
+      );
+
+      $(currentPhotoDeleteButtonEl).attr("data-id", i - 1);
+    }
+
+    lotPhotosContainer.removeChild(swiperContainerEls[lotPhotoIndex]);
+
+    lot.photos.photos.splice(lotPhotoIndex, 1);
+  }
+
+  // [ 0,1,2,3,4,5 ]
+
+  lotEls.forEach((lotEl) => myLotsContainer.appendChild(lotEl));
 };
 
 const createArchiveLotAndListeners = async (
@@ -388,12 +549,11 @@ const createArchiveLotAndListeners = async (
   { parent: myArchiveLotsContainer, onLotRemove }
 ) => {
   const archiveLotEl = $(`
-          <div class="userLots" data-id="myLotForm__${index + 1}">
+          <div class="userLots" data-id="myArchiveLotForm__${index + 1}">
           <form>
+          <br />
           <p><strong>${index + 1}</strong></p>
-          <a class="linkToLotPage" href="lot.html?id=${
-            lot.id
-          }">Страница лота</a>
+          <br />
           <label class="label lot_field" for="lot_name"
               ><span>Название лота: </span>
               <input disabled
@@ -417,7 +577,7 @@ const createArchiveLotAndListeners = async (
             <label class="label lot_field" for="lot_currency"
               ><span>Валюта: </span>
                   <select disabled id="selectLotCurrency">
-                    ${currencySelectOptions.map(curr => {
+                    ${currencySelectOptions.map((curr) => {
                       if (lot.currency == curr) {
                         return `<option selected value="${curr}">${curr}</option>`;
                       } else {
@@ -449,7 +609,7 @@ const createArchiveLotAndListeners = async (
             <label class="label lot_field" for="lot_method"
               ><span>Метод погашения: </span>
               <select disabled id="selectReturnWayOption">
-              ${returnSelectOptions.map(way => {
+              ${returnSelectOptions.map((way) => {
                 if (lot.return_way == way) {
                   return `<option selected value="${way}">${translate(
                     way
@@ -472,7 +632,7 @@ const createArchiveLotAndListeners = async (
             <label class="label lot_field" for="lot_cred"
               ><span>Форма кредитирования: </span>
               <select disabled id="selectLotForm">
-                    ${formSelectOptions.map(form => {
+                    ${formSelectOptions.map((form) => {
                       if (lot.form == form) {
                         return `<option selected value="${form}">${translate(
                           form
@@ -493,31 +653,33 @@ const createArchiveLotAndListeners = async (
               </textarea>
             </label>
             </form>
-            <div class="lot_photo">
+            
+            <div class="swiper-archived-container">
             ${lot.photos.photos
-              .map(photo => {
-                return `<img height="300" src="${photo}"></img>`;
+              .map((photo) => {
+                return `<img class="lot_photo" src="${photo}"></img>`;
               })
               .join("")}  
             </div>
-            <button class="postLotBtn btn">Restore</button>
+            <button class="postLotBtn btn">Восстановить</button>
+            <button class="delLotBtn btn">Удалить</button>
             </div>
   `).get(0);
 
   $(archiveLotEl)
     .find(".postLotBtn")
-    .on("click", async function(event) {
+    .on("click", async function (event) {
       try {
         const response = await fetch(URL + `lots/${lot.id}`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Basic ${encData()}`
-          }
+            Authorization: `Basic ${encData()}`,
+          },
         });
         if (response.ok) {
           console.log(response);
-          window.location.reload();
+          location.reload();
         } else throw new Error(error);
       } catch (error) {
         alert("Ошибка! Что-то пошло не так.");
@@ -525,6 +687,26 @@ const createArchiveLotAndListeners = async (
       }
     });
 
+  $(archiveLotEl)
+    .find(".delLotBtn")
+    .on("click", async function (event) {
+      try {
+        const response = await fetch(URL + `lots/personal/deleted/${lot.id}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Basic ${encData()}`,
+          },
+        });
+        if (response.ok) {
+          console.log(response);
+          location.reload();
+        } else throw new Error(error);
+      } catch (error) {
+        alert("Ошибка! Что-то пошло не так.");
+        console.log(error);
+      }
+    });
   return archiveLotEl;
 };
 
@@ -534,7 +716,7 @@ const createArchiveLotEls = async (lots, { onLotRemove }) => {
       async (lot, index) =>
         await createArchiveLotAndListeners(lot, index, {
           parent: myArchiveLotsContainer,
-          onLotRemove
+          onLotRemove,
         })
     )
   );
@@ -542,29 +724,29 @@ const createArchiveLotEls = async (lots, { onLotRemove }) => {
   return lotEls;
 };
 
-const manageArchiveLots = async sourceLots => {
+const manageArchiveLots = async (sourceLots) => {
   const lots = [...sourceLots];
 
   let lotEls = await createArchiveLotEls(lots, { onLotRemove });
 
   async function onLotRemove(lot, lotEl, i) {
     lots.splice(i, 1);
-    lotEls.forEach(lotElToBeRemoved =>
+    lotEls.forEach((lotElToBeRemoved) =>
       myArchiveLotsContainer.removeChild(lotElToBeRemoved)
     );
 
     lotEls = await createArchiveLotEls(lots, { onLotRemove });
-    lotEls.forEach(lotEl => myArchiveLotsContainer.appendChild(lotEl));
+    lotEls.forEach((lotEl) => myArchiveLotsContainer.appendChild(lotEl));
   }
 
-  lotEls.forEach(lotEl => myArchiveLotsContainer.appendChild(lotEl));
+  lotEls.forEach((lotEl) => myArchiveLotsContainer.appendChild(lotEl));
 };
 
 const getMyLots = async () => {
   try {
     const response = await fetch(URL + "lots/personal", {
       method: "GET",
-      headers: { Authorization: `Basic ${encData()}` }
+      headers: { Authorization: `Basic ${encData()}` },
     });
 
     if (!response.ok) {
@@ -583,7 +765,7 @@ const getMyLots = async () => {
   try {
     const response = await fetch(URL + "lots/personal/deleted", {
       method: "GET",
-      headers: { Authorization: `Basic ${encData()}` }
+      headers: { Authorization: `Basic ${encData()}` },
     });
 
     if (!response.ok) {
@@ -592,7 +774,7 @@ const getMyLots = async () => {
 
     const result = await response.json();
     if (result.length == 0) {
-      myLotsHeading.innerText = `Похоже, что у Вас нет архивных лотов!`;
+      myArchiveLotsHeading.innerText = `Похоже, что у Вас нет архивных лотов!`;
     } else {
       manageArchiveLots(result);
     }
@@ -604,14 +786,25 @@ const getMyLots = async () => {
 getMyLots();
 
 async function clearLots() {
-  let userLots = document.getElementsByClassName("userLots");
-
-  [...userLots].forEach(lot => {
-    lot.parentNode.removeChild(lot);
+  let userLots = $(".userLots");
+  userLots.each((lot) => {
+    userLots.remove(lot);
   });
 }
 
-createLotPublish.addEventListener("click", async function(e) {
+async function clearLot(id) {
+  let userLots = $(".userLots");
+  console.log(userLots);
+
+  let lotToBeDeleted = userLots.find(`[data-id=${id}]`);
+  userLots.each((lot) => {
+    if (lot == lotToBeDeleted) {
+      lot.remove();
+    }
+  });
+}
+
+createLotPublish.addEventListener("click", async function (e) {
   e.preventDefault();
   if ($("#createLotForm").valid() == false) {
     return;
@@ -628,12 +821,18 @@ createLotPublish.addEventListener("click", async function(e) {
     security: createLotSecurity.value,
     form: createLotCredForm.value,
     percentage: createLotPercentage.value,
-    commentary: createLotDescription.value
+    commentary: createLotDescription.value,
+  };
+  const verificationReq = {
+    value: document.getElementById("create_verification_req").checked,
+  };
+  const clubGuaranteeReq = {
+    value: document.getElementById("create_club_guarantee_req").checked,
   };
 
   let newLotID = 0;
   const formData = new FormData();
-  const photos = document.querySelector('input[type="file"][multiple]');
+  const photos = document.querySelector("#createLotPhoto");
   for (let i = 0; i < photos.files.length; i++) {
     formData.append(
       `file${(Math.random() * 100000).toFixed(0)}`,
@@ -646,13 +845,12 @@ createLotPublish.addEventListener("click", async function(e) {
       body: JSON.stringify(value),
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Basic ${encData()}`
-      }
+        Authorization: `Basic ${encData()}`,
+      },
     });
     if (response.ok) {
       const result = await response.json();
       newLotID = result["lot_id"];
-      clearLots();
       myLotsHeading.innerHTML = `<strong>Мои лоты:</strong>`;
       modalWindow.style.display = "none";
       createLotName.value = "";
@@ -673,56 +871,107 @@ createLotPublish.addEventListener("click", async function(e) {
       method: "POST",
       body: formData,
       headers: {
-        Authorization: `Basic ${encData()}`
-      }
+        Authorization: `Basic ${encData()}`,
+      },
     });
-    // for (let key of formData.keys()) {
-    //   formData.delete(key);
-    // }
+    console.log(response);
+
+    clearLots();
     getMyLots();
   } catch (error) {
     alert("Ошибка! Что-то пошло не так.");
     console.log(error);
   }
+  try {
+    const response = await fetch(URL + "lots/" + newLotID + "/photos", {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: `Basic ${encData()}`,
+      },
+    });
+    console.log(response);
+  } catch (error) {
+    alert("Ошибка! Что-то пошло не так.");
+    console.log(error);
+  }
+  try {
+    const response = await fetch(
+      URL + `lots/personal/` + newLotID + `/request/guarantee`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Basic ${encData()}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(clubGuaranteeReq),
+      }
+    );
+    if (response.ok) {
+      console.log(response);
+    } else throw new Error(error);
+  } catch (error) {
+    console.log(error);
+  }
+  try {
+    const response = await fetch(
+      URL + `lots/personal/` + newLotID + `/request/verification`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Basic ${encData()}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(verificationReq),
+      }
+    );
+    if (response.ok) {
+      clearLots();
+      getMyLots();
+      console.log(response);
+    } else throw new Error(error);
+  } catch (error) {
+    console.log(error);
+  }
 });
 
-const validateForm = $(function() {
+const validateForm = $(function () {
   $("#createLotForm").validate({
     rules: {
       create_lot_name: {
-        required: true
+        required: true,
       },
       create_lot_reqsum: {
         required: true,
-        number: true
+        number: true,
       },
       create_lot_currency: {
-        required: true
+        required: true,
       },
       create_lot_reqmonths: {
         required: true,
-        number: true
+        number: true,
       },
       create_lot_percentage: {
         required: true,
-        number: true
+        number: true,
       },
       create_lot_method: {
-        required: true
+        required: true,
       },
       create_lot_security: {
-        required: true
+        required: true,
       },
       create_lot_cred: {
-        required: true
-      }
-    }
+        required: true,
+      },
+    },
   });
 });
 
 createLotPublish.addEventListener("change", validateForm);
 
-archiveLotsBtn.addEventListener("click", function(e) {
+archiveLotsBtn.addEventListener("click", function (e) {
   e.preventDefault();
   myLotsBtn.classList.remove("btnActive");
   archiveLotsBtn.classList.add("btnActive");
@@ -730,7 +979,7 @@ archiveLotsBtn.addEventListener("click", function(e) {
   myArchiveLotsContainer.style.display = "block";
 });
 
-myLotsBtn.addEventListener("click", function(e) {
+myLotsBtn.addEventListener("click", function (e) {
   e.preventDefault();
   archiveLotsBtn.classList.remove("btnActive");
   myLotsBtn.classList.add("btnActive");

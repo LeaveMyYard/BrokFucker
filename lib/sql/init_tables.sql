@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS Users (
 CREATE TABLE IF NOT EXISTS UsersLots (
     `email` TEXT PRIMARY KEY,
     `user_lots` TEXT NOT NULL DEFAULT '[]',
-    `favorite_lots` TEXT NOT NULL DEFAULT '[]'
+    `favorite_lots` TEXT NOT NULL DEFAULT '[]',
+    FOREIGN KEY (`email`) REFERENCES Users(`email`)
 );
 
 CREATE TRIGGER IF NOT EXISTS AddingUserToUsersLots
@@ -43,7 +44,15 @@ CREATE TABLE IF NOT EXISTS PasswordChangeVerification(
     `verification_hash` TEXT PRIMARY KEY,
     `email` TEXT NOT NULL,
     `password` TEXT NOT NULL,
-    `request_date` DATETIME NOT NULL
+    `request_date` DATETIME NOT NULL,
+    FOREIGN KEY (`email`) REFERENCES Users(`email`)
+);
+
+CREATE TABLE IF NOT EXISTS AccountRestoreVerification(
+    `verification_hash` TEXT PRIMARY KEY,
+    `email` TEXT NOT NULL,
+    `request_date` DATETIME NOT NULL,
+    FOREIGN KEY (`email`) REFERENCES Users(`email`)
 );
 
 CREATE TABLE IF NOT EXISTS Lots (
@@ -63,7 +72,42 @@ CREATE TABLE IF NOT EXISTS Lots (
     `confirmed` BOOLEAN NOT NULL DEFAULT 'False',
     `deleted` BOOLEAN NOT NULL DEFAULT 'False',
     `commentary` TEXT DEFAULT '',
-    `photos` TEXT DEFAULT '[]'
+    `photos` TEXT DEFAULT '[]',
+    FOREIGN KEY (`user`) REFERENCES Users(`email`)
+);
+
+CREATE TABLE IF NOT EXISTS LotGuaranteeRequests (
+    `id` INTEGER PRIMARY KEY,
+    FOREIGN KEY (`id`) REFERENCES Lots(`id`)
+);
+
+CREATE VIEW IF NOT EXISTS LotsWithGuaranteeRequested 
+AS
+    SELECT *
+    FROM `Lots`
+    WHERE `id` IN (
+        SELECT `id` from LotGuaranteeRequests
+    );
+
+CREATE TABLE IF NOT EXISTS LotSecurityVerificationRequests (
+    `id` INTEGER PRIMARY KEY,
+    FOREIGN KEY (`id`) REFERENCES Lots(`id`)
+);
+
+CREATE VIEW IF NOT EXISTS LotsWithSecurityVerificationRequested 
+AS
+    SELECT *
+    FROM `Lots`
+    WHERE `id` IN (
+        SELECT `id` from LotGuaranteeRequests
+    );
+
+CREATE TABLE IF NOT EXISTS LotVerificationDeclines (
+    `id` INTEGER PRIMARY KEY,
+    `reason` TEXT NOT NULL,
+    `removed_by` INTEGER NOT NULL,
+    FOREIGN KEY (`id`) REFERENCES Lots(`id`),
+    FOREIGN KEY (`removed_by`) REFERENCES Users(`email`)
 );
 
 CREATE VIEW IF NOT EXISTS LiveLots

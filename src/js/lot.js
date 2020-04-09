@@ -1,6 +1,4 @@
-// const URL = "http://localhost:5000/api/v1/1";
-const host = window.location.host;
-const URL = `/api/v1/`;
+const URL = "http://localhost:5000/api/v1/";
 
 const lotSubMsg = document.getElementById("lotSubMsg");
 const lotProfilePic = document.getElementById("lotProfilePic");
@@ -16,16 +14,18 @@ const lotSubBtn = document.getElementById("lotSubBtn");
 
 const lotID = window.location.search.split("=")[1];
 
-const encData = function() {
+const encData = function () {
   if (localStorage.getItem("email")) {
-    return (
-      window.btoa(localStorage.getItem("email") + ":") +
-      localStorage.getItem("password")
+    return window.btoa(
+      localStorage.getItem("email") +
+        ":" +
+        window.atob(localStorage.getItem("password"))
     );
   } else {
-    return (
-      window.btoa(sessionStorage.getItem("email") + ":") +
-      sessionStorage.getItem("password")
+    return window.btoa(
+      sessionStorage.getItem("email") +
+        ":" +
+        window.atob(sessionStorage.getItem("password"))
     );
   }
 };
@@ -36,15 +36,15 @@ function logOut() {
   location.reload();
 }
 
-lotCallback.addEventListener("click", function() {
+lotCallback.addEventListener("click", function () {
   modalWindow.style.display = "block";
 });
 
-modalCloseBtn.addEventListener("click", function() {
+modalCloseBtn.addEventListener("click", function () {
   modalWindow.style.display = "none";
 });
 
-window.onclick = function(e) {
+window.onclick = function (e) {
   if (e.target == modalWindow) {
     modalWindow.style.display = "none";
   }
@@ -58,7 +58,7 @@ if (localStorage.getItem("email")) {
   lotSubValue.value = sessionStorage.getItem("email");
 }
 
-selectSub.addEventListener("change", function() {
+selectSub.addEventListener("change", function () {
   if (this.value == "email") {
     lotSubValue.disabled = true;
     if (localStorage.getItem("email")) {
@@ -84,7 +84,7 @@ async function onReady() {
     try {
       const response = await fetch(URL + "user", {
         method: "GET",
-        headers: { Authorization: `Basic ${encData()}` }
+        headers: { Authorization: `Basic ${encData()}` },
       });
 
       if (!response.ok) {
@@ -104,7 +104,20 @@ async function onReady() {
 }
 onReady();
 
-lotProfilePic.addEventListener("click", function() {
+vocabulary = {
+  cash: "Наличные",
+  cashless: "Безналичные",
+  any: "Любой",
+  every_month: "Ежемесячно",
+  term_end: "Окончание срока",
+  other: "Другое",
+};
+
+function translate(data) {
+  return vocabulary[data];
+}
+
+lotProfilePic.addEventListener("click", function () {
   location.href = "my_profile.html";
 });
 
@@ -112,7 +125,9 @@ const getTheLot = async () => {
   try {
     const response = await fetch(URL + `lots/${lotID}`, {
       method: "GET",
-      headers: { Authorization: `Basic ${encData()}` }
+      headers: {
+        Authorization: `Basic ${encData()}`,
+      },
     });
 
     if (!response.ok) {
@@ -132,17 +147,21 @@ const getTheLot = async () => {
     document.getElementsByName("lot_reqsum")[0].value = result["amount"];
     document.getElementsByName("lot_currency")[0].value = result["currency"];
     document.getElementsByName("lot_reqmonths")[0].value = result["term"];
-    document.getElementsByName("lot_method")[0].value = result["return_way"];
+    document.getElementsByName("lot_method")[0].value = translate(
+      result["return_way"]
+    );
     document.getElementsByName("lot_security")[0].value = result["security"];
-    document.getElementsByName("lot_cred")[0].value = result["form"];
+    document.getElementsByName("lot_cred")[0].value = translate(result["form"]);
     document.getElementsByName("lot_desc")[0].innerText = result["commentary"];
     document.getElementsByName("lot_percentage")[0].value =
       result["percentage"];
     clubGuarantee.innerText = result["guarantee_percentage"];
     clubProven.innerText = result["security_checked"] == false ? "Нет" : "Да";
 
-    result["photos"]["photos"].map(photo => {
-      lotPhotos.innerHTML += `<img height="300" src="${photo}"></img>`;
+    result["photos"]["photos"].map((photo) => {
+      lotPhotos.innerHTML += ` <div class="lot_photo">
+      <img height="300" src="${photo}" />
+      </div>`;
     });
   } catch (error) {
     console.error(error);
@@ -151,36 +170,44 @@ const getTheLot = async () => {
 
 getTheLot();
 
-document.getElementById("LotToFav").addEventListener("click", async function() {
-  try {
-    const response = await fetch(URL + `lots/favorites/${lotID}`, {
-      method: "PUT",
-      headers: { Authorization: `Basic ${encData()}` }
-    });
-    if (!response.ok) {
-      throw new Error("Unsuccessfull response");
-    } else {
-      alert("Лот добавлен в избранные!");
+document
+  .getElementById("LotToFav")
+  .addEventListener("click", async function () {
+    try {
+      const response = await fetch(URL + `lots/favorites/${lotID}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Basic ${encData()}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      } else {
+        alert("Лот добавлен в избранные!");
+      }
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error);
-  }
-});
+  });
 
-lotSubBtn.addEventListener("click", async function() {
+lotSubBtn.addEventListener("click", async function () {
   const value = {
     type: selectSub.value == "email" ? "Email" : "PhoneCall",
-    message: lotSubCommentary.innerText
+    message: lotSubCommentary.innerText,
   };
   if (value.type == "PhoneCall") {
     const upd = {
-      phone: lotSubValue.value
+      phone: lotSubValue.value,
     };
     try {
       const response = await fetch(URL + `user`, {
         method: "PUT",
-        headers: { Authorization: `Basic ${encData()}` },
-        body: JSON.stringify(upd)
+        headers: {
+          Authorization: `Basic ${encData()}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(upd),
       });
       if (!response.ok) {
         throw new Error("Unsuccessfull response");
@@ -195,8 +222,11 @@ lotSubBtn.addEventListener("click", async function() {
   try {
     const response = await fetch(URL + `lots/subscription/${lotID}`, {
       method: "PUT",
-      headers: { Authorization: `Basic ${encData()}` },
-      body: JSON.stringify(value)
+      headers: {
+        Authorization: `Basic ${encData()}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(value),
     });
     if (!response.ok) {
       throw new Error("Unsuccessfull response");

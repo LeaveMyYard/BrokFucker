@@ -36,7 +36,7 @@
           </div>
           <div id="menuIfLogged">
             <ul>
-              <a href="index.html" class="fixed-header__menu-item ">
+              <a href="index.html" class="fixed-header__menu-item">
                 <li>Лоты</li>
               </a>
               <a
@@ -80,7 +80,8 @@
           <span>Зарегистрирован: </span>
           <span id="myprofRegDate">19.12.2019</span>
         </p>
-        <button id="myLotsBtn">Мои лоты</button>
+        <button class="btn" id="myLotsBtn">Мои лоты</button>
+        <br />
         <br />
         <label class="label label_name" for="prof_name"
           ><span>Имя: </span></label
@@ -94,6 +95,7 @@
           required
         />
         <br />
+        <br />
         <label class="label label_phone" for="prof_phone"
           ><span>Телефон: </span></label
         >
@@ -105,8 +107,24 @@
           placeholder="не заполнено"
           required
         />
+        <div id="doc_message_info"></div>
         <br />
-        <button type="submit" id="updateData">Сохранить</button>
+        <br />
+        <label class="label label_psw" for="prof_newPsw"
+          ><span>Пароль: </span></label
+        >
+        <input
+          class="inputPhone"
+          type="tel"
+          id="myprofPsw"
+          name="prof_newPsw"
+          placeholder="введите новый пароль"
+          required
+        />
+        <div id="doc_message"></div>
+        <br />
+        <br />
+        <button class="btn" type="submit" id="updateData">Сохранить</button>
       </div>
     </div>
     <script src="js/header.js"></script>

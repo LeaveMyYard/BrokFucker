@@ -88,7 +88,11 @@ body {
 }
 
 label.error {
-  display: none !important;
+  display: block;
+  margin: 5px auto;
+  border: none;
+  color: red;
+  font-weight: 600;
 }
 
 .showPswIcon {
@@ -204,7 +208,6 @@ label.error {
   text-transform: uppercase;
   font-size: 1.2rem;
   font-weight: 600;
-  background: #e66465;
 }
 .profile-info button:last-of-type {
   margin-bottom: 0.5rem;
@@ -278,18 +281,48 @@ label.error {
   text-transform: uppercase;
   font-size: 1.2rem;
   font-weight: 600;
+  cursor: pointer;
+  transition: 0.5s;
+}
+button {
+  padding: 0.5rem 1.3rem;
+  margin-bottom: 3.2rem;
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.5s;
+}
+button:hover {
+  transition: 0.5s;
   background: #e66465;
 }
 
 .lot_photo {
-  display: block;
-  margin-top: 1.5rem;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  opacity: 1;
+  transition: 0.5s ease;
 }
 
 .create_lot_photo {
   display: block;
   margin: 1.5rem 0;
   cursor: pointer;
+}
+
+.deletePhotoBtn {
+  transition: 0.5s ease;
+  opacity: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  text-align: center;
 }
 
 #createLotPhoto {
@@ -450,18 +483,90 @@ main {
 }
 
 .linkToLotPage {
-<<<<<<< HEAD
   color: #9198e5;
   margin: 1.5rem 0;
-=======
-  display: block;
-  margin: 1rem 0;
-  font-size: 1.5rem;
-  color: #9198e5;
->>>>>>> developer
 }
 
 .linkToPage {
   color: #ff4747;
   font-weight: 600;
+}
+
+.errorMsg {
+  margin: 1rem 0;
+  color: #ff4747;
+  font-weight: 600;
+}
+.successMsg {
+  margin: 1rem 0;
+  color: green;
+  font-weight: 600;
+}
+
+#myprofEmail {
+  font-weight: 600;
+}
+
+.btnContainer {
+  display: flex;
+  max-width: 550px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.addPhotoBtn {
+  background: #2a88ff;
+  border: 1px solid #aaa;
+  height: 25px;
+  position: relative;
+  cursor: pointer;
+}
+.addPhotoBtn:hover {
+  background: #e66465;
+}
+
+.addPhotoImg {
+  display: inline-block;
+  width: 32px;
+  height: auto;
+  bottom: 5px;
+  left: 5%;
+  position: absolute;
+}
+
+.addPhotoText {
+  margin-left: 17px;
+}
+/* swiper */
+.swiper-container {
+  display: block;
+  position: relative;
+  margin: 1.5rem 0;
+}
+
+.swiper-archived-container {
+  display: block;
+  position: relative;
+  margin: 1.5rem 0;
+}
+
+.swiper-container:hover img {
+  opacity: 0.3;
+}
+.swiper-container:hover .deletePhotoBtn {
+  opacity: 1;
+}
+
+.myprof_errorMsg {
+  margin-top: 15px;
+  max-width: 250px;
+  color: red;
+}
+.myprof_successMsg {
+  margin-top: 15px;
+  max-width: 250px;
+  color: green;
+}
+
+.mylots_label_container {
+  margin: 20px 0;
 }
