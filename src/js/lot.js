@@ -117,10 +117,6 @@ function translate(data) {
   return vocabulary[data];
 }
 
-lotProfilePic.addEventListener("click", function () {
-  location.href = "my_profile.html";
-});
-
 const getTheLot = async () => {
   try {
     const response = await fetch(URL + `lots/${lotID}`, {

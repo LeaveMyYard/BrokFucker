@@ -307,10 +307,10 @@ const createLotAndListeners = async (
                 <span>Заказать: </span>
                 ${
                   lot.club_guarantee_requested
-                    ? `<input checked type="checkbox" id="club_guarantee_req">`
-                    : `<input type="checkbox" id="club_guarantee_req">`
+                    ? `<input checked type="checkbox" id="club_guarantee_req_${lot.id}">`
+                    : `<input type="checkbox" id="club_guarantee_req_${lot.id}">`
                 }
-                <label for="club_guarantee_req">ГАРАНТИЯ КЛУБА</label>
+                <label for="club_guarantee_req_${lot.id}">ГАРАНТИЯ КЛУБА</label>
                 </div>
                 <div class="mylots_label_container">
                 <span>Заказать: </span>
@@ -319,7 +319,9 @@ const createLotAndListeners = async (
                     ? `<input checked type="checkbox" id="verification_req_${lot.id}">`
                     : `<input type="checkbox" id="verification_req_${lot.id}">`
                 }
-                <label for="verification_req">ПРОВЕРЕННОЕ ОБЕСПЕЧЕНИЕ</label>
+                <label for="verification_req_${
+                  lot.id
+                }">ПРОВЕРЕННОЕ ОБЕСПЕЧЕНИЕ</label>
                 </div>
                 <div class="btnContainer">
                   <button class="deleteLotBtn btn">Удалить</button>
@@ -358,6 +360,8 @@ const createLotAndListeners = async (
         });
         if (response.ok) {
           onLotRemove(lot, lotEl, index);
+          clearArchiveLots();
+          getMyArchiveLots();
         } else throw new Error(error);
       } catch (error) {
         alert("Ошибка! Что-то пошло не так.");
@@ -700,7 +704,8 @@ const createArchiveLotAndListeners = async (
         });
         if (response.ok) {
           console.log(response);
-          location.reload();
+          clearArchiveLots();
+          getMyArchiveLots();
         } else throw new Error(error);
       } catch (error) {
         alert("Ошибка! Что-то пошло не так.");
@@ -762,6 +767,11 @@ const getMyLots = async () => {
   } catch (error) {
     console.error(error);
   }
+};
+
+getMyLots();
+
+const getMyArchiveLots = async () => {
   try {
     const response = await fetch(URL + "lots/personal/deleted", {
       method: "GET",
@@ -783,7 +793,7 @@ const getMyLots = async () => {
   }
 };
 
-getMyLots();
+getMyArchiveLots();
 
 async function clearLots() {
   let userLots = $(".userLots");
@@ -792,8 +802,27 @@ async function clearLots() {
   });
 }
 
+async function clearArchiveLots() {
+  let userLots = $(".userArchiveLots");
+  userLots.each((lot) => {
+    userLots.remove(lot);
+  });
+}
+
 async function clearLot(id) {
   let userLots = $(".userLots");
+  console.log(userLots);
+
+  let lotToBeDeleted = userLots.find(`[data-id=${id}]`);
+  userLots.each((lot) => {
+    if (lot == lotToBeDeleted) {
+      lot.remove();
+    }
+  });
+}
+
+async function clearArchiveLot(id) {
+  let userLots = $(".userArchiveLots");
   console.log(userLots);
 
   let lotToBeDeleted = userLots.find(`[data-id=${id}]`);
