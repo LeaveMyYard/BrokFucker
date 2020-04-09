@@ -20,7 +20,7 @@ from lib.util.logger import init_logger
 from datetime import datetime, timedelta
 from threading import Timer
 
-app = Flask(__name__, static_folder='admin-panel-test/static')
+app = Flask(__name__, static_folder='admin/static')
 CORS(app)
 
 logger = init_logger(__name__)
@@ -123,7 +123,7 @@ class WebApp:
         if path != "" and os.path.exists(app.static_folder + '/' + path):
             return send_from_directory(app.static_folder, path)
         else:
-            return send_from_directory('admin-panel-test', 'index.html')
+            return send_from_directory('admin', 'index.html')
 
     # Also redirect all /image requests to data/images
     @staticmethod
