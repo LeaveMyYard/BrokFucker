@@ -92,7 +92,7 @@ def weighted(weight):
 
             logger.debug(f"Stats: (1s: {ip_weights['1s'][request_ip]}, 1m: {ip_weights['1m'][request_ip]}, 1h: {ip_weights['1h'][request_ip]})")
 
-            return func(*args, *kwargs)
+            return func(*args, **kwargs)
 
         res_func.__name__ = func.__name__
 
