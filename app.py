@@ -730,10 +730,11 @@ class RestAPI:
     @weighted(weight=1)
     def remove_unapproved_lot(lot_id):
         required_fields = ['reason']
+        request_json = RestAPI.request_data_to_json(request.data)
 
-        RestAPI.check_required_fields(request.json, required_fields)
+        RestAPI.check_required_fields(request_json, required_fields)
 
-        reason = request.json['reason']
+        reason = request_json['reason']
         lot = Lot(lot_id)
         lot.delete_lot_by_moderator(user.email(), reason)
 
