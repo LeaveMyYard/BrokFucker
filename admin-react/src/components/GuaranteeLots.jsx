@@ -13,7 +13,7 @@ const GuaranteeLots = () => {
     try {
       const authToken = authService.getAuthToken();
       const guarantee = {
-        guarantee: document.querySelector("#guaranteeValue").value,
+        value: document.querySelector("#guaranteeValue").value,
       };
       const response = await fetch(URL + `lots/${lot.id}/guarantee`, {
         method: "PUT",
