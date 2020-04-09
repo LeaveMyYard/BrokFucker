@@ -922,7 +922,7 @@ class DatabaseHandler:
 
     def set_lot_guarantee_value(self, lot_id, value):
         self.cursor.execute(
-            f"UPDATE Users SET `guarantee_percentage` = ? WHERE `email` = ?",
+            f"UPDATE Lots SET `guarantee_percentage` = ? WHERE `id` = ?",
             (value, lot_id)
         )
 

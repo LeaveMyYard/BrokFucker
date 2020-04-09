@@ -662,12 +662,10 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def set_guarantee(lot_id):
-        if not request.json or not request.content_type.startswith('application/json'):
-            raise APIExceptions.NoJsonError()
-
-        RestAPI.check_required_fields(request.json, ['value'])
-
-        value = request.json['value']
+        request_json = RestAPI.request_data_to_json(request.data)
+        RestAPI.check_required_fields(request_json, ['value'])
+        
+        value = request_json['value']
         lot = Lot(lot_id)
         lot.set_guarantee_value(value)
         lot.remove_request_for_guarantee()
