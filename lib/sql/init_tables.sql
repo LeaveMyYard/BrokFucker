@@ -99,7 +99,7 @@ AS
     SELECT *
     FROM `Lots`
     WHERE `id` IN (
-        SELECT `id` from LotGuaranteeRequests
+        SELECT `id` from LotsWithSecurityVerificationRequested
     );
 
 CREATE TABLE IF NOT EXISTS LotVerificationDeclines (
