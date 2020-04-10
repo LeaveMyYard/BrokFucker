@@ -670,7 +670,7 @@ class DatabaseHandler:
     def set_security_checked(self, lot_id, checked):
         self.cursor.execute(
             f"UPDATE Lots SET `security_checked` = ? WHERE `id` = ?",
-            (checked, lot_id)
+            (str(checked), lot_id)
         )
         self.conn.commit()
         self.logger.debug(f'`Security checked` flag on lot with id `{lot_id}` is set to `{checked}`')
