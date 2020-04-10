@@ -120,8 +120,10 @@ export default function LotsItem({
               value={guarantee}
               onChange={(event) => onGuaranteeChange(event, lot, lotIndex)}
             ></input>
-            <button onClick={() => onGuaranteeSet(lot)}>Set</button>
-            <button onClick={() => onGuaranteeRemove(lot)}>Remove</button>
+            <div>
+              <button onClick={() => onGuaranteeSet(lot)}>Set</button>
+              <button onClick={() => onGuaranteeRemove(lot)}>Remove</button>
+            </div>
           </div>
         ) : (
           lot.guarantee_percentage
