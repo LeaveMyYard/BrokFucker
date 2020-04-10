@@ -73,3 +73,7 @@ class AccountRestoreError(IndexedException):
 class MaximumRequestsTimeout(IndexedException):
     def __init__(self, time_to_end: int):
         super().__init__(-1015, f'You made to much requests, wait at least {time_to_end} seconds to continue.')
+
+class LotNotExistsError(IndexedException):
+    def __init__(self, lot_id):
+        super().__init__(-1016, f'Lot with id {lot_id} does not exist')

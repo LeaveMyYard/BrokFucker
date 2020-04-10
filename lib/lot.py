@@ -65,6 +65,9 @@ class Lot:
         self.database = DatabaseHandler()
         self.lot_id = lot_id
 
+        if not self.database.is_lot_exists(self.lot_id):
+            raise APIExceptions.LotNotExistsError(self.lot_id)
+
     @staticmethod
     def get_settings():
         return Settings.get_enter_settings()['lot']

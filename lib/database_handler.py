@@ -432,6 +432,14 @@ class DatabaseHandler:
 
         return lot_id
 
+    def is_lot_exists(self, lot_id):
+        self.cursor.execute(
+            f"SEELCT * FROM Lots WHERE `id` = ?",
+            (lot_id, )
+        )
+
+        return self.cursor.fetchone() is not None
+
     def approve_lot(self, lot_id):
         if self.is_lot_removed_by_a_moderator(lot_id):
             self.remove_moderator_delete_reason(lot_id)
