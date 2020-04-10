@@ -86,7 +86,7 @@ AS
     SELECT *
     FROM `Lots`
     WHERE `id` IN (
-        SELECT `id` from LotGuaranteeRequests
+        SELECT `id` FROM LotGuaranteeRequests
     );
 
 CREATE TABLE IF NOT EXISTS LotSecurityVerificationRequests (
@@ -99,7 +99,7 @@ AS
     SELECT *
     FROM `Lots`
     WHERE `id` IN (
-        SELECT `id` from LotSecurityVerificationRequests
+        SELECT `id` FROM LotSecurityVerificationRequests
     );
 
 CREATE TABLE IF NOT EXISTS LotVerificationDeclines (
