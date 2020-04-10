@@ -678,6 +678,7 @@ class RestAPI:
     def remove_guarantee(lot_id):
         lot = Lot(lot_id)
         lot.set_guarantee_value(0)
+        lot.remove_request_for_guarantee()
         return RestAPI.message('Lot\'s guarantee is now 0%'), 201
 
     @staticmethod
