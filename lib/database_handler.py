@@ -434,7 +434,7 @@ class DatabaseHandler:
 
     def is_lot_exists(self, lot_id):
         self.cursor.execute(
-            f"SEELCT * FROM Lots WHERE `id` = ?",
+            f"SELECT * FROM Lots WHERE `id` = ?",
             (lot_id, )
         )
 
