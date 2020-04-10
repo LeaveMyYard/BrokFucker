@@ -512,7 +512,6 @@ class DatabaseHandler:
         self.conn.commit()
 
     def serialize_lot(self, lot: Tuple):
-        print(lot)
         res = {
             'id': lot[0],
             'date': lot[1],
