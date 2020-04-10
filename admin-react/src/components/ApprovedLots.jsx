@@ -57,30 +57,34 @@ const ApprovedLots = () => {
         <div>
           <h1 className="heading">Подтвержденные подписки</h1>
           <table className="lot-table">
-            <tr>
-              <th>№</th>
-              {/* <th>Страница</th> */}
-              <th>Сообщение</th>
-              <th>Тип</th>
-              <th>Подписчик</th>
-              <th>Убрать подписку</th>
-            </tr>
-            {lots.lots.map((lot, index) => (
+            <thead>
               <tr>
-                <td>{index + 1}</td>
-                {/* <td>
-                  <a href={`lot.html?id=${lot.lot}`}>Страница лота</a>
-                </td> */}
-                <td>{lot.message ? lot.message : "Не указано"}</td>
-                <td>{Translate(lot.type)}</td>
-                <td>{lot.user}</td>
-                <td>
-                  <button onClick={() => onSubscriptionDecline(lot.id)}>
-                    Remove
-                  </button>
-                </td>
+                <th>№</th>
+                <th>Страница</th>
+                <th>Сообщение</th>
+                <th>Тип</th>
+                <th>Подписчик</th>
+                <th>Убрать подписку</th>
               </tr>
-            ))}
+            </thead>
+            <tbody>
+              {lots.lots.map((lot, index) => (
+                <tr key={lot.lot}>
+                  <td>{index + 1}</td>
+                  <td>
+                    <a href={`/lot.html?id=${lot.lot}`}>Страница лота</a>
+                  </td>
+                  <td>{lot.message ? lot.message : "Не указано"}</td>
+                  <td>{Translate(lot.type)}</td>
+                  <td>{lot.user}</td>
+                  <td>
+                    <button onClick={() => onSubscriptionDecline(lot.id)}>
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
           </table>
         </div>
       ) : (

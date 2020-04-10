@@ -304,6 +304,8 @@ const createLotAndListeners = async (
                     .join("")}
                 </div>
                 <div class="mylots_label_container">
+                <p>Гарантия клуба: ${lot.guarantee_percentage}</p>
+                <br />
                 <span>Заказать: </span>
                 ${
                   lot.club_guarantee_requested
@@ -900,22 +902,6 @@ createLotPublish.addEventListener("click", async function (e) {
       createLotPercentage.value = "";
       createLotDescription.value = "";
     } else throw new Error(error);
-  } catch (error) {
-    alert("Ошибка! Что-то пошло не так.");
-    console.log(error);
-  }
-  try {
-    const response = await fetch(URL + "lots/" + newLotID + "/photos", {
-      method: "POST",
-      body: formData,
-      headers: {
-        Authorization: `Basic ${encData()}`,
-      },
-    });
-    console.log(response);
-
-    clearLots();
-    getMyLots();
   } catch (error) {
     alert("Ошибка! Что-то пошло не так.");
     console.log(error);

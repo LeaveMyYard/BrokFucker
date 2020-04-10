@@ -190,10 +190,12 @@ document
     }
   });
 
+console.log(lotSubCommentary);
+
 lotSubBtn.addEventListener("click", async function () {
   const value = {
     type: selectSub.value == "email" ? "Email" : "PhoneCall",
-    message: lotSubCommentary.innerText,
+    message: lotSubCommentary.value,
   };
   if (value.type == "PhoneCall") {
     const upd = {
