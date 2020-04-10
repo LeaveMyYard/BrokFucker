@@ -650,11 +650,11 @@ class RestAPI:
     @weighted(weight=1)
     def set_security_checked(lot_id):
         lot = Lot(lot_id)
-        if request.type == 'PUT':
+        if request.method == 'PUT':
             lot.set_security_checked(True)
             lot.remove_request_for_security_verification()
             return RestAPI.message('Lot\'s security is now checked'), 201
-        if request.type == 'DELETE':
+        if request.method == 'DELETE':
             lot.set_security_checked(False)
             lot.remove_request_for_security_verification()
             return RestAPI.message('Lot\'s security is no more checked'), 201
