@@ -13,7 +13,7 @@ const VerificationLots = () => {
     try {
       const authToken = authService.getAuthToken();
 
-      const response = await fetch(URL + `lots/${lot.id}/approve`, {
+      const response = await fetch(URL + `lots/${lot.id}/security`, {
         method: "PUT",
         headers: {
           Authorization: `Basic ${authToken}`,
@@ -36,7 +36,7 @@ const VerificationLots = () => {
     try {
       const authToken = authService.getAuthToken();
 
-      const response = await fetch(URL + `lots/unapproved/${lot.id}`, {
+      const response = await fetch(URL + `lots/${lot.id}/security`, {
         method: "DELETE",
         headers: {
           Authorization: `Basic ${authToken}`,

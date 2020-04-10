@@ -67,7 +67,10 @@ selectSub.addEventListener("change", function () {
       lotSubValue.value = sessionStorage.getItem("email");
     }
   } else {
-    if (sessionStorage.getItem("phone") == "") {
+    if (
+      sessionStorage.getItem("phone") === "" ||
+      sessionStorage.getItem("phone") === "null"
+    ) {
       lotSubValue.value = "";
       lotSubValue.disabled = false;
     } else {
@@ -234,5 +237,7 @@ lotSubBtn.addEventListener("click", async function () {
     }
   } catch (error) {
     console.error(error);
+  } finally {
+    modalWindow.style.display = "none";
   }
 });

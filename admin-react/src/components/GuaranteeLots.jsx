@@ -9,55 +9,6 @@ const GuaranteeLots = () => {
   const [loading, setLoading] = useState(true);
   const [lots, setLots] = useState();
 
-  const onGuaranteeApprove = async (lot) => {
-    try {
-      const authToken = authService.getAuthToken();
-      const guarantee = {
-        value: document.querySelector("#guaranteeValue").value,
-      };
-      const response = await fetch(URL + `lots/${lot.id}/guarantee`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Basic ${authToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(guarantee),
-      });
-
-      if (!response.ok) {
-        throw new Error("Unsuccessfull response");
-      }
-
-      return await response.json();
-    } catch (error) {
-    } finally {
-      await refreshList();
-    }
-  };
-
-  const onGuaranteeRemove = async (lot) => {
-    try {
-      const authToken = authService.getAuthToken();
-
-      const response = await fetch(URL + `lots/${lot.id}/guarantee`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Basic ${authToken}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Unsuccessfull response");
-      }
-
-      return await response.json();
-    } catch (error) {
-    } finally {
-      await refreshList();
-    }
-  };
-
   const refreshList = async () => {
     setLoading(true);
 
@@ -85,9 +36,8 @@ const GuaranteeLots = () => {
           <LotsList
             list={lots}
             refreshList={refreshList}
-            onApprove={onGuaranteeApprove}
-            onRemove={onGuaranteeRemove}
-            isGuaranteeList={true}
+            // onApprove={onGuaranteeApprove}
+            // onRemove={onGuaranteeRemove}
           />
         </div>
       )}

@@ -1,4 +1,4 @@
-export const URL = "/api/v1/";
+export const URL = "http://localhost:5000/api/v1/";
 
 export const BASE_HREF = "/admin";
 

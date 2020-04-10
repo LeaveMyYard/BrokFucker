@@ -29,28 +29,6 @@ const UnapprovedLots = () => {
     }
   };
 
-  const onSubscriptionDecline = async (id) => {
-    try {
-      const authToken = authService.getAuthToken();
-
-      const response = await fetch(URL + `lots/subscription/${id}/unapprove`, {
-        method: "GET",
-        headers: {
-          Authorization: `Basic ${authToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Unsuccessfull response");
-      }
-
-      return await response.json();
-    } catch (error) {
-    } finally {
-      await refreshList();
-    }
-  };
-
   const refreshList = async () => {
     setLoading(true);
 
@@ -75,7 +53,7 @@ const UnapprovedLots = () => {
         <h1 className="heading">Loading...</h1>
       ) : lots.lots.length !== 0 ? (
         <div>
-          <h1 className="heading">Неподтвержденные лоты</h1>
+          <h1 className="heading">Неподтвержденные подписки</h1>
           <table className="lot-table">
             <tr>
               <th>№</th>
@@ -97,9 +75,6 @@ const UnapprovedLots = () => {
                 <td>
                   <button onClick={() => onSubscriptionApprove(lot.id)}>
                     Approve
-                  </button>
-                  <button onClick={() => onSubscriptionDecline(lot.id)}>
-                    Remove
                   </button>
                 </td>
               </tr>

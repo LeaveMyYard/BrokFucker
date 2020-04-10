@@ -22,6 +22,101 @@ class LotsService {
     }
   }
 
+  async approve(lot) {
+    try {
+      const authToken = authService.getAuthToken();
+
+      const response = await fetch(URL + `lots/${lot.id}/approve`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Basic ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+
+      return await response.json();
+    } catch (error) {
+    } finally {
+      // await refreshList();
+    }
+  }
+
+  async remove(lot) {
+    try {
+      const authToken = authService.getAuthToken();
+      // const reason = document.getElementById("declineReason").value;
+      const reason = { reason: "Лот не подходит под стандарты." };
+      const response = await fetch(URL + `lots/unapproved/${lot.id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Basic ${authToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(reason),
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+
+      return await response.json();
+    } catch (error) {
+    } finally {
+      // await refreshList();
+    }
+  }
+
+  async guaranteeApprove(lot) {
+    try {
+      const authToken = authService.getAuthToken();
+      const guarantee = lot.guarantee_percentage;
+      const response = await fetch(URL + `lots/${lot.id}/guarantee`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Basic ${authToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ value: guarantee }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+
+      return await response.json();
+    } catch (error) {
+    } finally {
+      // await refreshList();
+    }
+  }
+
+  async guaranteeRemove(lot) {
+    try {
+      const authToken = authService.getAuthToken();
+
+      const response = await fetch(URL + `lots/${lot.id}/guarantee`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Basic ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+
+      return await response.json();
+    } catch (error) {
+    } finally {
+      // await refreshList();
+    }
+  }
+
   async getApprovedSubscriptions() {
     try {
       const authToken = authService.getAuthToken();
@@ -100,6 +195,52 @@ class LotsService {
       return result;
     } catch (error) {
       throw error;
+    }
+  }
+
+  async securityCheckApprove(lot) {
+    try {
+      const authToken = authService.getAuthToken();
+
+      const response = await fetch(URL + `lots/${lot.id}/security`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Basic ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+
+      return await response.json();
+    } catch (error) {
+    } finally {
+      // await refreshList();
+    }
+  }
+
+  async securityCheckDecline(lot) {
+    try {
+      const authToken = authService.getAuthToken();
+
+      const response = await fetch(URL + `lots/${lot.id}/security`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Basic ${authToken}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+
+      return await response.json();
+    } catch (error) {
+    } finally {
+      // await refreshList();
     }
   }
 }

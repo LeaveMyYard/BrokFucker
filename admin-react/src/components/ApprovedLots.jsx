@@ -9,26 +9,6 @@ const ApprovedLots = () => {
   const [loading, setLoading] = useState(true);
   const [lots, setLots] = useState();
 
-  const onSubscriptionApprove = async (id) => {
-    try {
-      const authToken = authService.getAuthToken();
-      const response = await fetch(URL + `lots/subscription/${id}/approve`, {
-        method: "GET",
-        headers: {
-          Authorization: `Basic ${authToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Unsuccessfull response");
-      }
-      return await response.json();
-    } catch (error) {
-    } finally {
-      await refreshList();
-    }
-  };
-
   const onSubscriptionDecline = async (id) => {
     try {
       const authToken = authService.getAuthToken();
@@ -75,7 +55,7 @@ const ApprovedLots = () => {
         <h1 className="heading">Loading...</h1>
       ) : lots.lots.length !== 0 ? (
         <div>
-          <h1 className="heading">Подтвержденные лоты</h1>
+          <h1 className="heading">Подтвержденные подписки</h1>
           <table className="lot-table">
             <tr>
               <th>№</th>
@@ -83,6 +63,7 @@ const ApprovedLots = () => {
               <th>Сообщение</th>
               <th>Тип</th>
               <th>Подписчик</th>
+              <th>Убрать подписку</th>
             </tr>
             {lots.lots.map((lot, index) => (
               <tr>
@@ -93,6 +74,11 @@ const ApprovedLots = () => {
                 <td>{lot.message ? lot.message : "Не указано"}</td>
                 <td>{Translate(lot.type)}</td>
                 <td>{lot.user}</td>
+                <td>
+                  <button onClick={() => onSubscriptionDecline(lot.id)}>
+                    Remove
+                  </button>
+                </td>
               </tr>
             ))}
           </table>

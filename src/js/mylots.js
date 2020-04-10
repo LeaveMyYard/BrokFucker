@@ -313,7 +313,12 @@ const createLotAndListeners = async (
                 <label for="club_guarantee_req_${lot.id}">ГАРАНТИЯ КЛУБА</label>
                 </div>
                 <div class="mylots_label_container">
-                <span>Заказать: </span>
+                ${
+                  lot.security_checked
+                    ? `<span>Заказать: </span>
+                   <input disabled checked type="checkbox" id="verification_req_${lot.id}">
+                  <label for="verification_req_${lot.id}">ПРОВЕРЕННОЕ ОБЕСПЕЧЕНИЕ УЖЕ ОФОРМЛЕНО</label>`
+                    : `<span>Заказать: </span>
                 ${
                   lot.verification_requested
                     ? `<input checked type="checkbox" id="verification_req_${lot.id}">`
@@ -321,7 +326,8 @@ const createLotAndListeners = async (
                 }
                 <label for="verification_req_${
                   lot.id
-                }">ПРОВЕРЕННОЕ ОБЕСПЕЧЕНИЕ</label>
+                }">ПРОВЕРЕННОЕ ОБЕСПЕЧЕНИЕ</label>`
+                }
                 </div>
                 <div class="btnContainer">
                   <button class="deleteLotBtn btn">Удалить</button>
@@ -704,6 +710,7 @@ const createArchiveLotAndListeners = async (
         });
         if (response.ok) {
           console.log(response);
+          location.reload();
           clearArchiveLots();
           getMyArchiveLots();
         } else throw new Error(error);
@@ -759,6 +766,7 @@ const getMyLots = async () => {
     }
 
     const result = await response.json();
+    console.log(result);
     if (result.length == 0) {
       myLotsHeading.innerText = `Похоже, что у Вас ещё нет лотов!`;
     } else {
@@ -786,6 +794,7 @@ const getMyArchiveLots = async () => {
     if (result.length == 0) {
       myArchiveLotsHeading.innerText = `Похоже, что у Вас нет архивных лотов!`;
     } else {
+      myArchiveLotsHeading.innerText = "";
       manageArchiveLots(result);
     }
   } catch (error) {
@@ -944,7 +953,7 @@ createLotPublish.addEventListener("click", async function (e) {
   }
   try {
     const response = await fetch(
-      URL + `lots/personal/` + newLotID + `/request/verification`,
+      URL + `lots/personal/` + newLotID + `/request/verify_security`,
       {
         method: "PUT",
         headers: {
