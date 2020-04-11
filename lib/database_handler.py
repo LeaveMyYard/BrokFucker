@@ -148,6 +148,17 @@ class DatabaseHandler:
 
         return res[0] == hashlib.sha256(password.encode('utf-8')).hexdigest()
 
+
+    def get_users_password_hash(self, email: str) -> str:
+        if not self.check_user_exists(email):
+            return None
+
+        self.cursor.execute(
+            f"SELECT `password` FROM Users WHERE `email` = ?",
+            (email, )
+        )
+        return self.cursor.fetchone()[0]
+
     def is_moderator(self, email: str) -> bool:
         if not self.check_user_exists(email):
             return False
@@ -186,7 +197,7 @@ class DatabaseHandler:
         if len(password) > 32:
             raise APIExceptions.RegistrationError(-1201, 'A password size is bigger than 32.')
 
-        password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
+        password_hash = password
         random_hash = self.generage_new_random_hash()
         reg_date = datetime.now()
 

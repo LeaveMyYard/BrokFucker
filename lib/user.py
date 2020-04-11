@@ -1,4 +1,4 @@
-from flask_httpauth import HTTPBasicAuth
+from flask_httpauth import HTTPDigestAuth
 from lib.database_handler import DatabaseHandler
 from flask import Flask, abort, jsonify, request, make_response
 from lib.util.exceptions import EmailValidationError
@@ -11,16 +11,21 @@ from lib.util.enums import SubscriptionTypes
 import sqlite3
 
 class User:
-    auth = HTTPBasicAuth()
+    auth = HTTPDigestAuth(use_ha1_pw=True)
     login_required = auth.login_required
     email = auth.username
 
     @staticmethod
-    @auth.verify_password
-    def verify_password(email, password):
+    @auth.get_password
+    def get_user_password(email):
         database = DatabaseHandler()
-        # print(f'  Login made: {email}|{password}')
-        return database.check_password(email, password)
+        return database.get_users_password_hash(email)
+
+    # @staticmethod
+    # @auth.verify_password
+    # def verify_password(email, password):
+    #     database = DatabaseHandler()
+    #     return database.check_password(email, password)
 
     @staticmethod
     @auth.error_handler
@@ -30,7 +35,7 @@ class User:
     @staticmethod
     def begin_email_verification(email, password):
         database = DatabaseHandler()
-        database.create_email_confirmation_request(email, password)
+        database.create_email_confirmation_request(email, User.auth.generate_ha1(email, password))
 
     @staticmethod
     def verify_email_from_code(code):

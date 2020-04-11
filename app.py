@@ -27,6 +27,7 @@ logger = init_logger(__name__)
 
 app.config['UPLOAD_FOLDER'] = 'data/images/upload'
 app.config['MAX_CONTENT_PATH'] = Settings.get_maximum_image_size()
+app.config['SECRET_KEY'] = 'A?D(G+KbPeShVmYq3t6v9y$B&E)H@McQfTjWnZr4u7x!z%C*F-JaNdRgUkXp2s5v'
 
 ip_weights = {
     '1s': {},
