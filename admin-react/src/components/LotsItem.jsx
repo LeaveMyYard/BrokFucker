@@ -92,6 +92,9 @@ export default function LotsItem({
     <tr key={lot.id}>
       <td>{dateFix(lot.date)}</td>
       <td>{lot.name}</td>
+      <td>
+        <a href={`/lot.html?id=${lot.id}`}>Страница лота</a>
+      </td>
       <td>{lot.user}</td>
       <td>{lot.amount}</td>
       <td>{lot.currency}</td>

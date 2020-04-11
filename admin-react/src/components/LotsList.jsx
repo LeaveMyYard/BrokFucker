@@ -26,6 +26,7 @@ export function LotsList({
         <tr>
           <th>Дата</th>
           <th>Название лота</th>
+          <th>Страница лота</th>
           <th>Имя</th>
           <th>Сумма</th>
           <th>Валюта</th>
@@ -45,38 +46,6 @@ export function LotsList({
         {list.map((lot, lotIndex) => (
           <LotsItem key={lot.id} lot={lot} refreshList={refreshList} />
         ))}
-        {/* {list.map((lot, lotIndex) => (
-          <tr key={lot.id}>
-            <td>{dateFix(lot.date)}</td>
-            <td>{lot.name}</td>
-            <td>{lot.user}</td>
-            <td>{lot.amount}</td>
-            <td>{lot.currency}</td>
-            <td>{lot.term}</td>
-            <td>{Translate(lot.return_way)}</td>
-            <td>{lot.security}</td>
-            <td>{lot.percentage}</td>
-            <td>{Translate(lot.form)}</td>
-            <td>{lot.security_checked ? "Да" : "Нет"}</td>
-            <td>
-              {isGuaranteeList ? (
-                <input
-                  type="number"
-                  value={lot.guarantee_percentage}
-                  onChange={(event) =>
-                    onLotGuaranteeChange(event, lot, lotIndex)
-                  }
-                ></input>
-              ) : (
-                lot.guarantee_percentage
-              )}
-            </td>
-            <td>
-              <button onClick={() => onApprove(lot)}>Approve</button>
-              <button onClick={() => onRemove(lot)}>Remove</button>
-            </td>
-          </tr>
-        ))} */}
       </tbody>
       {/* <Modal show={show} /> */}
     </table>
