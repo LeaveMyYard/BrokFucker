@@ -481,6 +481,12 @@ main {
 .my-lots-archived {
   display: none;
 }
+.my-lots-finished {
+  display: none;
+}
+.my-lots-sponsored {
+  display: none;
+}
 
 .linkToLotPage {
   color: #9198e5;
@@ -569,4 +575,9 @@ main {
 
 .mylots_label_container {
   margin: 20px 0;
+}
+
+.my_lots-btn_container {
+  display: flex;
+  justify-content: space-between;
 }

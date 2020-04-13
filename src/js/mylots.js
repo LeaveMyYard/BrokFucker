@@ -9,7 +9,11 @@ const createLotBtn = document.getElementById("createLot");
 const createLotPublish = document.getElementById("createLotPublish");
 const myLotsBtn = document.getElementById("myLotsButton");
 const archiveLotsBtn = document.getElementById("archiveLotsButton");
+const sponsoredLotsBtn = document.getElementById("sponsoredLotsButton");
+const finishedLotsBtn = document.getElementById("finishedLotsButton");
 const myArchiveLotsContainer = document.querySelector(".my-lots-archived");
+const mySponsoredLotsContainer = document.querySelector(".my-lots-sponsored");
+const myFinishedLotsContainer = document.querySelector(".my-lots-finished");
 
 // create lot form
 const createLotName = document.getElementsByName("create_lot_name")[0];
@@ -755,6 +759,7 @@ const manageArchiveLots = async (sourceLots) => {
 
   lotEls.forEach((lotEl) => myArchiveLotsContainer.appendChild(lotEl));
 };
+//copy paste this part
 
 const getMyLots = async () => {
   try {
@@ -805,6 +810,288 @@ const getMyArchiveLots = async () => {
 };
 
 getMyArchiveLots();
+
+const getMySponsoredLots = async () => {
+  try {
+    const response = await fetch(URL + "lots/personal/taken", {
+      method: "GET",
+      headers: { Authorization: `Basic ${encData()}` },
+    });
+
+    if (!response.ok) {
+      throw new Error("Unsuccessfull response");
+    }
+
+    const result = await response.json();
+    if (result.length == 0) {
+      mySponsoredLotsHeading.innerText = `Похоже, что у Вас нет спонсируемых лотов!`;
+    } else {
+      mySponsoredLotsHeading.innerText = "";
+      result.map((lot, index) => {
+        mySponsoredLotsContainer.innerHTML += `<div class="userSponsoredLots" data-id="myArchiveLotForm__${
+          index + 1
+        }">
+      <form>
+      <br />
+      <p><strong>${index + 1}</strong></p>
+      <br />
+      <label class="label lot_field" for="lot_name"
+          ><span>Название лота: </span>
+          <input disabled
+            class="inputName"
+            type="text"
+            name="lot_name"
+            value="${lot.name}"
+            required
+          />
+        </label>
+        <label class="label lot_field" for="lot_reqsum"
+          ><span>Необходимая сумма: </span>
+          <input disabled
+            class="inputReqSum"
+            type="number"
+            name="lot_reqsum"
+            value="${lot.amount}"
+            required
+          />
+        </label>
+        <label class="label lot_field" for="lot_currency"
+          ><span>Валюта: </span>
+              <select disabled id="selectLotCurrency">
+                ${currencySelectOptions.map((curr) => {
+                  if (lot.currency == curr) {
+                    return `<option selected value="${curr}">${curr}</option>`;
+                  } else {
+                    return `<option value="${curr}">${curr}</option>`;
+                  }
+                })}
+              </select>
+              
+        </label>
+        <label class="label lot_field" for="lot_reqmonths"
+          ><span>Срок, месяцев: </span>
+          <input disabled
+            class="inputReqMonths"
+            type="number"
+            name="lot_reqmonths"
+            value="${lot.term}"
+            required
+          />
+        </label>
+        <label class="label lot_field" for="lot_percentage"
+          ><span>Ставка, годовых: </span>
+          <input disabled
+            type="number"
+            name="lot_percentage"
+            value="${lot.percentage}"
+            required
+          />
+        </label>
+        <label class="label lot_field" for="lot_method"
+          ><span>Метод погашения: </span>
+          <select disabled id="selectReturnWayOption">
+          ${returnSelectOptions.map((way) => {
+            if (lot.return_way == way) {
+              return `<option selected value="${way}">${translate(
+                way
+              )}</option>`;
+            } else {
+              return `<option value="${way}">${translate(way)}</option>`;
+            }
+          })}
+          </select>
+        </label>
+        <label class="label lot_field" for="lot_security"
+          ><span>Обеспечение: </span>
+          <input disabled
+            type="text"
+            name="lot_security"
+            value="${lot.security}"
+            required
+          />
+        </label>
+        <label class="label lot_field" for="lot_cred"
+          ><span>Форма кредитирования: </span>
+          <select disabled id="selectLotForm">
+                ${formSelectOptions.map((form) => {
+                  if (lot.form == form) {
+                    return `<option selected value="${form}">${translate(
+                      form
+                    )}</option>`;
+                  } else {
+                    return `<option value="${form}">${translate(
+                      form
+                    )}</option>`;
+                  }
+                })}
+              </select>
+        </label>
+        <label class="label lot_field" for="lot_shortdesc"
+          ><span>Короткое описание: </span>
+          <textarea disabled
+            name="lot_shortdesc"
+          >${lot.commentary}
+          </textarea>
+        </label>
+        </form>
+        
+        <div class="swiper-archived-container">
+        ${lot.photos.photos
+          .map((photo) => {
+            return `<img class="lot_photo" src="${photo}"></img>`;
+          })
+          .join("")}  
+        </div>
+        </div>`;
+      });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+getMySponsoredLots();
+
+const getMyFinishedLots = async () => {
+  try {
+    const response = await fetch(URL + "lots/personal/finished", {
+      method: "GET",
+      headers: { Authorization: `Basic ${encData()}` },
+    });
+
+    if (!response.ok) {
+      throw new Error("Unsuccessfull response");
+    }
+
+    const result = await response.json();
+    if (result.length == 0) {
+      myFinishedLotsHeading.innerText = `Похоже, что у Вас нет завершенных лотов!`;
+    } else {
+      myFinishedLotsHeading.innerText = "";
+      result.map((lot, index) => {
+        myFinishedLotsContainer.innerHTML += `<div class="userFinishedLots" data-id="myFinishedLotForm__${
+          index + 1
+        }">
+      <form>
+      <br />
+      <p><strong>${index + 1}</strong></p>
+      <br />
+      <label class="label lot_field" for="lot_name"
+          ><span>Название лота: </span>
+          <input disabled
+            class="inputName"
+            type="text"
+            name="lot_name"
+            value="${lot.name}"
+            required
+          />
+        </label>
+        <label class="label lot_field" for="lot_reqsum"
+          ><span>Необходимая сумма: </span>
+          <input disabled
+            class="inputReqSum"
+            type="number"
+            name="lot_reqsum"
+            value="${lot.amount}"
+            required
+          />
+        </label>
+        <label class="label lot_field" for="lot_currency"
+          ><span>Валюта: </span>
+              <select disabled id="selectLotCurrency">
+                ${currencySelectOptions.map((curr) => {
+                  if (lot.currency == curr) {
+                    return `<option selected value="${curr}">${curr}</option>`;
+                  } else {
+                    return `<option value="${curr}">${curr}</option>`;
+                  }
+                })}
+              </select>
+              
+        </label>
+        <label class="label lot_field" for="lot_reqmonths"
+          ><span>Срок, месяцев: </span>
+          <input disabled
+            class="inputReqMonths"
+            type="number"
+            name="lot_reqmonths"
+            value="${lot.term}"
+            required
+          />
+        </label>
+        <label class="label lot_field" for="lot_percentage"
+          ><span>Ставка, годовых: </span>
+          <input disabled
+            type="number"
+            name="lot_percentage"
+            value="${lot.percentage}"
+            required
+          />
+        </label>
+        <label class="label lot_field" for="lot_method"
+          ><span>Метод погашения: </span>
+          <select disabled id="selectReturnWayOption">
+          ${returnSelectOptions.map((way) => {
+            if (lot.return_way == way) {
+              return `<option selected value="${way}">${translate(
+                way
+              )}</option>`;
+            } else {
+              return `<option value="${way}">${translate(way)}</option>`;
+            }
+          })}
+          </select>
+        </label>
+        <label class="label lot_field" for="lot_security"
+          ><span>Обеспечение: </span>
+          <input disabled
+            type="text"
+            name="lot_security"
+            value="${lot.security}"
+            required
+          />
+        </label>
+        <label class="label lot_field" for="lot_cred"
+          ><span>Форма кредитирования: </span>
+          <select disabled id="selectLotForm">
+                ${formSelectOptions.map((form) => {
+                  if (lot.form == form) {
+                    return `<option selected value="${form}">${translate(
+                      form
+                    )}</option>`;
+                  } else {
+                    return `<option value="${form}">${translate(
+                      form
+                    )}</option>`;
+                  }
+                })}
+              </select>
+        </label>
+        <label class="label lot_field" for="lot_shortdesc"
+          ><span>Короткое описание: </span>
+          <textarea disabled
+            name="lot_shortdesc"
+          >${lot.commentary}
+          </textarea>
+        </label>
+        </form>
+        
+        <div class="swiper-archived-container">
+        ${lot.photos.photos
+          .map((photo) => {
+            return `<img class="lot_photo" src="${photo}"></img>`;
+          })
+          .join("")}  
+        </div>
+        </div>`;
+      });
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+getMyFinishedLots();
 
 async function clearLots() {
   let userLots = $(".userLots");
@@ -998,15 +1285,47 @@ createLotPublish.addEventListener("change", validateForm);
 archiveLotsBtn.addEventListener("click", function (e) {
   e.preventDefault();
   myLotsBtn.classList.remove("btnActive");
+  sponsoredLotsBtn.classList.remove("btnActive");
+  finishedLotsBtn.classList.remove("btnActive");
   archiveLotsBtn.classList.add("btnActive");
   myLotsContainer.style.display = "none";
+  myFinishedLotsContainer.style.display = "none";
+  mySponsoredLotsContainer.style.display = "none";
   myArchiveLotsContainer.style.display = "block";
 });
 
 myLotsBtn.addEventListener("click", function (e) {
   e.preventDefault();
-  archiveLotsBtn.classList.remove("btnActive");
   myLotsBtn.classList.add("btnActive");
+  sponsoredLotsBtn.classList.remove("btnActive");
+  finishedLotsBtn.classList.remove("btnActive");
+  archiveLotsBtn.classList.remove("btnActive");
   myLotsContainer.style.display = "block";
+  myFinishedLotsContainer.style.display = "none";
+  mySponsoredLotsContainer.style.display = "none";
+  myArchiveLotsContainer.style.display = "none";
+});
+
+sponsoredLotsBtn.addEventListener("click", function (e) {
+  e.preventDefault();
+  myLotsBtn.classList.remove("btnActive");
+  sponsoredLotsBtn.classList.add("btnActive");
+  finishedLotsBtn.classList.remove("btnActive");
+  archiveLotsBtn.classList.remove("btnActive");
+  myLotsContainer.style.display = "none";
+  myFinishedLotsContainer.style.display = "none";
+  mySponsoredLotsContainer.style.display = "block";
+  myArchiveLotsContainer.style.display = "none";
+});
+
+finishedLotsBtn.addEventListener("click", function (e) {
+  e.preventDefault();
+  myLotsBtn.classList.remove("btnActive");
+  sponsoredLotsBtn.classList.remove("btnActive");
+  finishedLotsBtn.classList.add("btnActive");
+  archiveLotsBtn.classList.remove("btnActive");
+  myLotsContainer.style.display = "none";
+  myFinishedLotsContainer.style.display = "block";
+  mySponsoredLotsContainer.style.display = "none";
   myArchiveLotsContainer.style.display = "none";
 });

@@ -7,7 +7,7 @@ export default function Translate(data) {
     term_end: "Окончание срока",
     other: "Другое",
     Email: "Email",
-    Phone: "Телефон",
+    PhoneCall: "Телефон",
   };
 
   return vocabulary[data];
