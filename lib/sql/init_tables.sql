@@ -263,4 +263,5 @@ AS
         SELECT `id` 
         FROM Lots
         WHERE `deleted` = 'False'
-    );
+    )
+    AND `lot` NOT IN ConfirmedLots;
