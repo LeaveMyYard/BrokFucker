@@ -114,7 +114,8 @@ CREATE VIEW IF NOT EXISTS LiveLots
 AS
     SELECT *
     FROM Lots
-    WHERE `confirmed` = 'True' AND `deleted` = 'False';
+    WHERE `confirmed` = 'True' 
+    AND `deleted` = 'False';
 
 CREATE VIEW IF NOT EXISTS LiveUnacceptedLots
 AS
@@ -128,14 +129,28 @@ CREATE TABLE IF NOT EXISTS SubscriptionRequests (
     `lot` INTEGER NOT NULL,
     `type` INTEGER NOT NULL,
     `message` TEXT,
-    `confirmed` BOOLEAN NOT NULL DEFAULT 'False'
+    `confirmed` BOOLEAN NOT NULL DEFAULT 'False',
+    `finished` BOOLEAN NOT NULL DEFAULT 'False'
 );
+
+CREATE VIEW IF NOT EXISTS FinishedSubscriptions
+AS
+    SELECT `id`, `user`, `lot`, `type`, `message`
+    FROM SubscriptionRequests
+    WHERE `finished` = 'True' 
+    AND `lot` IN (
+        SELECT `id` 
+        FROM Lots
+        WHERE `deleted` = 'False'
+    );
 
 CREATE VIEW IF NOT EXISTS ConfirmedSubscriptions
 AS
     SELECT `id`, `user`, `lot`, `type`, `message`
     FROM SubscriptionRequests
-    WHERE `confirmed` = 'True' AND `lot` IN (
+    WHERE `confirmed` = 'True'
+    AND `finished` = 'False' 
+    AND `lot` IN (
         SELECT `id` 
         FROM Lots
         WHERE `deleted` = 'False'
@@ -145,7 +160,8 @@ CREATE VIEW IF NOT EXISTS UnconfirmedSubscriptions
 AS
     SELECT `id`, `user`, `lot`, `type`, `message`
     FROM SubscriptionRequests
-    WHERE `confirmed` = 'False' AND `lot` IN (
+    WHERE `confirmed` = 'False'
+    AND `lot` IN (
         SELECT `id` 
         FROM Lots
         WHERE `deleted` = 'False'
