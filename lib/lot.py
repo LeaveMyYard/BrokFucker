@@ -158,6 +158,16 @@ class Lot:
         return database.get_personal(user, lot_filter=Lot.check_filter(lot_filter))
 
     @staticmethod
+    def get_personal_confirmed(user, lot_filter = None):
+        database = DatabaseHandler()
+        return database.get_personal_confirmed(user, lot_filter=Lot.check_filter(lot_filter))
+
+    @staticmethod
+    def get_personal_finished(user, lot_filter = None):
+        database = DatabaseHandler()
+        return database.get_personal_finished(user, lot_filter=Lot.check_filter(lot_filter))
+
+    @staticmethod
     def get_personal_deleted(user, lot_filter = None):
         database = DatabaseHandler()
         return database.get_personal_deleted(user, lot_filter=Lot.check_filter(lot_filter))

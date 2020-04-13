@@ -509,6 +509,7 @@ class RestAPI:
 
     @staticmethod
     @route('lots/personal', methods=['GET', 'POST'])
+    @route('lots/personal/current', methods=['GET', 'POST'])
     @user.login_required
     @weighted(weight=3)
     def get_personal_lots():
@@ -520,6 +521,34 @@ class RestAPI:
             lot_filter = request_json['filter'] if 'filter' in request_json else {}
 
         return jsonify(Lot.get_personal(user.email(), lot_filter)), 200
+
+    @staticmethod
+    @route('lots/personal/taken', methods=['GET', 'POST'])
+    @user.login_required
+    @weighted(weight=3)
+    def get_personal_taken_lots():
+        try:
+            request_json = RestAPI.request_data_to_json(request.data)
+        except APIExceptions.NoJsonError:
+            lot_filter = {}
+        else:
+            lot_filter = request_json['filter'] if 'filter' in request_json else {}
+
+        return jsonify(Lot.get_personal_confirmed(user.email(), lot_filter)), 200
+
+    @staticmethod
+    @route('lots/personal/finished', methods=['GET', 'POST'])
+    @user.login_required
+    @weighted(weight=3)
+    def get_personal_finished_lots():
+        try:
+            request_json = RestAPI.request_data_to_json(request.data)
+        except APIExceptions.NoJsonError:
+            lot_filter = {}
+        else:
+            lot_filter = request_json['filter'] if 'filter' in request_json else {}
+
+        return jsonify(Lot.get_personal_finished(user.email(), lot_filter)), 200
 
     @staticmethod
     @route('lots/personal/deleted', methods=['GET', 'POST'])

@@ -140,6 +140,20 @@ CREATE TABLE IF NOT EXISTS SubscriptionRequests (
     `finished` BOOLEAN NOT NULL DEFAULT 'False'
 );
 
+CREATE VIEW IF NOT EXISTS ConfirmedLots
+AS
+    SELECT `lot`
+    FROM SubscriptionRequests
+    WHERE `confirmed` = 'True'
+    GROUP BY `lot`
+
+CREATE VIEW IF NOT EXISTS FinishedLots
+AS
+    SELECT `lot`
+    FROM SubscriptionRequests
+    WHERE `finished` = 'True'
+    GROUP BY `lot`
+
 CREATE VIEW IF NOT EXISTS FinishedSubscriptions
 AS
     SELECT `id`, `user`, `lot`, `type`, `message`

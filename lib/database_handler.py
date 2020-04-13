@@ -716,7 +716,8 @@ class DatabaseHandler:
 
     def get_favorites(self, email, lot_filter):
         self.cursor.execute(
-            f"SELECT `favorite_lots` FROM UsersLots WHERE `email` = ?" + self.__format_sql_lot_filter_string(lot_filter, where_is_already_used=True), 
+            f"SELECT `favorite_lots` FROM UsersLots WHERE `email` = ?" +
+            self.__format_sql_lot_filter_string(lot_filter, where_is_already_used=True), 
             (email, )
         )
         
@@ -726,7 +727,30 @@ class DatabaseHandler:
 
     def get_personal(self, email, lot_filter):
         self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `user` = ? and `deleted` = 'False'" + self.__format_sql_lot_filter_string(lot_filter, where_is_already_used=True),
+            f"SELECT * FROM Lots WHERE `user` = ? AND `deleted` = 'False' "
+            "AND `id` NOT IN ConfirmedLots "
+            "AND `id` NOT IN FinishedLots" +
+            self.__format_sql_lot_filter_string(lot_filter, where_is_already_used=True),
+            (email, )
+        )
+
+        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
+
+    def get_personal_confirmed(self, email, lot_filter):
+        self.cursor.execute(
+            f"SELECT * FROM Lots WHERE `user` = ? AND `deleted` = 'False' "
+            "AND `id` IN ConfirmedLots " +
+            self.__format_sql_lot_filter_string(lot_filter, where_is_already_used=True),
+            (email, )
+        )
+
+        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
+
+    def get_personal_finished(self, email, lot_filter):
+        self.cursor.execute(
+            f"SELECT * FROM Lots WHERE `user` = ? AND `deleted` = 'False' "
+            "AND `id` IN FinishedLots " +
+            self.__format_sql_lot_filter_string(lot_filter, where_is_already_used=True),
             (email, )
         )
 
