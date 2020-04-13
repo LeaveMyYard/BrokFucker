@@ -22,6 +22,26 @@ class LotsService {
     }
   }
 
+  async getLotsArchive() {
+    try {
+      const authToken = authService.getAuthToken();
+
+      const response = await fetch(URL + "lots/archive", {
+        method: "GET",
+        headers: { Authorization: `Basic ${authToken}` },
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+      console.log(response);
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async approve(lot) {
     try {
       const authToken = authService.getAuthToken();
@@ -73,7 +93,13 @@ class LotsService {
   async guaranteeApprove(lot) {
     try {
       const authToken = authService.getAuthToken();
-      const guarantee = lot.guarantee_percentage;
+      let guarantee = lot.guarantee_percentage;
+      if (guarantee < 0) {
+        guarantee = 0;
+      }
+      if (guarantee > 100) {
+        guarantee = 100;
+      }
       const response = await fetch(URL + `lots/${lot.id}/guarantee`, {
         method: "PUT",
         headers: {

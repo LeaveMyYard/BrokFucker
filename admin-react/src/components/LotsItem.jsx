@@ -82,8 +82,6 @@ export default function LotsItem({
       result = undefined;
     }
 
-    // console.log(`onGuaranteeChange() args:`, result, typeof result);
-
     lot.guarantee_percentage = result;
     setGuarantee(lot.guarantee_percentage);
   };
@@ -95,6 +93,7 @@ export default function LotsItem({
       <td>
         <a href={`/lot.html?id=${lot.id}`}>Страница лота</a>
       </td>
+      {lotsPageType === lotsPageTypesEnum.ARCHIVE && <td>Archive Link</td>}
       <td>{lot.user}</td>
       <td>{lot.amount}</td>
       <td>{lot.currency}</td>
@@ -120,6 +119,8 @@ export default function LotsItem({
           <div>
             <input
               type="number"
+              min="0"
+              max="100"
               value={guarantee}
               onChange={(event) => onGuaranteeChange(event, lot, lotIndex)}
             ></input>
