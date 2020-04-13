@@ -798,8 +798,10 @@ class Server:
     @staticmethod
     def process_exception(ex, error):
         if not request.path.startswith('/api/') and ex in WebApp.exceptions_responses:
+            self.logger.error(f'Website error {ex}: {error}')
             return WebApp.exceptions_responses[ex](error), ex if isinstance(ex, int) else 403
         elif ex in RestAPI.exceptions_responses:
+            self.logger.error(f'RestAPI error {ex}: {error}')
             return make_response(jsonify(RestAPI.exceptions_responses[ex](error)), ex if isinstance(ex, int) else 403)
             
 
