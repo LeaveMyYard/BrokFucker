@@ -771,6 +771,34 @@ class RestAPI:
         Lot.set_subscription_approved(id, approved=False)
         return RestAPI.message(f'Subscription {id} is now unapproved.'), 201
 
+    @staticmethod
+    @route('lots/archive', methods=['GET', 'POST'])
+    @administrator.login_required
+    @weighted(weight=5)
+    def get_lots_archive():
+        try:
+            request_json = RestAPI.request_data_to_json(request.data)
+        except APIExceptions.NoJsonError:
+            lot_filter = {}
+        else:
+            lot_filter = request_json['filter'] if 'filter' in request_json else {}
+
+        return jsonify(Lot.get_archive(lot_filter)), 200
+
+    @staticmethod
+    @route('lots/archive/<int:lot_id>', methods=['GET', 'POST'])
+    @administrator.login_required
+    @weighted(weight=5)
+    def get_lot_archive_history(lot_id):
+        try:
+            request_json = RestAPI.request_data_to_json(request.data)
+        except APIExceptions.NoJsonError:
+            lot_filter = {}
+        else:
+            lot_filter = request_json['filter'] if 'filter' in request_json else {}
+
+        return jsonify(Lot.get_archived_history(lot_id, lot_filter)), 200
+
     # -------------------------------------------------------------------------
     # Admin stuff
     # -------------------------------------------------------------------------

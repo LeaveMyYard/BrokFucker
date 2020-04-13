@@ -76,6 +76,83 @@ CREATE TABLE IF NOT EXISTS Lots (
     FOREIGN KEY (`user`) REFERENCES Users(`email`)
 );
 
+CREATE TABLE IF NOT EXISTS LotsArchive (
+    `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+    `date` DATETIME NOT NULL,
+    `name` TEXT NOT NULL,
+    `user` TEXT NOT NULL,
+    `amount` TEXT NOT NULL,
+    `currency` TEXT NOT NULL,
+    `term` INTEGER NOT NULL,
+    `return_way` INTEGER NOT NULL,
+    `security` TEXT NOT NULL,
+    `percentage` FLOAT NOT NULL,
+    `form` INT NOT NULL,
+    `security_checked` BOOLEAN NOT NULL DEFAULT 'False',
+    `guarantee_percentage` FLOAT NOT NULL DEFAULT '0',
+    `confirmed` BOOLEAN NOT NULL DEFAULT 'False',
+    `deleted` BOOLEAN NOT NULL DEFAULT 'False',
+    `commentary` TEXT DEFAULT '',
+    `photos` TEXT DEFAULT '[]',
+    `original_id` INTEGER NOT NULL,
+    `approve_date` DATETIME NOT NULL,
+    FOREIGN KEY (`user`) REFERENCES Users(`email`)
+);
+
+CREATE VIEW IF NOT EXISTS ArchiveLatestLots
+AS
+	SELECT 
+        ET1.`original_id` AS `id`, 
+		`date`,
+		`name`,
+		`user`,
+		`amount`,
+		`currency`,
+		`term`,
+		`return_way`,
+		`security`,
+		`percentage`,
+		`form`,
+		`security_checked`,
+		`guarantee_percentage`,
+		`confirmed`,
+		`deleted`,
+		`commentary`,
+		`photos`
+	FROM `LotsArchive` AS ET1
+	INNER JOIN (
+		SELECT original_id, 
+		MAX(approve_date) AS approve_date
+		FROM `LotsArchive`
+		GROUP BY original_id
+	) AS ET2
+	ON ET1.original_id = ET2.original_id
+	AND ET1.approve_date = ET2.approve_date;
+
+CREATE TRIGGER IF NOT EXISTS LotArchivation
+AFTER UPDATE ON Lots
+WHEN NEW.confirmed = 'True'
+	BEGIN
+        INSERT INTO LotsArchive(
+            'date', 'name', 'user',
+            'amount', 'currency', 'term',
+            'return_way', 'security',
+            'percentage', 'form', 'security_checked',
+            'guarantee_percentage', 'confirmed',
+            'deleted', 'commentary', 'photos',
+            'original_id', 'approve_date'
+        )
+        VALUES (
+            new.date, new.name, new.user,
+            new.amount, new.currency, new.term,
+            new.return_way, new.security,
+            new.percentage, new.form, new.security_checked,
+            new.guarantee_percentage, new.confirmed,
+            new.deleted, new.commentary, new.photos,
+            new.id, datetime('now')
+        );
+	END;
+
 CREATE TABLE IF NOT EXISTS LotGuaranteeRequests (
     `id` INTEGER PRIMARY KEY,
     FOREIGN KEY (`id`) REFERENCES Lots(`id`)

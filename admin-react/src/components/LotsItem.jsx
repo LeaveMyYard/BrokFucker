@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-
+import { useHistory, Link } from "react-router-dom";
 import lotsService from "../services/Lots";
 import translateService from "../services/Translate";
 import dateFix from "../utils/dateFix";
@@ -12,6 +12,11 @@ export default function LotsItem({
 }) {
   const [guarantee, setGuarantee] = useState(lot.guarantee_percentage);
   const lotsPageType = useContext(LotsPageTypeContext);
+  const history = useHistory();
+
+  const handleRedirect = (lotID) => {
+    history.push(`/lots/archive/${lotID}`);
+  };
 
   const onApprove = async () => {
     try {
@@ -82,8 +87,6 @@ export default function LotsItem({
       result = undefined;
     }
 
-    // console.log(`onGuaranteeChange() args:`, result, typeof result);
-
     lot.guarantee_percentage = result;
     setGuarantee(lot.guarantee_percentage);
   };
@@ -95,6 +98,13 @@ export default function LotsItem({
       <td>
         <a href={`/lot.html?id=${lot.id}`}>Страница лота</a>
       </td>
+      {lotsPageType === lotsPageTypesEnum.ARCHIVE && (
+        <td>
+          <Link to={`/admin/dashboard/lots/archive/${lot.id}`}>
+            История лота
+          </Link>
+        </td>
+      )}
       <td>{lot.user}</td>
       <td>{lot.amount}</td>
       <td>{lot.currency}</td>
@@ -120,6 +130,8 @@ export default function LotsItem({
           <div>
             <input
               type="number"
+              min="0"
+              max="100"
               value={guarantee}
               onChange={(event) => onGuaranteeChange(event, lot, lotIndex)}
             ></input>

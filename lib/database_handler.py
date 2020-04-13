@@ -825,10 +825,8 @@ class DatabaseHandler:
             (lot_id, )
         )
         photos: list = eval(self.cursor.fetchone()[0])
-        photo_hash = photos.pop(photo_id)
+        photos.pop(photo_id)
         stringified_photos = str(photos).replace('\'', '"')
-
-        remove(f'data/images/lots/{photo_hash}.jpg')
 
         self.cursor.execute(
             f"UPDATE Lots SET `photos` = ? WHERE `id` = ?",
@@ -949,3 +947,28 @@ class DatabaseHandler:
         )
 
         return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
+
+    def get_archived_lots(self, lot_filter):
+        self.cursor.execute(
+            "SELECT * FROM ArchiveLatestLots" + self.__format_sql_lot_filter_string(lot_filter)
+        )
+
+        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
+
+    def get_archived_lot_history(self, lot_id, lot_filter):
+        self.cursor.execute(
+            "SELECT * FROM LotsArchive" + self.__format_sql_lot_filter_string(lot_filter)
+        )
+
+        table = self.cursor.fetchall()
+        res_list = []
+
+        for row in table:
+            row = list(row)
+            row[0], row[17] = row[17], row[0]
+            res = self.serialize_lot(row)
+            res['record_id'] = row[17]
+            res['approve_date'] = row[18]
+            res_list.append(res)
+
+        return res_list

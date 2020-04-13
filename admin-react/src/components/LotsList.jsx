@@ -27,6 +27,7 @@ export function LotsList({
           <th>Дата</th>
           <th>Название лота</th>
           <th>Страница лота</th>
+          {lotsPageType === lotsPageTypesEnum.ARCHIVE && <th>История лота</th>}
           <th>Имя</th>
           <th>Сумма</th>
           <th>Валюта</th>

@@ -1,6 +1,7 @@
 import React, { useState, createContext } from "react";
 import {
   BrowserRouter as Router,
+  useParams,
   Switch,
   Route,
   Link,
@@ -11,16 +12,19 @@ import LotsPage from "./LotsPage";
 import VerificationLots from "./VerificationLots";
 import GuaranteeLots from "./GuaranteeLots";
 import ModeratorsPage from "./ModeratorsPage";
+import LotHistoryPage from "./LotHistoryPage";
 import AuthService from "../services/Auth";
 import "../Admin.css";
 import logo from "../letter-a.png";
 import ApprovedLots from "./ApprovedLots";
 import UnapprovedLots from "./UnapprovedLots";
+import ArchivePage from "./ArchivePage";
 
 export const lotsPageTypesEnum = {
   UNAPPROVED: "UNAPPROVED",
   VERIFICATION: "VERIFICATION",
   GUARANTEE: "GUARANTEE",
+  ARCHIVE: "ARCHIVE",
 };
 
 export const LotsPageTypeContext = createContext(lotsPageTypesEnum.UNAPPROVED);
@@ -34,6 +38,8 @@ const Sidebar = (props) => {
       ? lotsPageTypesEnum.GUARANTEE
       : location.pathname.includes("/verification")
       ? lotsPageTypesEnum.VERIFICATION
+      : location.pathname.includes("/lots/archive")
+      ? lotsPageTypesEnum.ARCHIVE
       : undefined
   );
   const history = useHistory();
@@ -61,6 +67,12 @@ const Sidebar = (props) => {
                 to="/admin/dashboard/lots/unapproved"
               >
                 Лоты
+              </Link>
+              <Link
+                onClick={() => changeLotsPageType(lotsPageTypesEnum.ARCHIVE)}
+                to="/admin/dashboard/lots/archive"
+              >
+                Архивные <p>лоты</p>
               </Link>
               <Link to="/admin/dashboard/moderators">Модераторы</Link>
               <Link
@@ -90,6 +102,15 @@ const Sidebar = (props) => {
                 exact
                 path="/admin/dashboard/lots/unapproved"
                 component={LotsPage}
+              ></Route>
+              <Route
+                exact
+                path="/admin/dashboard/lots/archive"
+                component={ArchivePage}
+              ></Route>
+              <Route
+                path="/admin/dashboard/lots/archive/:id"
+                component={LotHistoryPage}
               ></Route>
               <Route
                 path="/admin/dashboard/moderators"
@@ -128,6 +149,12 @@ const Sidebar = (props) => {
                 Лоты
               </Link>
               <Link
+                onClick={() => changeLotsPageType(lotsPageTypesEnum.ARCHIVE)}
+                to="/admin/dashboard/lots/archive"
+              >
+                Архивные лоты
+              </Link>
+              <Link
                 onClick={() => changeLotsPageType(lotsPageTypesEnum.GUARANTEE)}
                 to="/admin/dashboard/guarantee"
               >
@@ -154,6 +181,11 @@ const Sidebar = (props) => {
                 exact
                 path="/admin/dashboard/lots/unapproved"
                 component={LotsPage}
+              ></Route>
+              <Route
+                exact
+                path="/admin/dashboard/lots/archive"
+                component={ArchivePage}
               ></Route>
               <Route
                 path="/admin/dashboard/guarantee"

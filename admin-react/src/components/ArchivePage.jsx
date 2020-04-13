@@ -5,7 +5,7 @@ import { URL } from "../constants";
 import lotsService from "../services/Lots";
 import authService from "../services/Auth";
 
-const LotsPage = () => {
+const ArchivePage = () => {
   const [loading, setLoading] = useState(true);
   const [lots, setLots] = useState();
 
@@ -13,7 +13,7 @@ const LotsPage = () => {
     setLoading(true);
 
     try {
-      const lots = await lotsService.getLots();
+      const lots = await lotsService.getLotsArchive();
       setLots(lots);
     } catch (error) {
       setLots();
@@ -40,4 +40,4 @@ const LotsPage = () => {
   );
 };
 
-export default LotsPage;
+export default ArchivePage;
