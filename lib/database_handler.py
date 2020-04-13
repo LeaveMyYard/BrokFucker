@@ -2,6 +2,7 @@ import sqlite3
 import os
 import hashlib
 import base64
+from enum import Enum
 from typing import Union, Tuple
 from flask import request
 from datetime import datetime, timedelta
@@ -17,6 +18,11 @@ from PIL import Image
 from os import path, remove
 from datetime import datetime
 from lib.util.enums import SubscriptionTypes
+
+class SubscriptionStatus(Enum):
+    NotConfirmed = 1
+    Confirmed = 2
+    Finished = 3
 
 class DatabaseHandler:
     def __init__(self, file_name: str = 'database.db'):
@@ -922,6 +928,48 @@ class DatabaseHandler:
 
         self.conn.commit()
 
+    def get_subscription_status(self, id) -> SubscriptionStatus:
+        self.cursor.execute(
+            f"SELECT `confirmed`, `finished` FROM SubscriptionRequests WHERE `id` = ?",
+            (id, )
+        )
+
+        confirmed, finished = self.cursor.fetchone()
+        confirmed, finished = eval(confirmed), eval(finished)
+
+        if finished:
+            return SubscriptionStatus.Finished
+        elif confirmed:
+            return SubscriptionStatus.Confirmed
+        else:
+            return SubscriptionStatus.NotConfirmed
+
+    def delete_subscription(self, id):
+        status = self.get_subscription_status(id)
+
+        if status != SubscriptionStatus.NotConfirmed:
+            raise APIExceptions.SubscriptionManagementError(f'Could not delete subscription with status {status.name()}')
+        
+        self.cursor.execute(
+            f"DELETE FROM SubscriptionRequests WHERE `id` = ?",
+            (id, )
+        )
+
+        self.conn.commit()
+
+    def finish_subscription(self, i, finished=True):
+        status = self.get_subscription_status(id)
+
+        if status != SubscriptionStatus.Confirmed:
+            raise APIExceptions.SubscriptionManagementError(f'Could not finish subscription with status {status.name()}')
+
+        self.cursor.execute(
+            f"UPDATE SubscriptionRequests SET `finished` = ? WHERE `id` = ?",
+            (str(finished), id)
+        )
+
+        self.conn.commit()
+
     def get_approved_subscriptions(self):
         self.cursor.execute(
             f"SELECT * FROM ConfirmedSubscriptions"
@@ -931,6 +979,12 @@ class DatabaseHandler:
     def get_unapproved_subscriptions(self):
         self.cursor.execute(
             f"SELECT * FROM UnconfirmedSubscriptions"
+        )
+        return [{'id': id, 'user': user, 'lot': lot, 'type': SubscriptionTypes(type).name, 'message': message} for id, user, lot, type, message in self.cursor.fetchall()]
+
+    def get_finished_subscriptions(self):
+        self.cursor.execute(
+            f"SELECT * FROM FinishedSubscriptions"
         )
         return [{'id': id, 'user': user, 'lot': lot, 'type': SubscriptionTypes(type).name, 'message': message} for id, user, lot, type, message in self.cursor.fetchall()]
 

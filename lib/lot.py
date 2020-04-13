@@ -206,3 +206,13 @@ class Lot:
     def set_subscription_approved(id, approved=True):
         database = DatabaseHandler()
         database.approve_subscription(id, approve=approved)
+
+    @staticmethod
+    def delete_subscription(id):
+        database = DatabaseHandler()
+        database.delete_subscription(id)
+
+    @staticmethod
+    def finish_subscription(id):
+        database = DatabaseHandler()
+        database.finish_subscription(id)

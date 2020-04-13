@@ -77,3 +77,7 @@ class MaximumRequestsTimeout(IndexedException):
 class LotNotExistsError(IndexedException):
     def __init__(self, lot_id):
         super().__init__(-1016, f'Lot with id {lot_id} does not exist')
+
+class SubscriptionManagementError(IndexedException):
+    def __init__(self, message):
+        super().__init__(-1017, message)

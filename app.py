@@ -801,6 +801,22 @@ class RestAPI:
         return RestAPI.message(f'Subscription {id} is now unapproved.'), 201
 
     @staticmethod
+    @route('lots/subscription/<string:id>', methods=['DELETE'])
+    @moderator.login_required
+    @weighted(weight=1)
+    def delete_subscription(id):
+        Lot.delete_subscription(id)
+        return RestAPI.message(f'Subscription {id} is now deleted.'), 201
+
+    @staticmethod
+    @route('lots/subscription/<string:id>/finish', methods=['GET'])
+    @moderator.login_required
+    @weighted(weight=1)
+    def finish_subscription(id):
+        Lot.finish_subscription(id)
+        return RestAPI.message(f'Subscription {id} is now finished.'), 201
+
+    @staticmethod
     @route('lots/archive', methods=['GET', 'POST'])
     @administrator.login_required
     @weighted(weight=5)
