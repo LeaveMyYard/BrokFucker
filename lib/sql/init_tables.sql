@@ -145,14 +145,14 @@ AS
     SELECT `lot`
     FROM SubscriptionRequests
     WHERE `confirmed` = 'True'
-    GROUP BY `lot`
+    GROUP BY `lot`;
 
 CREATE VIEW IF NOT EXISTS FinishedLots
 AS
     SELECT `lot`
     FROM SubscriptionRequests
     WHERE `finished` = 'True'
-    GROUP BY `lot`
+    GROUP BY `lot`;
 
 CREATE VIEW IF NOT EXISTS FinishedSubscriptions
 AS
