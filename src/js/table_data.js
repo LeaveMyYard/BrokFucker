@@ -6,6 +6,10 @@ const orderBy = document.getElementById("order_by");
 const orderType = document.getElementById("order_type");
 const showOnly = document.getElementById("show_only");
 
+logOutBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+});
+
 const encData = function () {
   if (localStorage.getItem("email")) {
     return window.btoa(

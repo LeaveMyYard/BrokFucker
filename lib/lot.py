@@ -183,6 +183,16 @@ class Lot:
         return database.get_all_unapproved_lots(lot_filter=Lot.check_filter(lot_filter))
 
     @staticmethod
+    def get_archive(lot_filter = None):
+        database = DatabaseHandler()
+        return database.get_archived_lots(lot_filter=Lot.check_filter(lot_filter))
+
+    @staticmethod
+    def get_archived_history(lot_id, lot_filter = None):
+        database = DatabaseHandler()
+        return database.get_archived_lot_history(lot_id, lot_filter=Lot.check_filter(lot_filter))
+
+    @staticmethod
     def get_approved_subscriptions():
         database = DatabaseHandler()
         return database.get_approved_subscriptions()

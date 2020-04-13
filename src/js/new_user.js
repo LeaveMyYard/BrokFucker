@@ -16,9 +16,9 @@ if (errorReg == 1) {
   errorContainer.append(errorMsg);
 }
 
-document.querySelector(".inputEmail").addEventListener("input", (e) => {
-  e.target.value = e.target.value.replace(/[^a-z, 0-9, \@, \. ]/i, "");
-});
+// document.querySelector(".inputEmail").addEventListener("input", (e) => {
+//   e.target.value = e.target.value.replace(/[^a-z, 0-9, \@, \. ]/i, "");
+// });
 
 regForm.addEventListener("submit", async function (e) {
   e.preventDefault();
