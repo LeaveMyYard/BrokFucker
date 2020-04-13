@@ -188,6 +188,10 @@ const Sidebar = (props) => {
                 component={ArchivePage}
               ></Route>
               <Route
+                path="/admin/dashboard/lots/archive/:id"
+                component={LotHistoryPage}
+              ></Route>
+              <Route
                 path="/admin/dashboard/guarantee"
                 component={GuaranteeLots}
               ></Route>
