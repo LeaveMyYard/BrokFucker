@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-
+import { useHistory } from "react-router-dom";
 import lotsService from "../services/Lots";
 import translateService from "../services/Translate";
 import dateFix from "../utils/dateFix";
@@ -12,6 +12,11 @@ export default function LotsItem({
 }) {
   const [guarantee, setGuarantee] = useState(lot.guarantee_percentage);
   const lotsPageType = useContext(LotsPageTypeContext);
+  const history = useHistory();
+
+  const handleRedirect = (lotID) => {
+    history.push(`/lots/archive/${lotID}`);
+  };
 
   const onApprove = async () => {
     try {
@@ -93,7 +98,13 @@ export default function LotsItem({
       <td>
         <a href={`/lot.html?id=${lot.id}`}>Страница лота</a>
       </td>
-      {lotsPageType === lotsPageTypesEnum.ARCHIVE && <td>Archive Link</td>}
+      {lotsPageType === lotsPageTypesEnum.ARCHIVE && (
+        <td>
+          <p className="historyLink" onClick={() => handleRedirect(lot.id)}>
+            История лота
+          </p>
+        </td>
+      )}
       <td>{lot.user}</td>
       <td>{lot.amount}</td>
       <td>{lot.currency}</td>

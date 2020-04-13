@@ -89,9 +89,9 @@ const logIn = async () => {
   }
 };
 
-document.querySelector(".inputEmail").addEventListener("input", (e) => {
-  e.target.value = e.target.value.replace(/[^a-z, 0-9, \@, \. ]/i, "");
-});
+// document.querySelector(".inputEmail").addEventListener("input", (e) => {
+//   e.target.value = e.target.value.replace(/[^a-z, 0-9, \@, \. ]/i, "");
+// });
 
 const validateForm = $(function () {
   $("#loginForm").validate({

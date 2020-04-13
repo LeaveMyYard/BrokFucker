@@ -149,3 +149,13 @@
 .lot-table tr:hover {
   background-color: #c2c2c2;
 }
+
+.historyLink {
+  color: #007bff;
+}
+
+.historyLink:hover {
+  color: #007bff;
+  text-decoration: underline;
+  cursor: pointer;
+}
