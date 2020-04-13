@@ -115,7 +115,14 @@ AS
     SELECT *
     FROM Lots
     WHERE `confirmed` = 'True' 
-    AND `deleted` = 'False';
+    AND `deleted` = 'False'
+	AND Lots.id NOT IN (
+		SELECT `lot`
+        FROM SubscriptionRequests
+        WHERE `confirmed` = 'True'
+        OR `finished` = 'True'
+        GROUP BY `lot`
+	);
 
 CREATE VIEW IF NOT EXISTS LiveUnacceptedLots
 AS
