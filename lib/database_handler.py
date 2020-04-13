@@ -964,6 +964,7 @@ class DatabaseHandler:
         res_list = []
 
         for row in table:
+            row = list(row)
             row[0], row[17] = row[17], row[0]
             res = self.serialize_lot(row)
             res['record_id'] = row[17]
