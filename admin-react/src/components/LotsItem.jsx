@@ -1,5 +1,5 @@
 import React, { useState, useContext } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 import lotsService from "../services/Lots";
 import translateService from "../services/Translate";
 import dateFix from "../utils/dateFix";
@@ -100,9 +100,9 @@ export default function LotsItem({
       </td>
       {lotsPageType === lotsPageTypesEnum.ARCHIVE && (
         <td>
-          <p className="historyLink" onClick={() => handleRedirect(lot.id)}>
+          <Link to={`/admin/dashboard/lots/archive/${lot.id}`}>
             История лота
-          </p>
+          </Link>
         </td>
       )}
       <td>{lot.user}</td>

@@ -42,6 +42,26 @@ class LotsService {
     }
   }
 
+  async getLotHistory(id) {
+    try {
+      const authToken = authService.getAuthToken();
+
+      const response = await fetch(URL + `lots/archive/${id}`, {
+        method: "GET",
+        headers: { Authorization: `Basic ${authToken}` },
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+      console.log(response);
+      const result = await response.json();
+      return result;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async approve(lot) {
     try {
       const authToken = authService.getAuthToken();

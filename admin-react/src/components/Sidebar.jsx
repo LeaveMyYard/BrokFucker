@@ -1,6 +1,7 @@
 import React, { useState, createContext } from "react";
 import {
   BrowserRouter as Router,
+  useParams,
   Switch,
   Route,
   Link,
@@ -11,6 +12,7 @@ import LotsPage from "./LotsPage";
 import VerificationLots from "./VerificationLots";
 import GuaranteeLots from "./GuaranteeLots";
 import ModeratorsPage from "./ModeratorsPage";
+import LotHistoryPage from "./LotHistoryPage";
 import AuthService from "../services/Auth";
 import "../Admin.css";
 import logo from "../letter-a.png";
@@ -107,6 +109,10 @@ const Sidebar = (props) => {
                 component={ArchivePage}
               ></Route>
               <Route
+                path="/admin/dashboard/lots/archive/:id"
+                component={LotHistoryPage}
+              ></Route>
+              <Route
                 path="/admin/dashboard/moderators"
                 component={ModeratorsPage}
               ></Route>
@@ -146,7 +152,7 @@ const Sidebar = (props) => {
                 onClick={() => changeLotsPageType(lotsPageTypesEnum.ARCHIVE)}
                 to="/admin/dashboard/lots/archive"
               >
-                Архивные <p>лоты</p>
+                Архивные лоты
               </Link>
               <Link
                 onClick={() => changeLotsPageType(lotsPageTypesEnum.GUARANTEE)}
