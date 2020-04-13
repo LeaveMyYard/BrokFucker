@@ -825,10 +825,8 @@ class DatabaseHandler:
             (lot_id, )
         )
         photos: list = eval(self.cursor.fetchone()[0])
-        photo_hash = photos.pop(photo_id)
+        photos.pop(photo_id)
         stringified_photos = str(photos).replace('\'', '"')
-
-        remove(f'data/images/lots/{photo_hash}.jpg')
 
         self.cursor.execute(
             f"UPDATE Lots SET `photos` = ? WHERE `id` = ?",
