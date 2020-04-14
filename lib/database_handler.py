@@ -957,7 +957,7 @@ class DatabaseHandler:
 
         self.conn.commit()
 
-    def finish_subscription(self, i, finished=True):
+    def finish_subscription(self, id, finished=True):
         status = self.get_subscription_status(id)
 
         if status != SubscriptionStatus.Confirmed:
