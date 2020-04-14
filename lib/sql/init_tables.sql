@@ -222,6 +222,7 @@ AS
     SELECT `lot`
     FROM SubscriptionRequests
     WHERE `confirmed` = 'True'
+    AND `finished` = 'False'
     GROUP BY `lot`;
 
 CREATE VIEW IF NOT EXISTS FinishedLots
