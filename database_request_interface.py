@@ -51,6 +51,6 @@ if __name__ == "__main__":
         if interface.execute_request(input(">>> Waiting for your next request:\n")):
             if interface.get_input_true_false(">>> Do you want to commit your changes?"):
                 interface.commit()
-            print('\n\n')
+        print('\n\n')
 
         
