@@ -31,6 +31,28 @@ const ApprovedLots = () => {
     }
   };
 
+  const onSubscriptionFinish = async (id) => {
+    try {
+      const authToken = authService.getAuthToken();
+
+      const response = await fetch(URL + `lots/subscription/${id}/finish`, {
+        method: "GET",
+        headers: {
+          Authorization: `Basic ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Unsuccessfull response");
+      }
+
+      return await response.json();
+    } catch (error) {
+    } finally {
+      await refreshList();
+    }
+  };
+
   const refreshList = async () => {
     setLoading(true);
 
@@ -65,6 +87,7 @@ const ApprovedLots = () => {
                 <th>Тип</th>
                 <th>Подписчик</th>
                 <th>Убрать подписку</th>
+                <th>Завершить</th>
               </tr>
             </thead>
             <tbody>
@@ -80,6 +103,11 @@ const ApprovedLots = () => {
                   <td>
                     <button onClick={() => onSubscriptionDecline(lot.id)}>
                       Remove
+                    </button>
+                  </td>
+                  <td>
+                    <button onClick={() => onSubscriptionFinish(lot.id)}>
+                      Finish
                     </button>
                   </td>
                 </tr>
