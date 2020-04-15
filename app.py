@@ -220,7 +220,9 @@ class RestAPI:
     @staticmethod
     @route('ping', methods=['GET'])
     @weighted(weight=1)
-    def ping():
+    def ping():        
+        ''' Проверяет соединение с сервером. '''
+
         return RestAPI.message('pong'), 200
 
     # -------------------------------------------------------------------------
@@ -231,6 +233,8 @@ class RestAPI:
     @route('register', methods=['POST'])
     @weighted(weight=10)
     def register():
+        ''' Начинает процесс регистрации нового пользователя. '''
+
         request_json = RestAPI.request_data_to_json(request.data)
 
         data_required = [
@@ -255,62 +259,32 @@ class RestAPI:
     @route('register/verify/<string:verification_hash>')
     @weighted(weight=2)
     def confirm_verification(verification_hash):
+        ''' Подтверждает регистрацию. '''
         return user.verify_email_from_code(verification_hash), 201
 
     # -------------------------------------------------------------------------
-    # User stuff
+    # User
     # -------------------------------------------------------------------------
+
+    ### -----------------------------------------------------------------------
+    ### Data
+    ### -----------------------------------------------------------------------
 
     @staticmethod
     @route('user', methods=['GET'])
     @user.login_required
     @weighted(weight=1)
-    def check_user():
+    def check_user(): 
+        ''' Информация о текущем пользователе. '''
         return jsonify(user.get_data()), 200
-
-    @staticmethod
-    @route('user/password', methods=['PUT'])
-    @user.login_required
-    @weighted(weight=10)
-    def change_password():
-        request_json = RestAPI.request_data_to_json(request.data)
-
-        data_required = [
-            'password'
-        ]
-
-        RestAPI.check_required_fields(request_json, data_required)
-        RestAPI.check_fields_values(request_json, "register")
-
-        user.change_password(request_json['password'])
-        return RestAPI.message(f'Verification in sent to {user.email()}')
-
-    @staticmethod
-    @route('user/password/verify/<string:code>')
-    @weighted(weight=2)
-    def verify_password_code(code):
-        user.verify_password_change(code)
-        return RestAPI.message(f'Password was successfuly changed.')
-
-    @staticmethod
-    @route('user/restore/<string:email>')
-    @weighted(weight=10)
-    def restore_account(email):
-        user.restore_account(email)
-        return RestAPI.message(f'Verification in sent to {email}')
-
-    @staticmethod
-    @route('user/restore/verify/<string:code>')
-    @weighted(weight=2)
-    def verify_account_restore(code):
-        user.verify_account_restore(code)
-        return RestAPI.message(f'Temporary password is sent to your email.')
 
     @staticmethod
     @route('user', methods=['PUT'])
     @user.login_required
     @weighted(weight=2)
     def edit_user_data():
+        ''' Обновить данные текущего пользователя. '''
+
         request_json = RestAPI.request_data_to_json(request.data)
 
         data_required = {
@@ -327,10 +301,67 @@ class RestAPI:
         return RestAPI.message('Data is edited successful'), 201
 
     @staticmethod
+    @route('user/password', methods=['PUT'])
+    @user.login_required
+    @weighted(weight=10)
+    def change_password():
+        ''' Запрос на изменение пароля пользователя. '''
+
+        request_json = RestAPI.request_data_to_json(request.data)
+
+        data_required = [
+            'password'
+        ]
+
+        RestAPI.check_required_fields(request_json, data_required)
+        RestAPI.check_fields_values(request_json, "register")
+
+        user.change_password(request_json['password'])
+        return RestAPI.message(f'Verification in sent to {user.email()}')
+
+    @staticmethod
+    @route('user/password/verify/<string:code>')
+    @weighted(weight=2)
+    def verify_password_code(code):
+        ''' Подтвердить код изменения пароля. '''
+
+        user.verify_password_change(code)
+        return RestAPI.message(f'Password was successfuly changed.')
+
+    @staticmethod
+    @route('user/restore/<string:email>')
+    @weighted(weight=10)
+    def restore_account(email):
+        ''' Восстановить пароль. '''
+
+        user.restore_account(email)
+        return RestAPI.message(f'Verification in sent to {email}')
+
+    @staticmethod
+    @route('user/restore/verify/<string:code>')
+    @weighted(weight=2)
+    def verify_account_restore(code):
+        ''' Подтвердить восстановление пароля. '''
+
+        user.verify_account_restore(code)
+        return RestAPI.message(f'Temporary password is sent to your email.')
+
+    ### -----------------------------------------------------------------------
+    ### Avatar
+    ### -----------------------------------------------------------------------
+
+    @staticmethod
     @route('user/avatar', methods=['GET', 'POST', 'DELETE'])
     @user.login_required
     @weighted(weight=2)
     def edit_avatar():
+        ''' Работа с аватаром пользователя.
+
+            (GET) Ссылка на аватар текущего пользователя.
+            (POST) Загрузить новый аватар.
+            (DELETE) Удалить текущий аватар.
+
+        '''
         if request.method == 'GET':
             user.get_avatar_link()
             return jsonify({'link': user.get_avatar_link()}), 200
@@ -349,13 +380,33 @@ class RestAPI:
     @route('lots/settings', methods=['GET'])
     @weighted(weight=1)
     def get_lot_settings():
+        ''' Информация о доступных значениях различных полей лотов. '''
+
         return jsonify(Lot.get_settings()), 200
+
+    @staticmethod
+    @route('lots/approved', methods=['GET', 'POST'])
+    @route('lots', methods=['GET'])
+    @weighted(weight=5)
+    def get_approved_lots():
+        ''' Получить все публичные лоты. '''
+
+        try:
+            request_json = RestAPI.request_data_to_json(request.data)
+        except APIExceptions.NoJsonError:
+            lot_filter = {}
+        else:
+            lot_filter = request_json['filter'] if 'filter' in request_json else {}
+
+        return jsonify(Lot.get_all_approved_lots(lot_filter)), 200
 
     @staticmethod
     @route('lots', methods=['POST'])
     @user.login_required
     @weighted(weight=1)
     def create_lot():
+        ''' Создать новый лот. '''
+
         request_json = RestAPI.request_data_to_json(request.data)
 
         data_required = [
@@ -376,23 +427,11 @@ class RestAPI:
         return jsonify({'lot_id': user.create_lot(*[request_json[data] for data in data_required]) }), 201
 
     @staticmethod
-    @route('lots/approved', methods=['GET', 'POST'])
-    @route('lots', methods=['GET'])
-    @weighted(weight=5)
-    def get_approved_lots():
-        try:
-            request_json = RestAPI.request_data_to_json(request.data)
-        except APIExceptions.NoJsonError:
-            lot_filter = {}
-        else:
-            lot_filter = request_json['filter'] if 'filter' in request_json else {}
-
-        return jsonify(Lot.get_all_approved_lots(lot_filter)), 200
-
-    @staticmethod
     @route('lots/<int:lot_id>', methods=['GET'])
     @weighted(weight=1)
     def get_lot(lot_id):
+        ''' Получить данные о лоте. '''
+
         return jsonify(Lot(lot_id).get_lot_data()), 200
 
     @staticmethod
@@ -400,6 +439,8 @@ class RestAPI:
     @user.login_required
     @weighted(weight=3)
     def update_lot(lot_id):
+        ''' Обновить данные лота. '''
+
         lot = Lot(lot_id)
         if not lot.can_user_edit(user.email()):
             raise APIExceptions.NoPermissionError()
@@ -431,6 +472,7 @@ class RestAPI:
     @user.login_required
     @weighted(weight=2)
     def delete_lot(lot_id):
+        ''' Удалить лот. '''
         lot = Lot(lot_id)
         if not lot.can_user_edit(user.email()):
             raise APIExceptions.NoPermissionError()
@@ -443,6 +485,8 @@ class RestAPI:
     @user.login_required
     @weighted(weight=2)
     def restore_lot(lot_id):
+        ''' Восстановить удаленный лот. '''
+
         lot = Lot(lot_id)
         if not lot.can_user_edit(user.email()):
             raise APIExceptions.NoPermissionError()
@@ -453,7 +497,9 @@ class RestAPI:
     @staticmethod
     @route('lots/<int:lot_id>/photos', methods=['GET'])
     @weighted(weight=2)
-    def get_lot_photo(lot_id):
+    def get_lot_photos(lot_id):
+        ''' Получить список фотографий лота. '''
+
         return jsonify({'link': Lot(lot_id).get_photos()}), 200
 
     @staticmethod
@@ -461,6 +507,7 @@ class RestAPI:
     @user.login_required
     @weighted(weight=3)
     def add_lot_photo(lot_id):
+        ''' Добавить лоту фотографию. '''
         lot = Lot(lot_id)
         if not lot.can_user_edit(user.email()):
             raise APIExceptions.NoPermissionError()
@@ -474,6 +521,8 @@ class RestAPI:
     @user.login_required
     @weighted(weight=2)
     def remove_lot_photo(lot_id, photo_id):
+        ''' Удалить фотографию лота. '''
+
         lot = Lot(lot_id)
 
         if not lot.can_user_edit(user.email()):
@@ -486,6 +535,8 @@ class RestAPI:
     @user.login_required
     @weighted(weight=1)
     def update_favorite_lots(lot_id):
+        ''' Добавить/удалить лот в/из избранное(го). '''
+
         if request.method == 'PUT':
             user.add_lot_to_favorites(lot_id)
             return RestAPI.message('A lot is added to favorites'), 201
@@ -498,6 +549,8 @@ class RestAPI:
     @user.login_required
     @weighted(weight=3)
     def get_favorite_lots():
+        ''' Получить список избранных лотов. '''
+
         try:
             request_json = RestAPI.request_data_to_json(request.data)
         except APIExceptions.NoJsonError:
@@ -513,6 +566,8 @@ class RestAPI:
     @user.login_required
     @weighted(weight=3)
     def get_personal_lots():
+        ''' Получить список своих лотов. '''
+
         try:
             request_json = RestAPI.request_data_to_json(request.data)
         except APIExceptions.NoJsonError:
@@ -527,6 +582,8 @@ class RestAPI:
     @user.login_required
     @weighted(weight=3)
     def get_personal_taken_lots():
+        ''' Получить список своих лотов, нашедших финансирование. '''
+
         try:
             request_json = RestAPI.request_data_to_json(request.data)
         except APIExceptions.NoJsonError:
@@ -541,6 +598,8 @@ class RestAPI:
     @user.login_required
     @weighted(weight=3)
     def get_personal_finished_lots():
+        ''' Получить список своих завершенных лотов. '''
+
         try:
             request_json = RestAPI.request_data_to_json(request.data)
         except APIExceptions.NoJsonError:
@@ -555,6 +614,8 @@ class RestAPI:
     @user.login_required
     @weighted(weight=3)
     def get_personal_deleted_lots():
+        ''' Получить список своих удаленных лотов. '''
+
         try:
             request_json = RestAPI.request_data_to_json(request.data)
         except APIExceptions.NoJsonError:
@@ -569,6 +630,8 @@ class RestAPI:
     @user.login_required
     @weighted(weight=1)
     def delete_lot_entirely(lot_id):
+        ''' Полностью удалить лот. '''
+
         lot = Lot(lot_id)
 
         if not lot.can_user_edit(user.email()):
@@ -583,6 +646,8 @@ class RestAPI:
     @user.login_required
     @weighted(weight=1)
     def request_club_guarantee(lot_id):
+        ''' Запросить гарантию клуба. '''
+
         lot = Lot(lot_id)
 
         if not lot.can_user_edit(user.email()):
@@ -600,12 +665,13 @@ class RestAPI:
             lot.remove_request_for_guarantee()
             return RestAPI.message('A request for a club garantee is now removed.'), 201
         
-
     @staticmethod
     @route('lots/personal/<int:lot_id>/request/verify_security', methods=['PUT'])
     @user.login_required
     @weighted(weight=1)
     def request_security_verification(lot_id):
+        ''' Запросить подтверждение обеспечения. '''
+
         lot = Lot(lot_id)
 
         if not lot.can_user_edit(user.email()):
@@ -628,6 +694,8 @@ class RestAPI:
     @user.login_required
     @weighted(weight=1)
     def subscribe_to_lot(lot_id):
+        ''' Подписаться на лот. '''
+
         request_json = RestAPI.request_data_to_json(request.data)
 
         data_required = [
@@ -642,12 +710,13 @@ class RestAPI:
         else:
             return RestAPI.message('You are already subscribed'), 200
             
-
     @staticmethod
     @route('lots/subscription/<int:lot_id>', methods=['DELETE'])
     @user.login_required
     @weighted(weight=1)
     def unsubscribe_from_lot(lot_id):
+        ''' Убрать подписку на лот. '''
+
         try:
             user.unsubscribe_from_lot(lot_id)
             return RestAPI.message(f'You are no longer subscribed to lot {lot_id}'), 201
@@ -659,6 +728,8 @@ class RestAPI:
     @user.login_required
     @weighted(weight=2)
     def get_subscribed_lots():
+        ''' Получить список лотов, на которые ты подписан. '''
+
         return jsonify({'lots': user.get_subscriptions()}), 200
 
     # -------------------------------------------------------------------------
@@ -670,6 +741,8 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def approve_lot(lot_id):
+        ''' Подтвердить лот. '''
+
         Lot(lot_id).approve()
         return RestAPI.message('A lot is now approved'), 201
 
@@ -678,6 +751,8 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def set_security_checked(lot_id):
+        ''' Подтвердить/убрать проверенное обеспечение лота. '''
+
         lot = Lot(lot_id)
         if request.method == 'PUT':
             lot.set_security_checked(True)
@@ -693,6 +768,8 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def set_guarantee(lot_id):
+        ''' Установить гарантию клуба лоту. '''
+
         request_json = RestAPI.request_data_to_json(request.data)
         RestAPI.check_required_fields(request_json, ['value'])
         
@@ -707,6 +784,8 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def remove_guarantee(lot_id):
+        ''' Убрать гарантию клуба у лота. '''
+
         lot = Lot(lot_id)
         lot.set_guarantee_value(0)
         lot.remove_request_for_guarantee()
@@ -717,6 +796,8 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=3)
     def get_guarantee_requested_lots():
+        ''' Получить список лотов, запросивших гарантию клуба. '''
+
         try:
             request_json = RestAPI.request_data_to_json(request.data)
         except APIExceptions.NoJsonError:
@@ -731,6 +812,8 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=3)
     def get_security_requested_lots():
+        ''' Получить список лотов, запросивших проверку обеспечения. '''
+
         try:
             request_json = RestAPI.request_data_to_json(request.data)
         except APIExceptions.NoJsonError:
@@ -745,6 +828,8 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=3)
     def get_unapproved_lots():
+        ''' Получить список неподтвержденных подписок. '''
+
         try:
             request_json = RestAPI.request_data_to_json(request.data)
         except APIExceptions.NoJsonError:
@@ -759,6 +844,8 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def remove_unapproved_lot(lot_id):
+        ''' Отклонить неподтвержденный лот. '''
+
         required_fields = ['reason']
         request_json = RestAPI.request_data_to_json(request.data)
 
@@ -775,6 +862,8 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def get_approved_subscriptions():
+        ''' Получить список подтвержденных подписок. '''
+
         return jsonify({'lots': Lot.get_approved_subscriptions()}), 200
 
     @staticmethod
@@ -782,6 +871,8 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def get_unapproved_subscriptions():
+        ''' Получить список неподтвержденных подписок. '''
+
         return jsonify({'lots': Lot.get_unapproved_subscriptions()}), 200
 
     @staticmethod
@@ -789,6 +880,8 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def approve_subscription(id):
+        ''' Подтвердить неподтвержденную подписку. '''
+
         Lot.set_subscription_approved(id)
         return RestAPI.message(f'Subscription {id} is now approved.'), 201
 
@@ -797,6 +890,8 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def unapprove_subscription(id):
+        ''' Снять подтверждение подписки. '''
+
         Lot.set_subscription_approved(id, approved=False)
         return RestAPI.message(f'Subscription {id} is now unapproved.'), 201
 
@@ -805,6 +900,8 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def delete_subscription(id):
+        ''' Удалить неподтвержденную подписку. '''
+
         Lot.delete_subscription(id)
         return RestAPI.message(f'Subscription {id} is now deleted.'), 201
 
@@ -813,6 +910,8 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def finish_subscription(id):
+        ''' Закончить подтвержденную подписку. '''
+        
         Lot.finish_subscription(id)
         return RestAPI.message(f'Subscription {id} is now finished.'), 201
 

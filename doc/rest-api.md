@@ -67,99 +67,139 @@
   
 # Список всех запросов
 ## Публичные запросы
-* ```GET /api/v1/ping```
+* ```(public) GET /api/v1/ping```
   * [Проверяет соединение с сервером.](#Проверка-соединения)
 
 ## Запросы регистрации
-* ```POST /api/v1/register```
+* ```(public) POST /api/v1/register```
   * [Начинает процесс регистрации нового пользователя.](#Создать-новый-аккаунт)
-* ```GET /api/v1/register/verify/<string:verification_hash>```
+* ```(public) GET /api/v1/register/verify/<string:verification_hash>```
   * [Подтверждает регистрацию.](#Подтвердить-регистрацию)
 
 ## Запросы пользователя
 ### Данные
-* ```GET /api/v1/user```
+* ```(user) GET /api/v1/user```
   * [Информация о текущем пользователе.]()
-* ```PUT /api/v1/user```
+* ```(user) PUT /api/v1/user```
   * [Обновить данные текущего пользователя.]()
-* ```PUT /api/v1/user/password```
-  * Запрос на изменение пароля пользователя.
-* ```GET /api/v1/lots/password/verification/<string:code>```
-  * Подтвердить код изменения пароля.
+* ```(user) PUT /api/v1/user/password```
+  * [Запрос на изменение пароля пользователя.]()
+* ```(public) GET /api/v1/lots/password/verification/<string:code>```
+  * [Подтвердить код изменения пароля.]()
+* ```(user) GET /api/v1/user/restore/<string:email>```
+  * [Восстановить пароль.]()
+* ```(public) GET /api/v1/user/restore/verify/<string:code>```
+  * [Подтвердить восстановление пароля.]()
 ### Аватар
-* ```GET /api/v1/user/avatar```
+* ```(user) GET /api/v1/user/avatar```
   * [Ссылка на аватар текущего пользователя.]()
-* ```POST /api/v1/user/avatar```
+* ```(user) POST /api/v1/user/avatar```
   * [Загрузить новый аватар.]()
-* ```DELETE /api/v1/user/avatar```
+* ```(user) DELETE /api/v1/user/avatar```
   * [Удалить текущий аватар.]()
   
 ## Лоты
 ### Общее
-* ```GET /api/v1/lots/settings```
-  * Информация о доступных значениях различных полей лотов.
-* ```GET /api/v1/lots```
-  * Получить все публичные лоты.
-* ```POST /api/v1/lots```
-  * Создать новый лот.
-* ```GET /api/v1/lots/<int:id>```
-  * Получить данные о лоте.
-* ```PUT /api/v1/lots/<int:id>```
-  * Обновить данные лота.
-* ```POST /api/v1/lots/<int:id>```
-  * Восстановить удаленный лот.
-* ```DELETE /api/v1/lots/<int:id>```
-  * Удалить лот.
-* ```GET /api/v1/lots/<int:id>/photos```
-  * Получить список фотографий лота.
-* ```POST /api/v1/lots/<int:id>/photos```
-  * Добавить лоту фотографию.
-* ```DELETE /api/v1/lots/<int:id>/photos/<int:photo_id>```
-  * Удалить фотографию лота.
-* ```GET /api/v1/lots/approved```
-  * Копия GET /api/v1/lots.
+* ```(public) GET /api/v1/lots/settings```
+  * [Информация о доступных значениях различных полей лотов.]()
+* ```(public) GET /api/v1/lots```
+  * [Получить все публичные лоты.]()
+* ```(public) GET/POST /api/v1/lots/approved```
+  * [Копия GET /api/v1/lots.]()
+* ```(user) POST /api/v1/lots```
+  * [Создать новый лот.]()
+* ```(public) GET /api/v1/lots/<int:id>```
+  * [Получить данные о лоте.]()
+* ```(user) PUT /api/v1/lots/<int:id>```
+  * [Обновить данные лота.]()
+* ```(user) POST /api/v1/lots/<int:id>```
+  * [Восстановить удаленный лот.]()
+* ```(user) DELETE /api/v1/lots/<int:id>```
+  * [Удалить лот.]()
+* ```(user) DELETE /api/v1/lots/personal/deleted/<int:lot_id>```
+  * [Полностью удалить лот.]()
+* ```(public) GET /api/v1/lots/<int:id>/photos```
+  * [Получить список фотографий лота.]()
+* ```(user) POST /api/v1/lots/<int:id>/photos```
+  * [Добавить лоту фотографию.]()
+* ```(user) DELETE /api/v1/lots/<int:id>/photos/<int:photo_id>```
+  * [Удалить фотографию лота.]()
 ### Избранное
-* ```PUT /api/v1/lots/favorites/<int:lot_id>```
-  * Добавить лот в избранное.
-* ```DELETE /api/v1/lots/favorites/<int:lot_id>```
-  * Удалить лот из избранных.
-* ```GET /api/v1/lots/favorites```
-  * Получить список избранных лотов.
+* ```(user) PUT /api/v1/lots/favorites/<int:lot_id>```
+  * [Добавить лот в избранное.]()
+* ```(user) DELETE /api/v1/lots/favorites/<int:lot_id>```
+  * [Удалить лот из избранных.]()
+* ```(user) GET/POST /api/v1/lots/favorites```
+  * [Получить список избранных лотов.]()
 ### Свои лоты
-* ```GET /api/v1/lots/personal```
-  * Получить список своих лотов.
-* ```GET /api/v1/lots/personal/deleted```
-  * Получить список своих удаленных лотов.
+* ```(user) GET/POST /api/v1/lots/personal```
+  * [Получить список своих не занятых лотов.]()
+* ```(user) GET/POST /api/v1/lots/personal/current```
+  * [Дубликат /api/v1/lots/personal]()
+* ```(user) GET/POST /api/v1/lots/personal/taken```
+  * [Получить список своих лотов, нашедших финансирование.]()
+* ```(user) GET/POST /api/v1/lots/personal/finished```
+  * [Получить список своих завершенных лотов.]()
+* ```(user) GET/POST /api/v1/lots/personal/deleted```
+  * [Получить список своих удаленных лотов.]()
 ### Подписки
-* ```PUT /api/v1/lots/subscription/<int:id>```
-  * Подписаться на лот.
-* ```DELETE /api/v1/lots/subscription/<int:id>```
-  * Убрать подписку на лот.
-* ```GET /api/v1/lots/subscription```
-  * Получить список лотов, на которые ты подписан.
-
+* ```(user) PUT /api/v1/lots/subscription/<int:id>```
+  * [Подписаться на лот.]()
+* ```(user) DELETE /api/v1/lots/subscription/<int:id>```
+  * [Убрать подписку на лот.]()
+* ```(user) GET /api/v1/lots/subscription```
+  * [Получить список лотов, на которые ты подписан.]()
+### Запросы
+* ```(user) PUT /api/v1/lots/personal/<int:lot_id>/request/guarantee```
+  * [Запросить гарантию клуба.]()
+* ```(user) PUT /api/v1/lots/personal/<int:lot_id>/request/verify_security```
+  * [Запросить подтверждение обеспечения.]()
 
 ## Запросы модератора
 ### Лоты
-* ```PUT /api/v1/lots/<int:lot_id>/approve```
-  * Подтвердить лот.
-* ```PUT /api/v1/lots/<int:lot_id>/security```
-  * Подтвердить проверенное обеспечение лота.
-* ```DELETE /api/v1/lots/<int:lot_id>/security```
-  * Убрать проверенное обеспечение лота.
-* ```GET /api/v1/lots/unapproved```
-  * Получить список неподтвержденных лотов.
+* ```(moderator) PUT /api/v1/lots/<int:lot_id>/approve```
+  * [Подтвердить лот.]()
+* ```(moderator) PUT /api/v1/lots/<int:lot_id>/security```
+  * [Подтвердить проверенное обеспечение лота.]()
+* ```(moderator) DELETE /api/v1/lots/<int:lot_id>/security```
+  * [Убрать проверенное обеспечение лота.]()
+* ```(moderator) PUT /api/v1/lots/<int:lot_id>/guarantee```
+  * [Установить гарантию клуба лоту.]()
+* ```(moderator) DELETE /api/v1/lots/<int:lot_id>/guarantee```
+  * [Убрать гарантию клуба у лота.]()
+* ```(moderator) GET /api/v1/lots/unapproved```
+  * [Получить список неподтвержденных лотов.]()
 ### Подписки
-* ```GET /api/v1/lots/subscription/approved```
-  * Получить список подтвержденных подписок.
-* ```GET /api/v1/lots/subscription/unapproved```
-  * Получить список неподтвержденных подписок.
-  
+* ```(moderator) GET /api/v1/lots/subscription/approved```
+  * [Получить список подтвержденных подписок.]()
+* ```(moderator) GET /api/v1/lots/subscription/unapproved```
+  * [Получить список неподтвержденных подписок.]()
+* ```(moderator) DELETE /api/v1/lots/unapproved/<int:lot_id>```
+  * [Отклонить неподтвержденный лот.]()
+### Запросы
+* ```(moderator) GET /api/v1/lots/requested/guarantee```
+  * [Получить список лотов, запросивших гарантию клуба.]()
+* ```(moderator) GET /api/v1/lots/requested/security_verification```
+  * [Получить список лотов, запросивших проверку обеспечения.]()
+* ```(moderator) GET /api/v1/lots/subscription/<string:id>/approve```
+  * [Подтвердить неподтвержденную подписку.]()
+* ```(moderator) GET /api/v1/lots/subscription/<string:id>/unapprove```
+  * [Снять подтверждение подписки.]()
+* ```(moderator) DELETE /api/v1/lots/subscription/<string:id>```
+  * [Удалить неподтвержденную подписку.]()
+* ```(moderator) GET /api/v1/lots/subscription/<string:id>/finish```
+  * [Закончить подтвержденную подписку.]()
+### Архив
+* ```(moderator) GET/POST /api/v1/lots/archive```
+  * [Получить список архивных подписок.]()
+* ```(moderator) GET /api/v1/lots/archive/<int:lot_id>```
+  * [Посмотреть историю архивной подписки.]()
+
 ## Запросы администратора
-* ```PUT /api/v1/user/<string:email>/moderator```
-  * Добавить права модератора.
-* ```DELETE /api/v1/user/<string:email>/moderator```
-  * Убрать права модератора.  
+* ```(administrator) PUT /api/v1/user/<string:email>/moderator```
+  * [Добавить права модератора.]()
+* ```(administrator) DELETE /api/v1/user/<string:email>/moderator```
+  * [Убрать права модератора.]()
 
 -------------------------------------------------------------
 
