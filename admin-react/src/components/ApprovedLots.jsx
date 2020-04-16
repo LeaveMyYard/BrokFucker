@@ -59,7 +59,6 @@ const ApprovedLots = () => {
     try {
       const lots = await lotsService.getApprovedSubscriptions();
       setLots(lots);
-      console.log(lots);
     } catch (error) {
       setLots();
     } finally {

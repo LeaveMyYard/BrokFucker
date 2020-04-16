@@ -97,7 +97,6 @@ const getLots = async () => {
       return new Error("Unsuccessfull response");
     } else {
       const result = await response.json();
-      console.log(result);
       const lotArr = [];
       result.forEach((item) => {
         item = `
@@ -121,7 +120,6 @@ const getLots = async () => {
       });
 
       lotTable.innerHTML += lotArr.join("");
-      console.log(options);
     }
   } catch (error) {}
 };
@@ -130,7 +128,6 @@ getLots();
 
 function clearLots() {
   let lotItems = document.querySelectorAll(".lot-list_item");
-  console.log(lotItems);
 
   lotItems.forEach((lot) => lot.remove());
 }

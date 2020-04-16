@@ -1,7 +1,6 @@
 import React, { useState, createContext } from "react";
 import {
   BrowserRouter as Router,
-  useParams,
   Switch,
   Route,
   Link,
@@ -19,6 +18,7 @@ import logo from "../letter-a.png";
 import ApprovedLots from "./ApprovedLots";
 import UnapprovedLots from "./UnapprovedLots";
 import ArchivePage from "./ArchivePage";
+import Dashboard from "./Dashboard";
 
 export const lotsPageTypesEnum = {
   UNAPPROVED: "UNAPPROVED",
@@ -60,7 +60,13 @@ const Sidebar = (props) => {
           <div className="sidebar_container">
             <div className="sidebar">
               <div className="sidebar-header">
-                <img className="sidebar__logo" src={logo} alt="BrokAdmin"></img>
+                <Link to="/admin/dashboard">
+                  <img
+                    className="sidebar__logo"
+                    src={logo}
+                    alt="BrokAdmin"
+                  ></img>
+                </Link>
               </div>
               <Link
                 onClick={() => changeLotsPageType(lotsPageTypesEnum.UNAPPROVED)}
@@ -105,6 +111,11 @@ const Sidebar = (props) => {
               ></Route>
               <Route
                 exact
+                path="/admin/dashboard"
+                component={Dashboard}
+              ></Route>
+              <Route
+                exact
                 path="/admin/dashboard/lots/archive"
                 component={ArchivePage}
               ></Route>
@@ -140,7 +151,13 @@ const Sidebar = (props) => {
           <div className="sidebar_container">
             <div className="sidebar">
               <div className="sidebar-header">
-                <img className="sidebar__logo" src={logo} alt="BrokAdmin"></img>
+                <Link to="/admin/dashboard">
+                  <img
+                    className="sidebar__logo"
+                    src={logo}
+                    alt="BrokAdmin"
+                  ></img>
+                </Link>
               </div>
               <Link
                 onClick={() => changeLotsPageType(lotsPageTypesEnum.UNAPPROVED)}
@@ -181,6 +198,11 @@ const Sidebar = (props) => {
                 exact
                 path="/admin/dashboard/lots/unapproved"
                 component={LotsPage}
+              ></Route>
+              <Route
+                exact
+                path="/admin/dashboard"
+                component={Dashboard}
               ></Route>
               <Route
                 exact

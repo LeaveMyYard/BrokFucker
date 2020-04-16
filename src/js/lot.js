@@ -94,7 +94,6 @@ async function onReady() {
         throw new Error("Unsuccessfull response");
       }
       const result = await response.json();
-      console.log(result);
       sessionStorage.setItem("phone", result["phone_number"]);
     } catch (error) {
       console.error(error);
@@ -134,7 +133,6 @@ const getTheLot = async () => {
     }
 
     const result = await response.json();
-    console.log(result);
 
     lotProfilePic.innerHTML = `<img src="${result["user_avatar"]}" style="width: 60%; height: 100%; margin-left: 20%"/>`;
     lotSubMsg.innerText = `Вы собираетесь спонсировать ${result["name"]}.
@@ -190,8 +188,6 @@ document
     }
   });
 
-console.log(lotSubCommentary);
-
 lotSubBtn.addEventListener("click", async function () {
   const value = {
     type: selectSub.value == "email" ? "Email" : "PhoneCall",
@@ -232,7 +228,6 @@ lotSubBtn.addEventListener("click", async function () {
     if (!response.ok) {
       throw new Error("Unsuccessfull response");
     }
-    console.log(response);
     const result = await response.json();
     if (result.msg == "You are already subscribed") {
       alert("Вы уже подписаны на этот лот!");

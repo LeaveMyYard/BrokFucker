@@ -110,7 +110,6 @@ async function dataOptions() {
       throw new Error("Unsuccessfull response");
     }
     const result = await response.json();
-    console.log(result);
 
     result.currency.forEach((curr) => {
       currencySelect.innerHTML += `<option value="${curr}">${curr}</option>`;
@@ -377,7 +376,6 @@ const createLotAndListeners = async (
         } else throw new Error(error);
       } catch (error) {
         alert("Ошибка! Что-то пошло не так.");
-        console.log(error);
       }
     });
 
@@ -398,7 +396,6 @@ const createLotAndListeners = async (
         } else throw new Error(error);
       } catch (error) {
         alert("Ошибка! Что-то пошло не так.");
-        console.log(error);
       }
     });
 
@@ -440,11 +437,9 @@ const createLotAndListeners = async (
           body: JSON.stringify(value),
         });
         if (response.ok) {
-          console.log(response);
         } else throw new Error(error);
       } catch (error) {
-        // alert("Ошибка! Что-то пошло не так.");
-        console.log(error);
+        console.error(error);
       }
       try {
         const response = await fetch(URL + `lots/${lot.id}/photos`, {
@@ -455,11 +450,9 @@ const createLotAndListeners = async (
           body: formData,
         });
         if (response.ok) {
-          console.log(response);
         } else throw new Error(error);
       } catch (error) {
-        // alert("Ошибка! Что-то пошло не так.");
-        console.log(error);
+        console.error(error);
       }
       try {
         const response = await fetch(
@@ -474,10 +467,9 @@ const createLotAndListeners = async (
           }
         );
         if (response.ok) {
-          console.log(response);
         } else throw new Error(error);
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
       try {
         const response = await fetch(
@@ -492,11 +484,10 @@ const createLotAndListeners = async (
           }
         );
         if (response.ok) {
-          console.log(response);
         } else throw new Error(error);
       } catch (error) {
         alert("Ошибка! Что-то пошло не так.");
-        console.log(error);
+        console.error(error);
       } finally {
         window.location.reload();
       }
@@ -694,12 +685,11 @@ const createArchiveLotAndListeners = async (
           },
         });
         if (response.ok) {
-          console.log(response);
           location.reload();
         } else throw new Error(error);
       } catch (error) {
         alert("Ошибка! Что-то пошло не так.");
-        console.log(error);
+        console.error(error);
       }
     });
 
@@ -715,14 +705,13 @@ const createArchiveLotAndListeners = async (
           },
         });
         if (response.ok) {
-          console.log(response);
           location.reload();
           clearArchiveLots();
           getMyArchiveLots();
         } else throw new Error(error);
       } catch (error) {
         alert("Ошибка! Что-то пошло не так.");
-        console.log(error);
+        console.error(error);
       }
     });
   return archiveLotEl;
@@ -773,7 +762,6 @@ const getMyLots = async () => {
     }
 
     const result = await response.json();
-    console.log(result);
     if (result.length == 0) {
       myLotsHeading.innerText = `Похоже, что у Вас ещё нет лотов!`;
     } else {
@@ -1109,7 +1097,6 @@ async function clearArchiveLots() {
 
 async function clearLot(id) {
   let userLots = $(".userLots");
-  console.log(userLots);
 
   let lotToBeDeleted = userLots.find(`[data-id=${id}]`);
   userLots.each((lot) => {
@@ -1121,7 +1108,6 @@ async function clearLot(id) {
 
 async function clearArchiveLot(id) {
   let userLots = $(".userArchiveLots");
-  console.log(userLots);
 
   let lotToBeDeleted = userLots.find(`[data-id=${id}]`);
   userLots.each((lot) => {
@@ -1191,7 +1177,7 @@ createLotPublish.addEventListener("click", async function (e) {
     } else throw new Error(error);
   } catch (error) {
     alert("Ошибка! Что-то пошло не так.");
-    console.log(error);
+    console.error(error);
   }
   try {
     const response = await fetch(URL + "lots/" + newLotID + "/photos", {
@@ -1201,10 +1187,9 @@ createLotPublish.addEventListener("click", async function (e) {
         Authorization: `Basic ${encData()}`,
       },
     });
-    console.log(response);
   } catch (error) {
     alert("Ошибка! Что-то пошло не так.");
-    console.log(error);
+    console.error(error);
   }
   try {
     const response = await fetch(
@@ -1219,10 +1204,9 @@ createLotPublish.addEventListener("click", async function (e) {
       }
     );
     if (response.ok) {
-      console.log(response);
     } else throw new Error(error);
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
   try {
     const response = await fetch(
@@ -1239,10 +1223,9 @@ createLotPublish.addEventListener("click", async function (e) {
     if (response.ok) {
       clearLots();
       getMyLots();
-      console.log(response);
     } else throw new Error(error);
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 });
 

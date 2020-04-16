@@ -169,7 +169,6 @@ const uploadProfPic = async () => {
     });
 
     const result = await response.json();
-    console.log("Успех:", JSON.stringify(result));
 
     location.reload();
   } catch (error) {
@@ -185,7 +184,6 @@ const deleteProfPic = async () => {
     });
 
     const result = await response.json();
-    console.log("Успех:", JSON.stringify(result));
     location.reload();
   } catch (error) {
     console.error("Ошибка:", error);

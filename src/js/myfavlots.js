@@ -212,7 +212,7 @@ const createLotAndListeners = async (
         } else throw new Error(error);
       } catch (error) {
         alert("Ошибка! Что-то пошло не так.");
-        console.log(error);
+        console.error(error);
       }
     });
   return lotEl;
