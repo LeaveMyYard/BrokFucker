@@ -981,7 +981,10 @@ class RestAPI:
     @user.login_required
     @weighted(weight=1)
     def unsubscribe_from_lot(lot_id):
-        ''' Убрать подписку на лот. '''
+        ''' Убрать подписку на лот. 
+        
+        Отменяет подписку на лот.
+        Не возможно отменить подписку, если ее уже подтвердили.'''
 
         try:
             user.unsubscribe_from_lot(lot_id)
@@ -994,7 +997,41 @@ class RestAPI:
     @user.login_required
     @weighted(weight=2)
     def get_subscribed_lots():
-        ''' Получить список лотов, на которые ты подписан. '''
+        ''' Получить список лотов, на которые ты подписан. 
+        
+        Возвращает список лотов, на которые ты подписан.
+        Подписки не обязательно будут подтвержденными.
+        
+        Как и в любом другом списке лотов, тут 
+        присутствует фильтрация.
+        Это означает, что используя метод POST 
+        (для некоторых запросов, означает что-то другое) 
+        можно отправить параметр "filter", в котором
+        нужно передать словарь, поддерживающий 
+        следующие значения:
+        
+        "limit" - число лотов в списке, максимум 1000. 
+        По умолчанию - 1000.
+
+        "offset" - номер первого лота в списке 
+        (отступ от начала). По умолчанию - 0.
+
+        "order_by" - имя поля, по которому необходимо
+        сортировать список.
+
+        "order_type" - тип сортировки, "ASC" или "DESC".
+        По умолчанию - "ASC".
+
+        "show_only" - словарь, в котором ключи - имена полей,
+        по которым нужно делать фильтрацию. Поддерживаются
+        только те поля, которые имеют в настройках 
+        формат List[str]. Значение же - список строк, где
+        каждая строка - значение этого поля. В итоге запрос
+        вернет только те лоты, значения полей которых,
+        соответствуют данной фильтрации. То есть, для каждого
+        ключа, будут отфильтрованы те лоты, значения
+        соответствующего поля которого не находится в 
+        списке-значении.'''
 
         return jsonify({'lots': user.get_subscriptions()}), 200
 
@@ -1007,27 +1044,36 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def approve_lot(lot_id):
-        ''' Подтвердить лот. '''
+        ''' Подтвердить лот. 
+        
+        Подтверждает лот по айди.'''
 
         Lot(lot_id).approve()
         return RestAPI.message('A lot is now approved'), 201
 
     @staticmethod
-    @route('lots/<int:lot_id>/security', methods=['PUT', 'DELETE'])
+    @route('lots/<int:lot_id>/security', methods=['PUT'])
     @moderator.login_required
     @weighted(weight=1)
     def set_security_checked(lot_id):
         ''' Подтвердить/убрать проверенное обеспечение лота. '''
 
         lot = Lot(lot_id)
-        if request.method == 'PUT':
-            lot.set_security_checked(True)
-            lot.remove_request_for_security_verification()
-            return RestAPI.message('Lot\'s security is now checked'), 201
-        if request.method == 'DELETE':
-            lot.set_security_checked(False)
-            lot.remove_request_for_security_verification()
-            return RestAPI.message('Lot\'s security is no more checked'), 201
+        lot.set_security_checked(True)
+        lot.remove_request_for_security_verification()
+        return RestAPI.message('Lot\'s security is now checked'), 201
+
+    @staticmethod
+    @route('lots/<int:lot_id>/security', methods=['DELETE'])
+    @moderator.login_required
+    @weighted(weight=1)
+    def set_security_unchecked(lot_id):
+        ''' Подтвердить/убрать проверенное обеспечение лота. '''
+
+        lot = Lot(lot_id)
+        lot.set_security_checked(False)
+        lot.remove_request_for_security_verification()
+        return RestAPI.message('Lot\'s security is no more checked'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/guarantee', methods=['PUT'])

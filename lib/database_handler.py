@@ -908,6 +908,19 @@ class DatabaseHandler:
     def unsubscribe_user_from_lot(self, user, lot_id):
         id_hash = sha256(f'{user}_{lot_id}')
         self.cursor.execute(
+            f"SELECT `confirmed` FROM SubscriptionRequests WHERE `id` = ?",
+            (id_hash, )
+        )
+
+        res = self.cursor.fetchone()
+
+        if res is None:
+            raise APIExceptions.SubscriptionManagementError("Could not unsubscribe from lot, because you are not subscribed.")
+
+        if res[0] == 'True':
+            raise APIExceptions.SubscriptionManagementError("Could not unsubscribe from lot, because your subscription is already confirmed.")
+
+        self.cursor.execute(
             f"DELETE FROM SubscriptionRequests WHERE `id` = ?",
             (id_hash, )
         )
