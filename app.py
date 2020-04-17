@@ -1,24 +1,26 @@
-from flask import Flask, abort, jsonify, request, make_response, send_from_directory, send_file
-from flask_cors import CORS
-from flask_httpauth import HTTPBasicAuth
-from lib.database_handler import DatabaseHandler
-from lib.user import User as user
-from lib.moderator import Moderator as moderator
-from lib.admin import Admin as administrator
-from lib.lot import Lot
-from lib.settings import Settings
-from datetime import timedelta
-from typing import Union, Dict, Callable, List
 import json
 import lib.util.exceptions as APIExceptions
 import re
 import os
 import copy
 
+from flask import (
+    Flask, abort, jsonify, request, 
+    make_response, send_from_directory, 
+    send_file
+)
+from flask_cors import CORS
+from flask_httpauth import HTTPBasicAuth
+from lib.database_handler import DatabaseHandler
 from lib.util.logger import init_logger
-
+from lib.user import User as user
+from lib.moderator import Moderator as moderator
+from lib.admin import Admin as administrator
+from lib.lot import Lot
+from lib.settings import Settings
+from lib.util.decorators import weighted
 from datetime import datetime, timedelta
-from threading import Timer
+from typing import Union, Dict, Callable, List
 
 app = Flask(__name__, static_folder='admin/static')
 CORS(app)
@@ -27,78 +29,6 @@ logger = init_logger(__name__)
 
 app.config['UPLOAD_FOLDER'] = 'data/images/upload'
 app.config['MAX_CONTENT_PATH'] = Settings.get_maximum_image_size()
-
-ip_weights = {
-    '1s': {},
-    '1m': {},
-    '1h': {}
-}
-
-ban_list = {}
-
-max_weights = Settings.get_max_weights()
-
-def remove_1s():
-    ip_weights['1s'] = {}
-    t = Timer(1.0, remove_1s)
-    t.start()
-
-def remove_1m():
-    ip_weights['1m'] = {}
-    t = Timer(60.0, remove_1m)
-    t.start()
-
-def remove_1h():
-    ip_weights['1h'] = {}
-    t = Timer(3600.0, remove_1h)
-    t.start()
-
-remove_1s()
-remove_1m()
-remove_1h()
-
-def weighted(weight):
-    def decorator(func):
-        def res_func(*args, **kwargs):
-            request_ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
-
-            logger.debug(f"Request from {request_ip} with weight {weight}.")
-
-            if request_ip in ban_list:
-                duration = ban_list[request_ip][0] - datetime.now()
-                if duration < timedelta(seconds=0):
-                    ban_list.pop(request_ip)
-                else:
-                    raise APIExceptions.MaximumRequestsTimeout(time_to_end=int((ban_list[request_ip][0] - datetime.now()).total_seconds()))
-
-            ban_durations = [timedelta(minutes=5), timedelta(minutes=15), timedelta(hours=1), timedelta(days=1)]
-            
-            for key, values in ip_weights.items():
-                if request_ip not in values:
-                    values[request_ip] = 0
-                if values[request_ip] > max_weights[key]:
-                    ban_list[request_ip] = [datetime.now(), (ban_list[request_ip][1] if request_ip in ban_list else []) + [datetime.now()]]
-                    ban_list[request_ip][1] = ban_cases = list(filter(lambda time: time > datetime.now() - timedelta(days=1), ban_list[request_ip][1]))
-
-                    for stats in ip_weights:
-                        stats[request_ip] = 0
-
-                    ban_time = ban_durations[len(ban_cases) - 1]
-                    ban_list[request_ip][0] = datetime.now() + ban_time
-
-                    logger.warning(f"User {request_ip} was banned for {ban_time}")
-                    raise APIExceptions.MaximumRequestsTimeout(int(ban_time.total_seconds()))
-                values[request_ip] += weight
-
-            logger.debug(f"Stats: (1s: {ip_weights['1s'][request_ip]}, 1m: {ip_weights['1m'][request_ip]}, 1h: {ip_weights['1h'][request_ip]})")
-
-            return func(*args, **kwargs)
-
-        res_func.__name__ = func.__name__
-
-        return res_func
-    return decorator
-
 
 class WebApp:
     # This one redirects main page to index.html
@@ -221,7 +151,10 @@ class RestAPI:
     @route('ping', methods=['GET'])
     @weighted(weight=1)
     def ping():        
-        ''' Проверяет соединение с сервером. '''
+        ''' Проверяет соединение с сервером. 
+        
+        Проверяет соединение с Rest API.
+        Возвращает простое сообщение "pong".'''
 
         return RestAPI.message('pong'), 200
 
@@ -233,7 +166,13 @@ class RestAPI:
     @route('register', methods=['POST'])
     @weighted(weight=10)
     def register():
-        ''' Начинает процесс регистрации нового пользователя. '''
+        ''' Начинает процесс регистрации нового пользователя. 
+        
+        Запрос на создание нового аккаунта. 
+        Отправит письмо с подтверждением на почту, если такая почта существует. 
+        Иначе, выдаст ошибку.
+        В письме с подтверждением будет ссылка, перейдя по которой 
+        браузер отправит запрос на подтверждение почты с кодом из сообщения.'''
 
         request_json = RestAPI.request_data_to_json(request.data)
 
@@ -259,7 +198,15 @@ class RestAPI:
     @route('register/verify/<string:verification_hash>')
     @weighted(weight=2)
     def confirm_verification(verification_hash):
-        ''' Подтверждает регистрацию. '''
+        ''' Подтверждает регистрацию. 
+        
+        Подтверждает регистрацию по коду {verification_hash}.
+        Ссылка с этим кодом присылается на почту пользователю:
+        ./email_verification.html?code={verification_hash}
+
+        При желании, эту ссылку можно изменить в настройках сервера, 
+        в файле settings.json, в параметре "email_verification_link_base".'''
+
         return user.verify_email_from_code(verification_hash), 201
 
     # -------------------------------------------------------------------------
@@ -275,7 +222,9 @@ class RestAPI:
     @user.login_required
     @weighted(weight=1)
     def check_user(): 
-        ''' Информация о текущем пользователе. '''
+        ''' Информация о текущем пользователе. 
+        
+        Возвращает словарь с данными о текущем пользователе.'''
         return jsonify(user.get_data()), 200
 
     @staticmethod
@@ -283,7 +232,10 @@ class RestAPI:
     @user.login_required
     @weighted(weight=2)
     def edit_user_data():
-        ''' Обновить данные текущего пользователя. '''
+        ''' Обновить данные текущего пользователя. 
+        
+        Изменить параметры пользователя, такие как
+        номер телефона и/или имя.'''
 
         request_json = RestAPI.request_data_to_json(request.data)
 
@@ -298,14 +250,18 @@ class RestAPI:
             if data in request_json:
                 user.edit_data(data_required[data], request_json[data])
 
-        return RestAPI.message('Data is edited successful'), 201
+        return RestAPI.message('Data is edited successfully.'), 201
 
     @staticmethod
     @route('user/password', methods=['PUT'])
     @user.login_required
     @weighted(weight=10)
     def change_password():
-        ''' Запрос на изменение пароля пользователя. '''
+        ''' Запрос на изменение пароля пользователя. 
+        
+        Отправляет запрос на изменение пароля.
+        Подтверждение прийдет на почту пользователя с ссылкой,
+        по аналогии с подтверждением почты.'''
 
         request_json = RestAPI.request_data_to_json(request.data)
 

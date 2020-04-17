@@ -52,7 +52,7 @@
 
 Для этого, требуется переслать данные логина и пароля в шапке запроса.
 
-Существует несколько уровней доступа запроса: **Public**, **User**, **Moderator** и **Admin**.
+Существует несколько уровней доступа запроса: **public**, **user**, **moderator** и **administrator**.
 
 В случае отсутствия необходимого уровня доступа, в ответе вернется ошибка.
 
@@ -79,7 +79,7 @@
 ## Запросы пользователя
 ### Данные
 * ```(user) GET /api/v1/user```
-  * [Информация о текущем пользователе.]()
+  * [Информация о текущем пользователе.](#Информация-о-текущем-пользователе)
 * ```(user) PUT /api/v1/user```
   * [Обновить данные текущего пользователя.]()
 * ```(user) PUT /api/v1/user/password```
@@ -201,413 +201,330 @@
 * ```(administrator) DELETE /api/v1/user/<string:email>/moderator```
   * [Убрать права модератора.]()
 
--------------------------------------------------------------
-
-Документация далее нуждается в доработке и русском переводе.
-
-Не рекомендуется ее читать, так как некоторые вещи могут быть не верными или устаревшими.
-
 # Данные о запросах
 ## Публичные запросы
-
 ### Проверка соединения
 ```
 GET /api/v1/ping
 ```
+**Описание:**
+
 Проверяет соединение с Rest API.
+Возвращает простое сообщение "pong".
 
 **Уровень доступа:**
+
 Public
 
 **Параметры:**
-* NONE
 
-**Ответ:**
-```javascript
-{}
-```
+Отсутствуют
 
-### Создать новый аккаунт
-```
-POST /api/v1/register
-```
-Запрос на создание нового аккаунта. Отправит письмо на почту.
+**Вес:** 
 
-**Уровень доступа:**
-Public
-
-**Параметры:**
-* email: string
-* password: string
+1
 
 **Ответ:**
 ```javascript
 {
-  'msg': 'New user created'
+  "msg": "pong"
+}
+```
+
+## Запросы регистрации
+### Создать новый аккаунт
+```
+POST /api/v1/register
+```
+**Описание:**
+
+Запрос на создание нового аккаунта. 
+Отправит письмо с подтверждением на почту, если такая почта существует. 
+Иначе, выдаст ошибку.
+В письме с подтверждением будет ссылка, перейдя по которой 
+браузер отправит запрос на подтверждение почты с кодом из сообщения.
+
+**Уровень доступа:**
+
+Public
+
+**Параметры:**
+* email: string | обязательный
+* password: string | обязательный
+
+**Вес:** 
+
+10
+
+**Ответ:**
+```javascript
+{
+  'msg': 'Verification is sent to {email}'
 }
 ```
 
 ### Подтвердить регистрацию
 ```
-POST /api/v1/register
+GET /api/v1/register/verify/<string:verification_hash>
 ```
-Запрос на создание нового аккаунта. Отправит письмо на почту.
+**Описание:**
+
+Подтверждает регистрацию по коду {verification_hash}.
+Ссылка с этим кодом присылается на почту пользователю:
+./email_verification.html?code={verification_hash}
+
+При желании, эту ссылку можно изменить в настройках сервера, 
+в файле settings.json, в параметре "email_verification_link_base".
 
 **Уровень доступа:**
+
 Public
 
 **Параметры:**
-* email: string
-* password: string
+
+Отсутствуют
 
 **Ответ:**
 ```javascript
 {
-  'msg': 'New user created'
+  'msg': 'Email was succesfully confirmed.'
 }
 ```
 
-## Запросы польщователя
-
-### Get user data
+## Запросы пользователя
+### Информация о текущем пользователе
 ```
 GET /api/v1/user
 ```
-Load all main user data.
+**Описание:**
 
-**Level:**
+Возвращает словарь с данными о текущем пользователе.
+
+**Уровень доступа:**
+
 User
 
-**Parameters:**
-* NONE
+**Параметры:**
 
-**Response:**
+Отсутствуют
+
+**Вес:** 
+
+1
+
+**Ответ:**
 ```javascript
 {
-  'email': 'test@gmail.com',
-  'type': 'user',
-  'registration_date': '',
-  'name': null,
-  'phone_number': null,
-  'avatar': 'http://127.0.0.1:5000/image/user/diawyd8i1u82dy182hdh.png'
+  "avatar":"http://127.0.0.1:5000/image/user/default.jpg",
+  "email":"example@gmail.com",
+  "name":"Head Admin",
+  "phone_number":null,
+  "registration_date":"2020-02-24 00:50:24.262170",
+  "type":"admin"
 }
+
 ```
 
-### Create new lot
+### Обновить данные текущего пользователя
 ```
-POST /api/v1/lots/createNew
+PUT /api/v1/user
 ```
-The new lot will be by default unapproved and will wait for moderator to approve.
+**Описание:**
 
-**Level:**
+Изменить параметры пользователя, такие как
+номер телефона и/или имя.
+
+**Уровень доступа:**
+
 User
 
-**Parameters:**
+**Параметры:**
+* phone: string
 * name: string
-* amount: int
-* currency: string
-* term: int
-* return_way: int
-* security: string
-* percentage: double
-* form: int
 
-**Response:**
+**Вес:** 
+
+2
+
+**Ответ:**
 ```javascript
 {
-  'msg': 'New lot created'
+  "msg": "Data is edited successfully."
 }
 ```
 
-### Get list of approved lots
+### Краткое описание
 ```
-GET /api/v1/lots/approved
+PUT /api/v1/user/password
 ```
-The list of dictionaries will return.
+**Описание:**
 
-**Level:**
+Отправляет запрос на изменение пароля.
+Подтверждение прийдет на почту пользователя с ссылкой,
+по аналогии с подтверждением почты.
+
+**Уровень доступа:**
+
 User
 
-**Parameters:**
-* NONE
+**Параметры:**
 
-**Response:**
-```javascript
-[
-  {
-    'id': 1,
-    'date': 'date',
-    'name': 'testname',
-    'user': 'test@gmail.com',
-    'amount': 12345,
-    'currency': 'USD',
-    'term': 0,
-    'return_way': 2,
-    'security': 'house',
-    'percentage': 0',
-    'form': 1,
-    'security_checked': false,
-    'guarantee_percentage': 90
-  },
-  {
-    'id': 2,
-    'date': 'date',
-    'name': 'testname',
-    'user': 'test@gmail.com',
-    'amount': 12345,
-    'currency': 'USD',
-    'term': 0,
-    'return_way': 2,
-    'security': 'house',
-    'percentage': 0',
-    'form': 1,
-    'security_checked': false,
-    'guarantee_percentage': 90
-  },
-  ...,
-  {
-    'id': 3000,
-    'date': 'date',
-    'name': 'testname',
-    'user': 'test@gmail.com',
-    'amount': 12345,
-    'currency': 'USD',
-    'term': 0,
-    'return_way': 2,
-    'security': 'house',
-    'percentage': 0',
-    'form': 1,
-    'security_checked': false,
-    'guarantee_percentage': 90
-  },
-]
-```
+* password: string | обязательный
 
-### Get favorite lots list
-```
-GET /api/v1/lots/favorites
-```
-Returns the list of all user's favorite lots.
+**Вес:** 
 
-**Level:**
-User
+10
 
-**Parameters:**
-* NONE
-
-**Response:**
-```javascript
-[
-  {
-    'id': 1,
-    'date': 'date',
-    'name': 'testname',
-    'user': 'test@gmail.com',
-    'amount': 12345,
-    'currency': 'USD',
-    'term': 0,
-    'return_way': 2,
-    'security': 'house',
-    'percentage': 0',
-    'form': 1,
-    'security_checked': false,
-    'guarantee_percentage': 90
-  },
-  {
-    'id': 2,
-    'date': 'date',
-    'name': 'testname',
-    'user': 'test@gmail.com',
-    'amount': 12345,
-    'currency': 'USD',
-    'term': 0,
-    'return_way': 2,
-    'security': 'house',
-    'percentage': 0',
-    'form': 1,
-    'security_checked': false,
-    'guarantee_percentage': 90
-  },
-  ...,
-  {
-    'id': 3000,
-    'date': 'date',
-    'name': 'testname',
-    'user': 'test@gmail.com',
-    'amount': 12345,
-    'currency': 'USD',
-    'term': 0,
-    'return_way': 2,
-    'security': 'house',
-    'percentage': 0',
-    'form': 1,
-    'security_checked': false,
-    'guarantee_percentage': 90
-  },
-]
-```
-
-### Add lot to favorites
-```
-POST /api/v1/lots/favorites/<lot_id>
-
-or
-
-PUT /api/v1/lots/favorites/<lot_id>
-```
-A lot id parametr should me passed at `<lot_id>` place.
-
-**Level:**
-User
-
-**Parameters:**
-* NONE
-
-**Response:**
+**Ответ:**
 ```javascript
 {
-  'msg': 'A lot is added to favorites'
+
 }
 ```
 
-### Remove lot from favorites
+* ```(user) PUT /api/v1/user/password```
+  * [Запрос на изменение пароля пользователя.]()
+* ```(public) GET /api/v1/lots/password/verification/<string:code>```
+  * [Подтвердить код изменения пароля.]()
+* ```(user) GET /api/v1/user/restore/<string:email>```
+  * [Восстановить пароль.]()
+* ```(public) GET /api/v1/user/restore/verify/<string:code>```
+  * [Подтвердить восстановление пароля.]()
+### Аватар
+* ```(user) GET /api/v1/user/avatar```
+  * [Ссылка на аватар текущего пользователя.]()
+* ```(user) POST /api/v1/user/avatar```
+  * [Загрузить новый аватар.]()
+* ```(user) DELETE /api/v1/user/avatar```
+  * [Удалить текущий аватар.]()
+  
+## Лоты
+### Общее
+* ```(public) GET /api/v1/lots/settings```
+  * [Информация о доступных значениях различных полей лотов.]()
+* ```(public) GET /api/v1/lots```
+  * [Получить все публичные лоты.]()
+* ```(public) GET/POST /api/v1/lots/approved```
+  * [Копия GET /api/v1/lots.]()
+* ```(user) POST /api/v1/lots```
+  * [Создать новый лот.]()
+* ```(public) GET /api/v1/lots/<int:id>```
+  * [Получить данные о лоте.]()
+* ```(user) PUT /api/v1/lots/<int:id>```
+  * [Обновить данные лота.]()
+* ```(user) POST /api/v1/lots/<int:id>```
+  * [Восстановить удаленный лот.]()
+* ```(user) DELETE /api/v1/lots/<int:id>```
+  * [Удалить лот.]()
+* ```(user) DELETE /api/v1/lots/personal/deleted/<int:lot_id>```
+  * [Полностью удалить лот.]()
+* ```(public) GET /api/v1/lots/<int:id>/photos```
+  * [Получить список фотографий лота.]()
+* ```(user) POST /api/v1/lots/<int:id>/photos```
+  * [Добавить лоту фотографию.]()
+* ```(user) DELETE /api/v1/lots/<int:id>/photos/<int:photo_id>```
+  * [Удалить фотографию лота.]()
+### Избранное
+* ```(user) PUT /api/v1/lots/favorites/<int:lot_id>```
+  * [Добавить лот в избранное.]()
+* ```(user) DELETE /api/v1/lots/favorites/<int:lot_id>```
+  * [Удалить лот из избранных.]()
+* ```(user) GET/POST /api/v1/lots/favorites```
+  * [Получить список избранных лотов.]()
+### Свои лоты
+* ```(user) GET/POST /api/v1/lots/personal```
+  * [Получить список своих не занятых лотов.]()
+* ```(user) GET/POST /api/v1/lots/personal/current```
+  * [Дубликат /api/v1/lots/personal]()
+* ```(user) GET/POST /api/v1/lots/personal/taken```
+  * [Получить список своих лотов, нашедших финансирование.]()
+* ```(user) GET/POST /api/v1/lots/personal/finished```
+  * [Получить список своих завершенных лотов.]()
+* ```(user) GET/POST /api/v1/lots/personal/deleted```
+  * [Получить список своих удаленных лотов.]()
+### Подписки
+* ```(user) PUT /api/v1/lots/subscription/<int:id>```
+  * [Подписаться на лот.]()
+* ```(user) DELETE /api/v1/lots/subscription/<int:id>```
+  * [Убрать подписку на лот.]()
+* ```(user) GET /api/v1/lots/subscription```
+  * [Получить список лотов, на которые ты подписан.]()
+### Запросы
+* ```(user) PUT /api/v1/lots/personal/<int:lot_id>/request/guarantee```
+  * [Запросить гарантию клуба.]()
+* ```(user) PUT /api/v1/lots/personal/<int:lot_id>/request/verify_security```
+  * [Запросить подтверждение обеспечения.]()
+
+## Запросы модератора
+### Лоты
+* ```(moderator) PUT /api/v1/lots/<int:lot_id>/approve```
+  * [Подтвердить лот.]()
+* ```(moderator) PUT /api/v1/lots/<int:lot_id>/security```
+  * [Подтвердить проверенное обеспечение лота.]()
+* ```(moderator) DELETE /api/v1/lots/<int:lot_id>/security```
+  * [Убрать проверенное обеспечение лота.]()
+* ```(moderator) PUT /api/v1/lots/<int:lot_id>/guarantee```
+  * [Установить гарантию клуба лоту.]()
+* ```(moderator) DELETE /api/v1/lots/<int:lot_id>/guarantee```
+  * [Убрать гарантию клуба у лота.]()
+* ```(moderator) GET /api/v1/lots/unapproved```
+  * [Получить список неподтвержденных лотов.]()
+### Подписки
+* ```(moderator) GET /api/v1/lots/subscription/approved```
+  * [Получить список подтвержденных подписок.]()
+* ```(moderator) GET /api/v1/lots/subscription/unapproved```
+  * [Получить список неподтвержденных подписок.]()
+* ```(moderator) DELETE /api/v1/lots/unapproved/<int:lot_id>```
+  * [Отклонить неподтвержденный лот.]()
+### Запросы
+* ```(moderator) GET /api/v1/lots/requested/guarantee```
+  * [Получить список лотов, запросивших гарантию клуба.]()
+* ```(moderator) GET /api/v1/lots/requested/security_verification```
+  * [Получить список лотов, запросивших проверку обеспечения.]()
+* ```(moderator) GET /api/v1/lots/subscription/<string:id>/approve```
+  * [Подтвердить неподтвержденную подписку.]()
+* ```(moderator) GET /api/v1/lots/subscription/<string:id>/unapprove```
+  * [Снять подтверждение подписки.]()
+* ```(moderator) DELETE /api/v1/lots/subscription/<string:id>```
+  * [Удалить неподтвержденную подписку.]()
+* ```(moderator) GET /api/v1/lots/subscription/<string:id>/finish```
+  * [Закончить подтвержденную подписку.]()
+### Архив
+* ```(moderator) GET/POST /api/v1/lots/archive```
+  * [Получить список архивных подписок.]()
+* ```(moderator) GET /api/v1/lots/archive/<int:lot_id>```
+  * [Посмотреть историю архивной подписки.]()
+
+## Запросы администратора
+* ```(administrator) PUT /api/v1/user/<string:email>/moderator```
+  * [Добавить права модератора.]()
+* ```(administrator) DELETE /api/v1/user/<string:email>/moderator```
+  * [Убрать права модератора.]()
+
+
+### Краткое описание
 ```
-DELETE /api/v1/lots/favorites/<lot_id>
+POST /api/v1/register
 ```
-A lot id parametr should me passed at `<lot_id>` place.
+**Описание:**
 
-**Level:**
-User
+Конкретное описание
 
-**Parameters:**
-* NONE
+**Уровень доступа:**
 
-**Response:**
+Public/User/Moderator/Administrator
+
+**Параметры:**
+
+Отсутствуют
+
+**Вес:** 
+
+10
+
+**Ответ:**
 ```javascript
 {
-  'msg': 'A lot is removed from favorites'
+
 }
-```
-
-## Moderator endpoints
-
-### Approve a lot
-```
-PUT /api/v1/lots/<int:lot_id>/approve
-```
-A lot id parametr should me passed at `<lot_id>` place.
-
-**Level:**
-Moderator
-
-**Parameters:**
-* NONE
-
-**Response:**
-```javascript
-{
-  'msg': 'A lot is now approved'
-}
-```
-
-### Set lot's security checked
-```
-PUT /api/v1/lots/<int:lot_id>/setSecurityChecked
-```
-A lot id parametr should me passed at `<lot_id>` place.
-
-**Level:**
-Moderator
-
-**Parameters:**
-* NONE
-
-**Response:**
-```javascript
-{
-  'msg': 'Lot\'s security is now checked'
-}
-```
-
-### Set lot's security unchecked
-```
-PUT /api/v1/lots/<int:lot_id>/setSecurityUnchecked
-```
-A lot id parametr should me passed at `<lot_id>` place.
-
-**Level:**
-Moderator
-
-**Parameters:**
-* NONE
-
-**Response:**
-```javascript
-{
-  'msg': 'Lot\'s security is no more checked'
-}
-```
-
-### Get all unapproved lots
-```
-GET /api/v1/lots/unapproved
-```
-Returns the list of unapproved lots.
-
-**Level:**
-Moderator
-
-**Parameters:**
-* NONE
-
-**Response:**
-```javascript
-[
-  {
-    'id': 1,
-    'date': 'date',
-    'name': 'testname',
-    'user': 'test@gmail.com',
-    'amount': 12345,
-    'currency': 'USD',
-    'term': 0,
-    'return_way': 2,
-    'security': 'house',
-    'percentage': 0',
-    'form': 1,
-    'security_checked': false,
-    'guarantee_percentage': 90
-  },
-  {
-    'id': 2,
-    'date': 'date',
-    'name': 'testname',
-    'user': 'test@gmail.com',
-    'amount': 12345,
-    'currency': 'USD',
-    'term': 0,
-    'return_way': 2,
-    'security': 'house',
-    'percentage': 0',
-    'form': 1,
-    'security_checked': false,
-    'guarantee_percentage': 90
-  },
-  ...,
-  {
-    'id': 3000,
-    'date': 'date',
-    'name': 'testname',
-    'user': 'test@gmail.com',
-    'amount': 12345,
-    'currency': 'USD',
-    'term': 0,
-    'return_way': 2,
-    'security': 'house',
-    'percentage': 0',
-    'form': 1,
-    'security_checked': false,
-    'guarantee_percentage': 90
-  },
-]
 ```
