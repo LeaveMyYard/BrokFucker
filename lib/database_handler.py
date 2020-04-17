@@ -13,16 +13,41 @@ from threading import Timer
 from lib.util.logger import init_logger
 from lib.util.hash import sha256
 from lib.settings import Settings
-from werkzeug.utils import secure_filename
-from PIL import Image
 from os import path, remove
 from datetime import datetime
 from lib.util.enums import SubscriptionTypes
 
-class SubscriptionStatus(Enum):
-    NotConfirmed = 1
-    Confirmed = 2
-    Finished = 3
+class DatabaseDrivenObject:
+    def __init__(self, file_name: str = 'database.db'):
+        
+        #Test if 'data' folder exists. If not, create it.
+        directory = 'data'
+        self.create_directory_if_not_exists(directory)
+
+        #All database files will be located at data folder
+        self.conn = sqlite3.connect(f'{directory}/{file_name}')
+        self.cursor = self.conn.cursor()
+        self.logger = init_logger(self.__class__.__name__)
+
+    @staticmethod
+    def create_directory_if_not_exists(directory):
+        try:
+            os.stat(directory)
+        except:
+            os.mkdir(directory)
+
+    @staticmethod
+    def init_tables():
+        database = DatabaseHandler()
+        script = 'lib/sql/init_tables.sql'
+        database.logger.debug(f'Initializing database from `{script}` file...')
+
+        #Load tables init sql request from 'lib/sql/init_tables.sql' and execute it. 
+        request_file = open(script, mode='r')
+        database.cursor.executescript(request_file.read())
+        database.conn.commit()
+
+
 
 class DatabaseHandler:
     def __init__(self, file_name: str = 'database.db'):
@@ -438,32 +463,6 @@ class DatabaseHandler:
 
         return lot_id
 
-    def is_lot_exists(self, lot_id):
-        self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `id` = ?",
-            (lot_id, )
-        )
-
-        return self.cursor.fetchone() is not None
-
-    def approve_lot(self, lot_id):
-        if self.is_lot_removed_by_a_moderator(lot_id):
-            self.remove_moderator_delete_reason(lot_id)
-
-        self.cursor.execute(
-            f"UPDATE Lots SET `confirmed` = 'True' WHERE `id` = ?",
-            (lot_id, )
-        )
-        self.conn.commit()
-        self.logger.info(f'New lot with id `{lot_id}` was approved')
-
-    def unapprove_lot(self, lot_id):
-        self.cursor.execute(
-            f"UPDATE Lots SET `confirmed` = 'False' WHERE `id` = ?",
-            (lot_id, )
-        )
-        self.conn.commit()
-
     def get_user_display_name(self, user):
         data = self.get_user_data(user)
         return data['name'] or data['email']
@@ -525,169 +524,6 @@ class DatabaseHandler:
         )
         self.conn.commit()
 
-    def serialize_lot(self, lot: Tuple):
-        res = {
-            'id': lot[0],
-            'date': lot[1],
-            'name': lot[2],
-            'user': lot[3],
-            'user_display_name': self.get_user_display_name(lot[3]),
-            'user_avatar': self.get_user_avatar_link(lot[3]),
-            'amount': lot[4],
-            'currency': lot[5],
-            'term': lot[6],
-            'return_way': lot[7],
-            'security': lot[8],
-            'percentage': lot[9],
-            'form': lot[10],
-            'security_checked': eval(lot[11]),
-            'guarantee_percentage': lot[12],
-            'confirmed': eval(lot[13]),
-            'commentary': lot[15],
-            'photos': self.get_lot_photos(lot[0]),
-            'taken': self.check_taken(lot[0])
-        }
-        
-        if self.is_lot_removed_by_a_moderator(lot[0]):
-            res['remove_reason'] = self.get_remove_reason(lot[0])
-
-        res['verification_requested'] = self.check_lot_security_verification_requested(lot[0])
-        res['club_guarantee_requested'] = self.check_club_guarantee_requested(lot[0])
-
-        return res
-
-    def set_lot_security_verification_requested(self, lot_id, requested: bool = True):
-        if requested:
-            self.cursor.execute(
-                f"INSERT OR IGNORE INTO LotSecurityVerificationRequests VALUES(?)",
-                (lot_id, )
-            )
-        else:
-            self.cursor.execute(
-                f"DELETE FROM LotSecurityVerificationRequests WHERE `id` = ?",
-                (lot_id, )
-            )
-
-        self.conn.commit()
-
-    def check_lot_security_verification_requested(self, lot_id):
-        self.cursor.execute(
-            f"SELECT * FROM LotSecurityVerificationRequests WHERE `id` = ?",
-            (lot_id,)
-        )
-
-        return self.cursor.fetchone() is not None
-
-    def set_lot_guarantee_requested(self, lot_id, requested: bool = True):
-        if requested:
-            self.cursor.execute(
-                f"INSERT OR IGNORE INTO LotGuaranteeRequests VALUES(?)",
-                (lot_id, )
-            )
-        else:
-            self.cursor.execute(
-                f"DELETE FROM LotGuaranteeRequests WHERE `id` = ?",
-                (lot_id, )
-            )
-
-        self.conn.commit()
-
-    def check_club_guarantee_requested(self, lot_id):
-        self.cursor.execute(
-            f"SELECT * FROM LotGuaranteeRequests WHERE `id` = ?",
-            (lot_id,)
-        )
-
-        return self.cursor.fetchone() is not None
-
-    def add_moderator_delete_reason(self, lot_id, moderator, reason):
-        if self.is_lot_removed_by_a_moderator(lot_id):
-            self.remove_moderator_delete_reason(lot_id)
-
-        self.cursor.execute(
-            f"INSERT INTO LotVerificationDeclines VALUES(?,?,?)",
-            (lot_id, reason, moderator)
-        )
-
-        self.conn.commit()
-
-    def remove_moderator_delete_reason(self, lot_id):
-        self.cursor.execute(
-            f"DELETE FROM LotVerificationDeclines WHERE `id` = ?",
-            (lot_id, )
-        )
-
-        self.conn.commit()
-
-    def is_lot_removed_by_a_moderator(self, lot_id):
-        self.cursor.execute(
-            f"SELECT * FROM LotVerificationDeclines WHERE `id` = ?",
-            (lot_id, )
-        )
-
-        return self.cursor.fetchall() != []
-
-    def get_remove_reason(self, lot_id):
-        self.cursor.execute(
-            f"SELECT `reason` FROM LotVerificationDeclines WHERE `id` = ?",
-            (lot_id, )
-        )
-
-        return self.cursor.fetchone()[0]
-
-    def check_taken(self, lot_id):
-        self.cursor.execute(
-            f"SELECT * FROM ConfirmedSubscriptions WHERE `lot` = ?",
-            (lot_id, )
-        )
-        return self.cursor.fetchall() != []
-
-    def get_lot(self, lot_id):
-        self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `id` = ?",
-            (lot_id, )
-        )
-        lot = self.cursor.fetchone()
-
-        return self.serialize_lot(lot)
-
-    @staticmethod
-    def __format_sql_lot_filter_string(lot_filter, where_is_already_used: bool = False) -> str:
-        res = ""
-        if lot_filter['show_only'] is not None:
-            res += (' WHERE ' if not where_is_already_used else ' AND ') + ' AND '.join(
-                [' OR '.join([f"`{type}` = '{value}'" for value in lot_filter['show_only'][type]]) for type in lot_filter['show_only']]
-            )
-        if lot_filter['order_by'] is not None:
-            res += f" ORDER BY `{lot_filter['order_by']}` {lot_filter['order_type'] if lot_filter['order_type'] is not None else ''}"
-        if lot_filter['limit'] is not None:
-            res += f" LIMIT {lot_filter['limit']}"
-        if lot_filter['offset'] is not None:
-            res += f" OFFSET {lot_filter['offset']}"
-        return res
-
-    def get_all_approved_lots(self, lot_filter):
-        self.cursor.execute(
-            "SELECT * FROM LiveLots" + self.__format_sql_lot_filter_string(lot_filter)
-        )
-
-        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
-
-    def get_all_unapproved_lots(self, lot_filter):
-        self.cursor.execute(
-            f"SELECT * FROM LiveUnacceptedLots" + self.__format_sql_lot_filter_string(lot_filter)
-        )
-
-        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
-
-    def set_security_checked(self, lot_id, checked):
-        self.cursor.execute(
-            f"UPDATE Lots SET `security_checked` = ? WHERE `id` = ?",
-            (str(checked), lot_id)
-        )
-        self.conn.commit()
-        self.logger.debug(f'`Security checked` flag on lot with id `{lot_id}` is set to `{checked}`')
-
     def add_lot_to_favorites(self, email, lot_id):
         self.cursor.execute(
             f"SELECT `favorite_lots` FROM UsersLots WHERE `email` = ?",
@@ -718,173 +554,6 @@ class DatabaseHandler:
             f"UPDATE UsersLots SET `favorite_lots` = ? WHERE `email` = ?",
             (str(res), email)
         )
-        self.conn.commit()
-
-    def get_favorites(self, email, lot_filter):
-        self.cursor.execute(
-            f"SELECT `favorite_lots` FROM UsersLots WHERE `email` = ?" +
-            self.__format_sql_lot_filter_string(lot_filter, where_is_already_used=True), 
-            (email, )
-        )
-        
-        res: list = eval(self.cursor.fetchone()[0])
-
-        return [self.get_lot(lot_id) for lot_id in reversed(res)]
-
-    def get_personal(self, email, lot_filter):
-        self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `user` = ? AND `deleted` = 'False' "
-            "AND `id` NOT IN ConfirmedLots "
-            "AND `id` NOT IN FinishedLots" +
-            self.__format_sql_lot_filter_string(lot_filter, where_is_already_used=True),
-            (email, )
-        )
-
-        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
-
-    def get_personal_confirmed(self, email, lot_filter):
-        self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `user` = ? AND `deleted` = 'False' "
-            "AND `id` IN ConfirmedLots " +
-            self.__format_sql_lot_filter_string(lot_filter, where_is_already_used=True),
-            (email, )
-        )
-
-        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
-
-    def get_personal_finished(self, email, lot_filter):
-        self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `user` = ? AND `deleted` = 'False' "
-            "AND `id` IN FinishedLots " +
-            self.__format_sql_lot_filter_string(lot_filter, where_is_already_used=True),
-            (email, )
-        )
-
-        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
-
-    def get_personal_deleted(self, email, lot_filter):
-        self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `user` = ? and `deleted` = 'True'" + self.__format_sql_lot_filter_string(lot_filter, where_is_already_used=True),
-            (email, )
-        )
-
-        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
-
-    def get_lot_creator(self, lot_id):
-        self.cursor.execute(
-            f"SELECT `user` FROM Lots WHERE `id` = ?",
-            (lot_id, )
-        )
-
-        return self.cursor.fetchone()[0]
-
-    def delete_lot(self, lot_id):
-        self.cursor.execute(
-            f"UPDATE Lots SET `deleted` = 'True' WHERE `id` = ?",
-            (lot_id, )
-        )
-        self.conn.commit()
-
-    def restore_lot(self, lot_id):
-        self.cursor.execute(
-            f"UPDATE Lots SET `deleted` = 'False' WHERE `id` = ?",
-            (lot_id, )
-        )
-        self.conn.commit()
-
-    def update_data(self, lot_id, field, value):
-        self.cursor.execute(
-            f"UPDATE Lots SET `{field}` = ? WHERE `id` = ?",
-            (value, lot_id)
-        )
-        self.conn.commit()
-
-    @staticmethod
-    def jsonify_photos(lot_id, photos):
-        return {
-            'lot_id': lot_id,
-            'photos': [f'{request.host_url}image/lot/{photo}.jpg' for photo in photos]
-        }
-
-    def get_lot_photos_list(self, lot_id):
-        self.cursor.execute(
-            f"SELECT `photos` FROM Lots WHERE `id` = ?",
-            (lot_id, )
-        )
-
-        return eval(self.cursor.fetchone()[0])
-
-    def get_lot_photos(self, lot_id):
-        return self.jsonify_photos(lot_id, self.get_lot_photos_list(lot_id))
-
-    def add_photo(self, image, lot_id):
-        self.create_directory_if_not_exists('data/images/temp')
-        self.create_directory_if_not_exists('data/images/lots')
-
-        temporary_file_location = f'data/images/temp/{secure_filename(image.filename)}'
-        image.save(temporary_file_location)
-
-        im = Image.open(temporary_file_location)
-        photo_hash = sha256(str(datetime.now()))
-        file_location = f'data/images/lots/{photo_hash}.jpg'
-        im = im.convert("RGB")
-        im.save(file_location)
-
-        remove(temporary_file_location)
-
-        self.cursor.execute(
-            f"SELECT `photos` FROM Lots WHERE `id` = ?",
-            (lot_id, )
-        )
-        photos = eval(self.cursor.fetchone()[0])
-        photos.append(photo_hash)
-
-        stringified_photos = str(photos).replace('\'', '"')
-
-        self.cursor.execute(
-            f"UPDATE Lots SET `photos` = ? WHERE `id` = ?",
-            (stringified_photos, lot_id)
-        )
-        self.conn.commit()
-
-        return 'Photo is successfuly added.'
-
-    def remove_photo(self, lot_id, photo_id):
-        self.cursor.execute(
-            f"SELECT `photos` FROM Lots WHERE `id` = ?",
-            (lot_id, )
-        )
-        photos: list = eval(self.cursor.fetchone()[0])
-        photos.pop(photo_id)
-        stringified_photos = str(photos).replace('\'', '"')
-
-        self.cursor.execute(
-            f"UPDATE Lots SET `photos` = ? WHERE `id` = ?",
-            (stringified_photos, lot_id)
-        )
-        self.conn.commit()
-
-        return 'Photo is successfuly removed.'
-
-    def is_lot_in_archive(self, lot_id) -> bool:
-        self.cursor.execute(
-            f"SELECT `deleted` FROM Lots WHERE `id` = ?",
-            (lot_id, )
-        )
-
-        return self.cursor.fetchone()[0] == 'True'
-
-    def delete_lot_data(self, lot_id):
-        self.cursor.execute(
-            f"DELETE FROM LotVerificationDeclines WHERE `id` = ?",
-            (lot_id, )
-        )
-
-        self.cursor.execute(
-            f"DELETE FROM Lots WHERE `id` = ?",
-            (lot_id, )
-        )
-
         self.conn.commit()
 
     def user_has_phone_number(self, user):
@@ -926,81 +595,6 @@ class DatabaseHandler:
         )
         self.conn.commit()
 
-    def get_user_subscriptions(self, user):
-        self.cursor.execute(
-            f"SELECT `lot`, `confirmed`, `type`, `message` FROM SubscriptionRequests WHERE `user` = ?",
-            (user, )
-        )
-        return [{'lot': lot, 'type': SubscriptionTypes(type).name, 'message': message, 'confirmed': eval(confirmed)} for lot, confirmed, type, message in self.cursor.fetchall()]
-
-    def approve_subscription(self, id, approve=True):
-        self.cursor.execute(
-            f"UPDATE SubscriptionRequests SET `confirmed` = ? WHERE `id` = ?",
-            (str(approve), id)
-        )
-
-        self.conn.commit()
-
-    def get_subscription_status(self, id) -> SubscriptionStatus:
-        self.cursor.execute(
-            f"SELECT `confirmed`, `finished` FROM SubscriptionRequests WHERE `id` = ?",
-            (id, )
-        )
-
-        confirmed, finished = self.cursor.fetchone()
-        confirmed, finished = eval(confirmed), eval(finished)
-
-        if finished:
-            return SubscriptionStatus.Finished
-        elif confirmed:
-            return SubscriptionStatus.Confirmed
-        else:
-            return SubscriptionStatus.NotConfirmed
-
-    def delete_subscription(self, id):
-        status = self.get_subscription_status(id)
-
-        if status != SubscriptionStatus.NotConfirmed:
-            raise APIExceptions.SubscriptionManagementError(f'Could not delete subscription with status {status.name()}')
-        
-        self.cursor.execute(
-            f"DELETE FROM SubscriptionRequests WHERE `id` = ?",
-            (id, )
-        )
-
-        self.conn.commit()
-
-    def finish_subscription(self, id, finished=True):
-        status = self.get_subscription_status(id)
-
-        if status != SubscriptionStatus.Confirmed:
-            raise APIExceptions.SubscriptionManagementError(f'Could not finish subscription with status {status.name()}')
-
-        self.cursor.execute(
-            f"UPDATE SubscriptionRequests SET `finished` = ? WHERE `id` = ?",
-            (str(finished), id)
-        )
-
-        self.conn.commit()
-
-    def get_approved_subscriptions(self):
-        self.cursor.execute(
-            f"SELECT * FROM ConfirmedSubscriptions"
-        )
-        return [{'id': id, 'user': user, 'lot': lot, 'type': SubscriptionTypes(type).name, 'message': message} for id, user, lot, type, message in self.cursor.fetchall()]
-
-    def get_unapproved_subscriptions(self):
-        self.cursor.execute(
-            f"SELECT * FROM UnconfirmedSubscriptions"
-        )
-        return [{'id': id, 'user': user, 'lot': lot, 'type': SubscriptionTypes(type).name, 'message': message} for id, user, lot, type, message in self.cursor.fetchall()]
-
-    def get_finished_subscriptions(self):
-        self.cursor.execute(
-            f"SELECT * FROM FinishedSubscriptions"
-        )
-        return [{'id': id, 'user': user, 'lot': lot, 'type': SubscriptionTypes(type).name, 'message': message} for id, user, lot, type, message in self.cursor.fetchall()]
-
     def set_moderator_rights(self, email):
         self.cursor.execute(
             f"UPDATE Users SET `type` = 1 WHERE `email` = ?",
@@ -1016,50 +610,3 @@ class DatabaseHandler:
         )
 
         self.conn.commit()
-
-    def set_lot_guarantee_value(self, lot_id, value):
-        self.cursor.execute(
-            f"UPDATE Lots SET `guarantee_percentage` = ? WHERE `id` = ?",
-            (value, lot_id)
-        )
-
-        self.conn.commit()
-
-    def get_lots_with_guarantee_requested(self, lot_filter):
-        self.cursor.execute(
-            "SELECT * FROM LotsWithGuaranteeRequested" + self.__format_sql_lot_filter_string(lot_filter)
-        )
-
-        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
-
-    def get_lots_with_security_verification_requested(self, lot_filter):
-        self.cursor.execute(
-            "SELECT * FROM LotsWithSecurityVerificationRequested" + self.__format_sql_lot_filter_string(lot_filter)
-        )
-
-        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
-
-    def get_archived_lots(self, lot_filter):
-        self.cursor.execute(
-            "SELECT * FROM ArchiveLatestLots" + self.__format_sql_lot_filter_string(lot_filter)
-        )
-
-        return [self.serialize_lot(lot) for lot in self.cursor.fetchall()]
-
-    def get_archived_lot_history(self, lot_id, lot_filter):
-        self.cursor.execute(
-            "SELECT * FROM LotsArchive" + self.__format_sql_lot_filter_string(lot_filter)
-        )
-
-        table = self.cursor.fetchall()
-        res_list = []
-
-        for row in table:
-            row = list(row)
-            row[0], row[17] = row[17], row[0]
-            res = self.serialize_lot(row)
-            res['record_id'] = row[17]
-            res['approve_date'] = row[18]
-            res_list.append(res)
-
-        return res_list
