@@ -1315,7 +1315,9 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def approve_subscription(id):
-        ''' Подтвердить неподтвержденную подписку. '''
+        ''' Подтвердить неподтвержденную подписку. 
+        
+        Подтвердить подписку из списка неподтвержденных подписок.'''
 
         Lot.set_subscription_approved(id)
         return RestAPI.message(f'Subscription {id} is now approved.'), 201
@@ -1325,7 +1327,10 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def unapprove_subscription(id):
-        ''' Снять подтверждение подписки. '''
+        ''' Снять подтверждение подписки. 
+        
+        Убрать с подтвержденной подписки подтверждение.
+        Автоматически, лот снова будет в поиске спонсора.'''
 
         Lot.set_subscription_approved(id, approved=False)
         return RestAPI.message(f'Subscription {id} is now unapproved.'), 201
@@ -1335,7 +1340,9 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def delete_subscription(id):
-        ''' Удалить неподтвержденную подписку. '''
+        ''' Удалить неподтвержденную подписку. 
+        
+        Удалить подписку, которая ожидает подтверждения.'''
 
         Lot.delete_subscription(id)
         return RestAPI.message(f'Subscription {id} is now deleted.'), 201
@@ -1345,7 +1352,11 @@ class RestAPI:
     @moderator.login_required
     @weighted(weight=1)
     def finish_subscription(id):
-        ''' Закончить подтвержденную подписку. '''
+        ''' Закончить подтвержденную подписку. 
+        
+        Отметить подтвержденную подписку, как законченную.
+        Соответственно, лот, на который ссылается подписка,
+        так-же станет завершенным.'''
         
         Lot.finish_subscription(id)
         return RestAPI.message(f'Subscription {id} is now finished.'), 201
@@ -1355,6 +1366,42 @@ class RestAPI:
     @administrator.login_required
     @weighted(weight=5)
     def get_lots_archive():
+        ''' Получить список архивных лотов.
+
+        Получить список лотов, которые были подтверждены когда-либо.
+        Значение каждого соответствующего лота выводятся в последней по времени записи.
+        
+        Как и в любом другом списке лотов, тут 
+        присутствует фильтрация.
+        Это означает, что используя метод POST 
+        (для некоторых запросов, означает что-то другое) 
+        можно отправить параметр "filter", в котором
+        нужно передать словарь, поддерживающий 
+        следующие значения:
+        
+        "limit" - число лотов в списке, максимум 1000. 
+        По умолчанию - 1000.
+
+        "offset" - номер первого лота в списке 
+        (отступ от начала). По умолчанию - 0.
+
+        "order_by" - имя поля, по которому необходимо
+        сортировать список.
+
+        "order_type" - тип сортировки, "ASC" или "DESC".
+        По умолчанию - "ASC".
+
+        "show_only" - словарь, в котором ключи - имена полей,
+        по которым нужно делать фильтрацию. Поддерживаются
+        только те поля, которые имеют в настройках 
+        формат List[str]. Значение же - список строк, где
+        каждая строка - значение этого поля. В итоге запрос
+        вернет только те лоты, значения полей которых,
+        соответствуют данной фильтрации. То есть, для каждого
+        ключа, будут отфильтрованы те лоты, значения
+        соответствующего поля которого не находится в 
+        списке-значении.'''
+
         try:
             request_json = RestAPI.request_data_to_json(request.data)
         except APIExceptions.NoJsonError:
@@ -1369,6 +1416,42 @@ class RestAPI:
     @administrator.login_required
     @weighted(weight=5)
     def get_lot_archive_history(lot_id):
+        ''' Посмотреть историю архивного лота.
+
+        Получить список лотов, каждый лот из которых
+        является исторической записью лота по номеру lot_id.
+        
+        Как и в любом другом списке лотов, тут 
+        присутствует фильтрация.
+        Это означает, что используя метод POST 
+        (для некоторых запросов, означает что-то другое) 
+        можно отправить параметр "filter", в котором
+        нужно передать словарь, поддерживающий 
+        следующие значения:
+        
+        "limit" - число лотов в списке, максимум 1000. 
+        По умолчанию - 1000.
+
+        "offset" - номер первого лота в списке 
+        (отступ от начала). По умолчанию - 0.
+
+        "order_by" - имя поля, по которому необходимо
+        сортировать список.
+
+        "order_type" - тип сортировки, "ASC" или "DESC".
+        По умолчанию - "ASC".
+
+        "show_only" - словарь, в котором ключи - имена полей,
+        по которым нужно делать фильтрацию. Поддерживаются
+        только те поля, которые имеют в настройках 
+        формат List[str]. Значение же - список строк, где
+        каждая строка - значение этого поля. В итоге запрос
+        вернет только те лоты, значения полей которых,
+        соответствуют данной фильтрации. То есть, для каждого
+        ключа, будут отфильтрованы те лоты, значения
+        соответствующего поля которого не находится в 
+        списке-значении.'''
+
         try:
             request_json = RestAPI.request_data_to_json(request.data)
         except APIExceptions.NoJsonError:
@@ -1387,6 +1470,10 @@ class RestAPI:
     @administrator.login_required
     @weighted(weight=1)
     def give_moderator_rights(email):
+        ''' Добавить права модератора
+
+        Изменяет статус пользователя с почтой email на "moderator".'''
+
         moderator.add(email)
         return RestAPI.message(f'{email} is now a moderator.')
 
@@ -1395,6 +1482,10 @@ class RestAPI:
     @administrator.login_required
     @weighted(weight=1)
     def remove_moderator_rights(email):
+        ''' Убрать права модератора
+
+        Изменяет статус пользователя с почтой email на "user".'''
+
         moderator.remove(email)
         return RestAPI.message(f'{email} is no longer a moderator.')
 
