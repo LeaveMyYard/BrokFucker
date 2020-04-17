@@ -92,16 +92,6 @@ class DatabaseHandler:
 
         __run_timer()
 
-    @staticmethod
-    def generage_new_random_hash() -> str:
-        return base64.b32encode(
-            hashlib.sha256(
-                (
-                    'random_words' + str(datetime.now())
-                ).encode('utf-8')
-            ).digest()
-        ).decode('utf-8')
-
     def clear_unused_codes(self, duration_to_delete: timedelta):
         self.logger.info('Clearing unused verification codes...')
         self.cursor.execute(
@@ -148,19 +138,6 @@ class DatabaseHandler:
         self.logger.info(f'Clearing complete. Removed {codes} unused codes.')
         self.conn.commit()
 
-    def check_user_exists(self, email: str) -> bool:
-        '''
-            Returns True if user with corresponding email exists, False otherwise
-        '''
-
-        self.cursor.execute(
-            f"SELECT * FROM Users WHERE `email` = ?",
-            (email, )
-        )
-        res = self.cursor.fetchall()
-        
-        return res != []
-
     def check_password(self, email: str, password: str) -> bool:
         '''
             Return True if the email and password pair is correct.
@@ -203,34 +180,6 @@ class DatabaseHandler:
 
         return res[0] >= 2
 
-    def create_email_confirmation_request(self, email: str, password: str):
-        '''
-            Create new email verification request, generage new link for verification and send it via email.
-        '''
-
-        if self.check_user_exists(email):
-            raise APIExceptions.RegistrationError(-1200, 'Email is already in use.')
-
-        if len(password) < 8:
-            raise APIExceptions.RegistrationError(-1201, 'A password size is less than 8.')
-
-        if len(password) > 32:
-            raise APIExceptions.RegistrationError(-1201, 'A password size is bigger than 32.')
-
-        password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
-        random_hash = self.generage_new_random_hash()
-        reg_date = datetime.now()
-
-        self.cursor.execute(
-            f"INSERT INTO EmailVerification (`email`, `password`, `verification_hash`, `request_date`)"
-            f"VALUES (?,?,?,?)",
-            (email, password_hash, random_hash, reg_date)
-        )        
-        self.conn.commit()
-
-        EmailSender.send_email_verification(email, random_hash)
-        self.logger.debug(f'New email with confirmation code `{random_hash}` was sent to `{email}`')
-
     def verify_email_confirmation(self, code: str) -> Union[str, None]:
         '''
             If the corresponding email verification exist, create such user.
@@ -262,57 +211,6 @@ class DatabaseHandler:
             (code, )
         )
         self.conn.commit()
-
-    def create_account_restore_email(self, email):
-        if email == 'admin':
-            raise APIExceptions.AccountRestoreError('Restoring the admin account is not possible.')
-
-        if not self.check_user_exists(email):
-            raise APIExceptions.AccountRestoreError('No such user exist.')
-
-        random_hash = self.generage_new_random_hash()
-        date = datetime.now()
-
-        self.cursor.execute(
-            f"INSERT INTO AccountRestoreVerification (`email`, `verification_hash`, `request_date`)"
-            f"VALUES (?,?,?)",
-            (email, random_hash, date)
-        )
-        self.conn.commit()
-
-        EmailSender.send_account_restore_verification(email, random_hash)
-
-    def verify_account_restore(self, code: str):
-        '''
-            If the corresponding email verification exist, create such user.
-            If not - throws an exception
-        '''
-
-        self.cursor.execute(
-            f"SELECT * FROM AccountRestoreVerification WHERE `verification_hash` = ?",
-            (code, )
-        )
-
-        try:
-            (_, email, date) = self.cursor.fetchone()
-        except TypeError:
-            raise APIExceptions.EmailValidationError(-1204, 'No such verification code exists, it was already used or was already deleted.')
-        
-        if (datetime.now() - datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")) > timedelta(hours=24):
-            raise APIExceptions.EmailValidationError(-1203, 'Email verification time has passed.')
-
-        new_password = self.generage_new_random_hash()[:12]
-        new_password_hashed = hashlib.sha256(new_password.encode('utf-8')).hexdigest()
-
-        self.cursor.execute(
-            f"UPDATE Users SET `password` = ? WHERE `email` = ?",
-            (new_password_hashed, email)
-        )
-
-        self.conn.commit()
-        
-        EmailSender.send_new_password(email, new_password)
-        
 
     def create_email_for_user_password_change(self, email, new_password):
         if self.check_password(email, new_password):
