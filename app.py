@@ -166,7 +166,7 @@ class RestAPI:
     @route('register', methods=['POST'])
     @weighted(weight=10)
     def register():
-        ''' Начинает процесс регистрации нового пользователя. 
+        ''' Создать новый аккаунт. 
         
         Запрос на создание нового аккаунта. 
         Отправит письмо с подтверждением на почту, если такая почта существует. 
@@ -198,7 +198,7 @@ class RestAPI:
     @route('register/verify/<string:verification_hash>')
     @weighted(weight=2)
     def confirm_verification(verification_hash):
-        ''' Подтверждает регистрацию. 
+        ''' Подтвердить регистрацию. 
         
         Подтверждает регистрацию по коду {verification_hash}.
         Ссылка с этим кодом присылается на почту пользователю:
@@ -278,7 +278,7 @@ class RestAPI:
         user = User.current()
 
         user.change_password(request_json['password'])
-        return RestAPI.message(f'Verification in sent to {user.email}')
+        return RestAPI.message(f'Verification in sent to {user.email}.')
 
     @staticmethod
     @route('user/password/verify/<string:code>')
@@ -306,7 +306,7 @@ class RestAPI:
         user = User(email)
 
         user.restore_account()
-        return RestAPI.message(f'Verification in sent to {user.email}')
+        return RestAPI.message(f'Verification in sent to {user.email}.')
 
     @staticmethod
     @route('user/restore/verify/<string:code>')
@@ -353,7 +353,7 @@ class RestAPI:
         user = User.current()
 
         user.add_avatar(request.files['file'])
-        return RestAPI.message('New avatar is saved'), 201
+        return RestAPI.message('New avatar is saved.'), 201
 
     @staticmethod
     @route('user/avatar', methods=['DELETE'])
@@ -368,7 +368,7 @@ class RestAPI:
         user = User.current()
 
         user.delete_avatar()
-        return RestAPI.message('Your avatar is now deleted'), 201
+        return RestAPI.message('Your avatar is now deleted.'), 201
 
     # -------------------------------------------------------------------------
     # Lots stuff
@@ -529,7 +529,7 @@ class RestAPI:
             if data in request_json:
                 lot.update_data(data, request_json[data])
 
-        return RestAPI.message('A lot is changed'), 201
+        return RestAPI.message('A lot is changed.'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>', methods=['DELETE'])
@@ -550,7 +550,7 @@ class RestAPI:
             raise APIExceptions.NoPermissionError()
         
         lot.delete_lot()
-        return RestAPI.message('A lot is deleted'), 201
+        return RestAPI.message('A lot is deleted.'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>', methods=['POST'])
@@ -569,7 +569,7 @@ class RestAPI:
             raise APIExceptions.NoPermissionError()
 
         lot.restore_lot()
-        return RestAPI.message('A lot is restored'), 201
+        return RestAPI.message('A lot is restored.'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/photos', methods=['GET'])
@@ -633,20 +633,20 @@ class RestAPI:
 
         user = User.current()
         user.add_lot_to_favorites(lot_id)
-        return RestAPI.message('A lot is added to favorites'), 201
+        return RestAPI.message('A lot is added to favorites.'), 201
 
     @staticmethod
     @route('lots/favorites/<int:lot_id>', methods=['DELETE'])
     @User.login_required
     @weighted(weight=1)
     def remove_favorite_lot(lot_id):
-        ''' Удалить лот из избранного. 
+        ''' Удалить лот из избранных. 
         
         Удаляет выбранный лот из списка избранных лотов пользователя.'''
 
         user = User.current()
         user.remove_lot_from_favorites(lot_id)
-        return RestAPI.message('A lot is removed from favorites'), 201
+        return RestAPI.message('A lot is removed from favorites.'), 201
 
     @staticmethod
     @route('lots/favorites', methods=['GET', 'POST'])
@@ -1013,9 +1013,9 @@ class RestAPI:
         user = User.current()
 
         if user.subscribe_to_lot(lot_id, *[request_json[data] for data in data_required]):
-            return RestAPI.message(f'You are now subscribed to lot {lot_id}'), 201
+            return RestAPI.message(f'You are now subscribed to lot {lot_id}.'), 201
         else:
-            return RestAPI.message('You are already subscribed'), 200
+            return RestAPI.message('You are already subscribed.'), 200
             
     @staticmethod
     @route('lots/subscription/<int:lot_id>', methods=['DELETE'])
@@ -1030,9 +1030,9 @@ class RestAPI:
         user = User.current()
         try:
             user.unsubscribe_from_lot(lot_id)
-            return RestAPI.message(f'You are no longer subscribed to lot {lot_id}'), 201
+            return RestAPI.message(f'You are no longer subscribed to lot {lot_id}.'), 201
         except:
-            return RestAPI.message('You are not subscribed'), 200
+            return RestAPI.message('You are not subscribed.'), 200
 
     @staticmethod
     @route('lots/subscription', methods=['GET'])
@@ -1092,7 +1092,7 @@ class RestAPI:
         Подтверждает лот по айди.'''
 
         Lot(lot_id).approve()
-        return RestAPI.message('A lot is now approved'), 201
+        return RestAPI.message('A lot is now approved.'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/security', methods=['PUT'])
@@ -1106,7 +1106,7 @@ class RestAPI:
         lot = Lot(lot_id)
         lot.set_security_checked(True)
         lot.remove_request_for_security_verification()
-        return RestAPI.message('Lot\'s security is now checked'), 201
+        return RestAPI.message('Lot\'s security is now checked.'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/security', methods=['DELETE'])
@@ -1120,7 +1120,7 @@ class RestAPI:
         lot = Lot(lot_id)
         lot.set_security_checked(False)
         lot.remove_request_for_security_verification()
-        return RestAPI.message('Lot\'s security is no more checked'), 201
+        return RestAPI.message('Lot\'s security is no more checked.'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/guarantee', methods=['PUT'])
@@ -1141,7 +1141,7 @@ class RestAPI:
         lot = Lot(lot_id)
         lot.set_guarantee_value(value)
         lot.remove_request_for_guarantee()
-        return RestAPI.message(f'Lot\'s guarantee is now {value}%'), 201
+        return RestAPI.message(f'Lot\'s guarantee is now {value}%.'), 201
 
     @staticmethod
     @route('lots/<int:lot_id>/guarantee', methods=['DELETE'])
@@ -1156,7 +1156,7 @@ class RestAPI:
         lot = Lot(lot_id)
         lot.set_guarantee_value(0)
         lot.remove_request_for_guarantee()
-        return RestAPI.message('Lot\'s guarantee is now 0%'), 201
+        return RestAPI.message('Lot\'s guarantee is now 0%.'), 201
 
     @staticmethod
     @route('lots/requested/guarantee', methods=['GET', 'POST'])
@@ -1333,7 +1333,7 @@ class RestAPI:
         user = User.current()
         lot.delete_lot_by_moderator(user.email, reason)
 
-        return RestAPI.message(f'Lot {lot_id} is now removed for a reason: {reason}')
+        return RestAPI.message(f'Lot {lot_id} is now removed for a reason: {reason}.')
 
     @staticmethod
     @route('lots/subscription/approved', methods=['GET'])
