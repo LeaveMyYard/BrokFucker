@@ -96,7 +96,7 @@ class SubscriptionListGatherer(DatabaseDrivenObject):
             for id, user, lot, type, message in self.cursor.fetchall()
         ]
 
-    def get_users(self, user):
+    def get_from_user(self, user):
         self.cursor.execute(
             f"SELECT `lot`, `confirmed`, `type`, `message` FROM SubscriptionRequests WHERE `user` = ?",
             (user, )

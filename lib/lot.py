@@ -8,6 +8,7 @@ from typing import Dict, Tuple
 from datetime import datetime
 import lib.util.exceptions as APIExceptions
 import os
+from lib.user import User
 
 class Lot(DatabaseDrivenObject):
     @staticmethod
@@ -17,14 +18,15 @@ class Lot(DatabaseDrivenObject):
     @staticmethod
     def serialize_lot(lot_data: Tuple):
         lot = Lot(lot_data[0])
+        user = User(lot_data[3])
         
         res = {
             'id': lot_data[0],
             'date': lot_data[1],
             'name': lot_data[2],
             'user': lot_data[3],
-            'user_display_name': self.get_user_display_name(lot[3]),
-            'user_avatar': self.get_user_avatar_link(lot[3]),
+            'user_display_name': user.get_display_name(),
+            'user_avatar': user.get_avatar_link(),
             'amount': lot_data[4],
             'currency': lot_data[5],
             'term': lot_data[6],
@@ -396,7 +398,7 @@ class LotListGatherer(DatabaseDrivenObject):
         return result_filter
 
     @staticmethod
-    def __format_sql_lot_filter_string(lot_filter, where_is_already_used: bool = False) -> str:
+    def _format_sql_lot_filter_string(lot_filter, where_is_already_used: bool = False) -> str:
         res = ""
         if lot_filter['show_only'] is not None:
             res += (' WHERE ' if not where_is_already_used else ' AND ') + ' AND '.join(
@@ -416,42 +418,42 @@ class LotListGatherer(DatabaseDrivenObject):
 
     def get_requested_for_guarantee(self):
         self.cursor.execute(
-            "SELECT * FROM LotsWithGuaranteeRequested" + self.__format_sql_lot_filter_string(self.lot_filter)
+            "SELECT * FROM LotsWithGuaranteeRequested" + self._format_sql_lot_filter_string(self.lot_filter)
         )
 
         return [Lot.serialize_lot(lot) for lot in self.cursor.fetchall()]
 
     def get_requested_for_security_verification(self):
         self.cursor.execute(
-            "SELECT * FROM LotsWithSecurityVerificationRequested" + self.__format_sql_lot_filter_string(self.lot_filter)
+            "SELECT * FROM LotsWithSecurityVerificationRequested" + self._format_sql_lot_filter_string(self.lot_filter)
         )
 
         return [Lot.serialize_lot(lot) for lot in self.cursor.fetchall()]
 
     def get_all_approved_lots(self):
         self.cursor.execute(
-            "SELECT * FROM LiveLots" + self.__format_sql_lot_filter_string(self.lot_filter)
+            "SELECT * FROM LiveLots" + self._format_sql_lot_filter_string(self.lot_filter)
         )
 
         return [Lot.serialize_lot(lot) for lot in self.cursor.fetchall()]
 
     def get_all_unapproved_lots(self):
         self.cursor.execute(
-            f"SELECT * FROM LiveUnacceptedLots" + self.__format_sql_lot_filter_string(self.lot_filter)
+            f"SELECT * FROM LiveUnacceptedLots" + self._format_sql_lot_filter_string(self.lot_filter)
         )
 
         return [Lot.serialize_lot(lot) for lot in self.cursor.fetchall()]
 
     def get_archive(self):
         self.cursor.execute(
-            "SELECT * FROM ArchiveLatestLots" + self.__format_sql_lot_filter_string(self.lot_filter)
+            "SELECT * FROM ArchiveLatestLots" + self._format_sql_lot_filter_string(self.lot_filter)
         )
 
         return [Lot.serialize_lot(lot) for lot in self.cursor.fetchall()]
 
     def get_archived_history(self, lot_id):
         self.cursor.execute(
-            "SELECT * FROM LotsArchive" + self.__format_sql_lot_filter_string(self.lot_filter)
+            "SELECT * FROM LotsArchive" + self._format_sql_lot_filter_string(self.lot_filter)
         )
 
         table = self.cursor.fetchall()
@@ -475,7 +477,7 @@ class UsersLotListGatherer(LotListGatherer):
     def get_favorites(self):
         self.cursor.execute(
             f"SELECT `favorite_lots` FROM UsersLots WHERE `email` = ?" +
-            self.__format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True), 
+            self._format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True), 
             (self.user, )
         )
         
@@ -485,11 +487,11 @@ class UsersLotListGatherer(LotListGatherer):
 
     def get_personal(self):
         self.cursor.execute(
-            "SELECT * FROM Lots" 
+            "SELECT * FROM Lots " 
             "WHERE `user` = ? AND `deleted` = 'False' "
             "AND `id` NOT IN ConfirmedLots "
             "AND `id` NOT IN FinishedLots" +
-            self.__format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True),
+            self._format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True),
             (self.user, )
         )
 
@@ -499,7 +501,7 @@ class UsersLotListGatherer(LotListGatherer):
         self.cursor.execute(
             "SELECT * FROM Lots WHERE `user` = ? AND `deleted` = 'False' "
             "AND `id` IN ConfirmedLots " +
-            self.__format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True),
+            self._format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True),
             (self.user, )
         )
 
@@ -509,7 +511,7 @@ class UsersLotListGatherer(LotListGatherer):
         self.cursor.execute(
             f"SELECT * FROM Lots WHERE `user` = ? AND `deleted` = 'False' "
             "AND `id` IN FinishedLots " +
-            self.__format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True),
+            self._format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True),
             (self.user, )
         )
 
@@ -518,7 +520,7 @@ class UsersLotListGatherer(LotListGatherer):
     def get_personal_deleted(self):
         self.cursor.execute(
             f"SELECT * FROM Lots WHERE `user` = ? and `deleted` = 'True'" + 
-            self.__format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True),
+            self._format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True),
             (self.user, )
         )
 
