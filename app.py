@@ -178,7 +178,7 @@ class RestAPI:
 
         data_required = [
             'email',
-            'password',
+            'password'
         ]
 
         for data in data_required:

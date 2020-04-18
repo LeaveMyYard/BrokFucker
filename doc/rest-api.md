@@ -259,7 +259,7 @@ Public
 **Ответ:**
 ```javascript
 {
-  'msg': 'Verification is sent to {email}'
+  'msg': 'Verification is sent to {email}.'
 }
 ```
 
