@@ -378,7 +378,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "Verification in sent to {user.email()}."
 }
 ```
 
@@ -407,7 +407,7 @@ Public
 **Ответ:**
 ```javascript
 {
-
+  "msg": "Password was successfuly changed."
 }
 ```
 
@@ -436,7 +436,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "Verification in sent to {email}."
 }
 ```
 
@@ -466,7 +466,7 @@ Public
 **Ответ:**
 ```javascript
 {
-
+  "msg": "Temporary password is sent to your email."
 }
 ```
 
@@ -495,7 +495,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong" 
 }
 ```
 
@@ -523,7 +523,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "New avatar is saved."
 }
 ```
 
@@ -551,7 +551,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "Your avatar is now deleted."
 }
 ```
 
@@ -589,7 +589,7 @@ Public
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -650,7 +650,7 @@ Public
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -680,7 +680,7 @@ Public
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -710,7 +710,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -739,7 +739,7 @@ Public
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -770,7 +770,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "A lot is changed."
 }
 ```
 
@@ -799,7 +799,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "A lot is restored."
 }
 ```
 
@@ -829,7 +829,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "A lot is deleted."
 }
 ```
 
@@ -857,7 +857,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "Lot {lot_id} is now deleted from archive."
 }
 ```
 
@@ -885,7 +885,7 @@ Public
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -915,7 +915,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -945,7 +945,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -972,7 +972,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "A lot is added to favorites."
 }
 ```
 
@@ -999,7 +999,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "A lot is removed from favorites."
 }
 ```
 
@@ -1057,7 +1057,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -1116,7 +1116,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -1174,7 +1174,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -1232,7 +1232,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -1261,7 +1261,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "You are now subscribed to lot {lot_id}."
 }
 ```
 
@@ -1289,7 +1289,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "You are no longer subscribed to lot {lot_id}."
 }
 ```
 
@@ -1348,7 +1348,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -1377,7 +1377,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "A request for a club garantee is sent."
 }
 ```
 
@@ -1406,7 +1406,7 @@ User
 **Ответ:**
 ```javascript
 {
-
+  "msg": "A request for a security verification is sent."
 }
 ```
 
@@ -1434,7 +1434,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "A lot is now approved."
 }
 ```
 
@@ -1461,7 +1461,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "Lot\'s security is now checked."
 }
 ```
 
@@ -1488,7 +1488,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "Lot\'s security is no more checked."
 }
 ```
 
@@ -1518,7 +1518,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "Lot\'s guarantee is now {value}%."
 }
 ```
 
@@ -1546,7 +1546,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "Lot\'s guarantee is now 0%."
 }
 ```
 
@@ -1604,7 +1604,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -1632,7 +1632,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -1661,7 +1661,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -1691,7 +1691,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "Lot {lot_id} is now removed for a reason: {reason}."
 }
 ```
 
@@ -1749,7 +1749,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -1807,7 +1807,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -1834,7 +1834,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "Subscription {id} is now approved."
 }
 ```
 
@@ -1862,7 +1862,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "Subscription {id} is now unapproved."
 }
 ```
 
@@ -1889,7 +1889,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "Subscription {id} is now deleted."
 }
 ```
 
@@ -1918,7 +1918,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "Subscription {id} is now finished."
 }
 ```
 
@@ -1977,7 +1977,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -2036,7 +2036,7 @@ Moderator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "pong"
 }
 ```
 
@@ -2064,7 +2064,7 @@ Administrator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "{email} is now a moderator."
 }
 ```
 
@@ -2091,6 +2091,6 @@ Administrator
 **Ответ:**
 ```javascript
 {
-
+  "msg": "{email} is no longer a moderator."
 }
 ```
