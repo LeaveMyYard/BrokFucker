@@ -619,7 +619,7 @@ class RestAPI:
     @user.login_required
     @weighted(weight=1)
     def remove_favorite_lot(lot_id):
-        ''' Удалить лот из избранного. 
+        ''' Удалить лот из избранных. 
         
         Удаляет выбранный лот из списка избранных лотов пользователя.'''
 
