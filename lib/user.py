@@ -341,7 +341,7 @@ class UserRegistrator(DatabaseDrivenObject):
             raise APIExceptions.RegistrationError('A password size is bigger than 32.')
 
         password_hash = hashlib.sha256(password.encode('utf-8')).hexdigest()
-        random_hash = self.generage_new_random_hash()
+        random_hash = generage_random_hash()
         reg_date = datetime.now()
 
         self.cursor.execute(
