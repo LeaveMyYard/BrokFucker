@@ -174,7 +174,7 @@ class Lot(DatabaseDrivenObject):
 
         self.cursor.execute(
             f"INSERT INTO LotVerificationDeclines VALUES(?,?,?)",
-            (self.lot_id, reason, moderator)
+            (self.lot_id, reason, moderator.email)
         )
 
         self.conn.commit()
@@ -208,7 +208,7 @@ class Lot(DatabaseDrivenObject):
         return self.cursor.fetchone()[0]
 
     def can_user_edit(self, user):
-        return self.get_lot_creator() == user
+        return self.get_lot_creator() == user.email
         
     def add_photo(self, image):
         self.unapprove()
@@ -492,7 +492,7 @@ class UsersLotListGatherer(LotListGatherer):
             "AND `id` NOT IN ConfirmedLots "
             "AND `id` NOT IN FinishedLots" +
             self._format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True),
-            (self.user, )
+            (self.user.email, )
         )
 
         return [Lot.serialize_lot(lot) for lot in self.cursor.fetchall()]
@@ -502,7 +502,7 @@ class UsersLotListGatherer(LotListGatherer):
             "SELECT * FROM Lots WHERE `user` = ? AND `deleted` = 'False' "
             "AND `id` IN ConfirmedLots " +
             self._format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True),
-            (self.user, )
+            (self.user.email, )
         )
 
         return [Lot.serialize_lot(lot) for lot in self.cursor.fetchall()]
@@ -512,7 +512,7 @@ class UsersLotListGatherer(LotListGatherer):
             f"SELECT * FROM Lots WHERE `user` = ? AND `deleted` = 'False' "
             "AND `id` IN FinishedLots " +
             self._format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True),
-            (self.user, )
+            (self.user.email, )
         )
 
         return [Lot.serialize_lot(lot) for lot in self.cursor.fetchall()]
@@ -521,7 +521,7 @@ class UsersLotListGatherer(LotListGatherer):
         self.cursor.execute(
             f"SELECT * FROM Lots WHERE `user` = ? and `deleted` = 'True'" + 
             self._format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True),
-            (self.user, )
+            (self.user.email, )
         )
 
         return [Lot.serialize_lot(lot) for lot in self.cursor.fetchall()]

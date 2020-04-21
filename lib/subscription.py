@@ -99,7 +99,7 @@ class SubscriptionListGatherer(DatabaseDrivenObject):
     def get_from_user(self, user):
         self.cursor.execute(
             f"SELECT `lot`, `confirmed`, `type`, `message` FROM SubscriptionRequests WHERE `user` = ?",
-            (user, )
+            (user.email, )
         )
 
         return [

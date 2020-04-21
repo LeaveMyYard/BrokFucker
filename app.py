@@ -103,7 +103,7 @@ class RestAPI:
     }
 
     @staticmethod
-    def message(msg) -> str:
+    def message(msg: str) -> str:
         return jsonify(
             {
                 'msg': msg
@@ -506,7 +506,7 @@ class RestAPI:
         lot = Lot(lot_id)
         user = User.current()
 
-        if not lot.can_user_edit(user.email):
+        if not lot.can_user_edit(user):
             raise APIExceptions.NoPermissionError()
 
         request_json = RestAPI.request_data_to_json(request.data)
@@ -546,7 +546,7 @@ class RestAPI:
         lot = Lot(lot_id)
         user = User.current()
 
-        if not lot.can_user_edit(user.email):
+        if not lot.can_user_edit(user):
             raise APIExceptions.NoPermissionError()
         
         lot.delete_lot()
@@ -565,7 +565,7 @@ class RestAPI:
 
         lot = Lot(lot_id)
         user = User.current()
-        if not lot.can_user_edit(user.email):
+        if not lot.can_user_edit(user):
             raise APIExceptions.NoPermissionError()
 
         lot.restore_lot()
@@ -596,7 +596,7 @@ class RestAPI:
 
         lot = Lot(lot_id)
         user = User.current()
-        if not lot.can_user_edit(user.email):
+        if not lot.can_user_edit(user):
             raise APIExceptions.NoPermissionError()
         
         resp = {filename: lot.add_photo(request.files[filename]) for filename in request.files}
@@ -617,7 +617,7 @@ class RestAPI:
 
         lot = Lot(lot_id)
         user = User.current()
-        if not lot.can_user_edit(user.email):
+        if not lot.can_user_edit(user):
             raise APIExceptions.NoPermissionError()
         
         return jsonify(lot.remove_photo(photo_id)), 201
@@ -696,7 +696,7 @@ class RestAPI:
             lot_filter = request_json['filter'] if 'filter' in request_json else {}
 
         user = User.current()
-        lot_list = UsersLotListGatherer(user.email, lot_filter)
+        lot_list = UsersLotListGatherer(user, lot_filter)
 
         return jsonify(lot_list.get_favorites()), 200
 
@@ -752,7 +752,7 @@ class RestAPI:
             lot_filter = request_json['filter'] if 'filter' in request_json else {}
 
         user = User.current()
-        lot_list = UsersLotListGatherer(user.email, lot_filter)
+        lot_list = UsersLotListGatherer(user, lot_filter)
 
         return jsonify(lot_list.get_personal()), 200
 
@@ -805,7 +805,7 @@ class RestAPI:
             lot_filter = request_json['filter'] if 'filter' in request_json else {}
 
         user = User.current()
-        lot_list = UsersLotListGatherer(user.email, lot_filter)
+        lot_list = UsersLotListGatherer(user, lot_filter)
 
         return jsonify(lot_list.get_personal_confirmed()), 200
 
@@ -857,7 +857,7 @@ class RestAPI:
             lot_filter = request_json['filter'] if 'filter' in request_json else {}
 
         user = User.current()
-        lot_list = UsersLotListGatherer(user.email, lot_filter)
+        lot_list = UsersLotListGatherer(user, lot_filter)
 
         return jsonify(lot_list.get_personal_finished()), 200
 
@@ -909,7 +909,7 @@ class RestAPI:
             lot_filter = request_json['filter'] if 'filter' in request_json else {}
 
         user = User.current()
-        lot_list = UsersLotListGatherer(user.email, lot_filter)
+        lot_list = UsersLotListGatherer(user, lot_filter)
 
         return jsonify(lot_list.get_personal_deleted()), 200
 
@@ -926,7 +926,7 @@ class RestAPI:
         lot = Lot(lot_id)
         user = User.current()
 
-        if not lot.can_user_edit(user.email):
+        if not lot.can_user_edit(user):
             raise APIExceptions.NoPermissionError()
 
         lot.delete_entirely()
@@ -947,7 +947,7 @@ class RestAPI:
         lot = Lot(lot_id)
         user = User.current()
 
-        if not lot.can_user_edit(user.email):
+        if not lot.can_user_edit(user):
             raise APIExceptions.NoPermissionError()
 
         try:
@@ -976,7 +976,7 @@ class RestAPI:
         lot = Lot(lot_id)
         user = User.current()
 
-        if not lot.can_user_edit(user.email):
+        if not lot.can_user_edit(user):
             raise APIExceptions.NoPermissionError()
 
         try:
@@ -1076,7 +1076,7 @@ class RestAPI:
         списке-значении.'''
 
         user = User.current()
-        return jsonify({'lots': SubscriptionListGatherer().get_from_user(user.email)}), 200
+        return jsonify({'lots': SubscriptionListGatherer().get_from_user(user)}), 200
 
     # -------------------------------------------------------------------------
     # Moderator stuff
@@ -1328,10 +1328,10 @@ class RestAPI:
 
         RestAPI.check_required_fields(request_json, required_fields)
 
+        moderator = Moderator.current()
         reason = request_json['reason']
         lot = Lot(lot_id)
-        user = User.current()
-        lot.delete_lot_by_moderator(user.email, reason)
+        lot.delete_lot_by_moderator(moderator, reason)
 
         return RestAPI.message(f'Lot {lot_id} is now removed for a reason: {reason}.')
 
