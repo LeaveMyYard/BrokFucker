@@ -1,19 +1,67 @@
-from flask_httpauth import HTTPBasicAuth
-from lib.database_handler import DatabaseHandler
 from flask import Flask, abort, jsonify, request, make_response
+from lib.moderator import Moderator, User
+import lib.util.exceptions as APIExceptions
 
-class Admin:
-    auth = HTTPBasicAuth()
-    login_required = auth.login_required
-    email = auth.username
-
+class Admin(Moderator):
     @staticmethod
-    @auth.verify_password
-    def verify_password(email, password):
-        database = DatabaseHandler()
-        return database.check_password(email, password) and database.is_administrator(email)
+    @User.auth.verify_password
+    def verify_user_password(email, password):
+        try:
+            user = Moderator(email)
+        except APIExceptions.UserError:
+            return False
+        else:
+            return user.check_password(password)
 
-    @staticmethod
-    @auth.error_handler
-    def unauthorized():
-        return make_response(jsonify({'code': -1002, 'msg': 'You are not authorized to execute this request.'}), 403)
+    def __init__(self, email):
+        super().__init__(email)
+
+        self.cursor.execute(
+            f"SELECT `type` FROM Users WHERE `email` = ?",
+            (email, )
+        )
+        res = self.cursor.fetchone()
+
+        if res[0] < 2:
+            raise APIExceptions.UserError("This user is not an administrator.")
+
+    def add_moderator_rights(self, email):
+        user = User(email)
+
+        try:
+            moderator = Moderator(email)
+        except APIExceptions.UserError:
+            pass
+        else:
+            raise APIExceptions.ModeratorAddingError(f'User {email} already has moderator rights.')
+        
+        self.cursor.execute(
+            f"UPDATE Users SET `type` = 1 WHERE `email` = ?",
+            (email, )
+        )
+
+        self.conn.commit()
+
+    def remove_moderator_rights(self, email):
+        user = User(email)
+
+        try:
+            Admin(email)
+        except APIExceptions.UserError:
+            pass
+        else:
+            raise APIExceptions.ModeratorAddingError('Could not remove moderator rights from an administrator.')
+
+        try:
+            moderator = Moderator(email)
+        except APIExceptions.UserError:
+            pass
+        else:
+            raise APIExceptions.ModeratorAddingError(f'User {email} is not a moderator.')
+        
+        self.cursor.execute(
+            f"UPDATE Users SET `type` = 0 WHERE `email` = ?",
+            (email, )
+        )
+
+        self.conn.commit()

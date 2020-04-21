@@ -12,11 +12,13 @@ class IndexedException(Exception):
     def __str__(self):
         return f'code({self.error_id}) {self.message}'
 
-class RegistrationError(IndexedException):
-    pass
+class UserError(IndexedException):
+    def __init__(self, message):
+        super().__init__(-1000, message)
 
-class EmailValidationError(RegistrationError):
-    pass
+class RegistrationError(IndexedException):
+    def __init__(self, message):
+        super().__init__(-1001, message)
 
 class NotAutorizedError(IndexedException):
     def __init__(self):
@@ -81,3 +83,7 @@ class LotNotExistsError(IndexedException):
 class SubscriptionManagementError(IndexedException):
     def __init__(self, message):
         super().__init__(-1017, message)
+
+class EmailValidationError(IndexedException):
+    def __init__(self, message):
+        super().__init__(-1018, message)
