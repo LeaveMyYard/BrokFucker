@@ -1,10 +1,13 @@
 from flask import Flask, abort, jsonify, request, make_response
-from lib.moderator import Moderator, User
+from lib.moderator import Moderator, User, HTTPBasicAuth
 import lib.util.exceptions as APIExceptions
 
 class Admin(Moderator):
+    auth = HTTPBasicAuth()
+    auth.error_handler(User.unauthorized)
+
     @staticmethod
-    @User.auth.verify_password
+    @auth.verify_password
     def verify_user_password(email, password):
         try:
             user = Moderator(email)
