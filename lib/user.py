@@ -355,16 +355,15 @@ class UserRegistrator(DatabaseDrivenObject):
         self.logger.debug(f'New email with confirmation code `{random_hash}` was sent to `{email}`')
 
     def verify_email_from_code(self, code):
-        database = DatabaseHandler()
         try:
-            database.verify_email_confirmation(code)
+            self.verify_email_confirmation(code)
         except EmailValidationError:
             raise
         else:
             return jsonify({'msg': 'Email was succesfully confirmed.'})
         finally:
             try:
-                database.delete_email_confirmation_code(code)
+                self.delete_email_confirmation_code(code)
             except sqlite3.Error:
                 pass
 
