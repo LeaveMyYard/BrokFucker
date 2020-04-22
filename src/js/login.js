@@ -70,6 +70,9 @@ const logIn = async () => {
     });
     const result = await response.json();
     if (!response.ok) {
+      alert(
+        result.msg + " " + userData + " " + encData + " " + window.atob(encData)
+      );
       throw new Error(result.msg);
     } else {
       if (termsCheckbox.checked == true) {
