@@ -9,7 +9,6 @@ class Admin(Moderator):
     @staticmethod
     @auth.verify_password
     def verify_user_password(email, password):
-        print(f'Admin verify {email}, {password}')
         try:
             user = Moderator(email)
         except APIExceptions.UserError:
