@@ -45,7 +45,7 @@ class User(DatabaseDrivenObject):
         self.email = email
 
         if not self.exists():
-            raise APIExceptions.UserError('No such user exists.')
+            raise APIExceptions.UserError(f'No such user exists ({email}).')
 
     def check_password(self, password: str) -> bool:
         ''' Check if the password is correct
@@ -354,19 +354,6 @@ class UserRegistrator(DatabaseDrivenObject):
         EmailSender.send_email_verification(email, random_hash)
         self.logger.debug(f'New email with confirmation code `{random_hash}` was sent to `{email}`')
 
-    def verify_email_from_code(self, code):
-        try:
-            self.verify_email_confirmation(code)
-        except EmailValidationError:
-            raise
-        else:
-            return jsonify({'msg': 'Email was succesfully confirmed.'})
-        finally:
-            try:
-                self.delete_email_confirmation_code(code)
-            except sqlite3.Error:
-                pass
-
     def verify_account_restore(self, code):
         '''
             If the corresponding email verification exist, create such user.
@@ -440,6 +427,8 @@ class UserRegistrator(DatabaseDrivenObject):
             pass
         else:
             raise APIExceptions.EmailValidationError('Email is already in use.')
+
+        self.delete_email_confirmation_code(code)
         
         self.logger.debug(f'New user `{email}` has successfuly confirmed his email and created an account')
         self.create(email, password)

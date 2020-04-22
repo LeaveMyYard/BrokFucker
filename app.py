@@ -207,7 +207,8 @@ class RestAPI:
         При желании, эту ссылку можно изменить в настройках сервера, 
         в файле settings.json, в параметре "email_verification_link_base".'''
 
-        return UserRegistrator().verify_email_from_code(verification_hash), 201
+        UserRegistrator().verify_email_confirmation(verification_hash)
+        return RestAPI.message("Email was succesfully confirmed."), 201
 
     # -------------------------------------------------------------------------
     # User
@@ -1528,7 +1529,8 @@ class RestAPI:
 
         Изменяет статус пользователя с почтой email на "moderator".'''
 
-        Admin.add_moderator_rights(email)
+        admin = Admin.current()
+        admin.add_moderator_rights(email)
         return RestAPI.message(f'{email} is now a moderator.')
 
     @staticmethod
@@ -1540,7 +1542,8 @@ class RestAPI:
 
         Изменяет статус пользователя с почтой email на "user".'''
 
-        Admin.remove_moderator_rights(email)
+        admin = Admin.current()
+        admin.remove_moderator_rights(email)
         return RestAPI.message(f'{email} is no longer a moderator.')
 
 class Server:
