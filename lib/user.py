@@ -23,6 +23,7 @@ class User(DatabaseDrivenObject):
     @staticmethod
     @auth.verify_password
     def verify_user_password(email, password):
+        print(f'User verify {email}, {password}')
         try:
             user = User(email)
         except APIExceptions.UserError:
