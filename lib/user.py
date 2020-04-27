@@ -96,7 +96,7 @@ class User(DatabaseDrivenObject):
 
     def exists(self) -> bool:
         '''
-            Returns True if user with corresponding email exists, False otherwise
+            Проверяет, существует ли данный аккаунт.
         '''
 
         self.cursor.execute(
@@ -104,10 +104,14 @@ class User(DatabaseDrivenObject):
             (self.email, )
         )
         res = self.cursor.fetchall()
-        
+
         return res != []
 
     def restore_account(self):
+        '''
+            Отправляет письмо с подтвреждением восстановления аккаунта.
+        '''
+
         if self.email == 'admin':
             raise APIExceptions.AccountRestoreError('Restoring the admin account is not possible.')
 
@@ -190,17 +194,17 @@ class User(DatabaseDrivenObject):
             )
 
     def create_lot(
-        self,
-        name,
-        amount,
-        currency,
-        term,
-        return_way,
-        security,
-        percentage,
-        form,
-        commentary
-    ):
+            self,
+            name,
+            amount,
+            currency,
+            term,
+            return_way,
+            security,
+            percentage,
+            form,
+            commentary
+        ):
         date = datetime.now()
         self.cursor.execute(
             f"INSERT INTO Lots (`date`, `name`, `user`, `amount`, `currency`, `term`, `return_way`, `security`, `percentage`, `form`, `security_checked`, `guarantee_percentage`, `confirmed`, `commentary`)"
@@ -258,7 +262,7 @@ class User(DatabaseDrivenObject):
             f"SELECT `favorite_lots` FROM UsersLots WHERE `email` = ?",
             (self.email, )
         )
-        
+
         res: list = ast.literal_eval(self.cursor.fetchone()[0])
         if lot_id in res:
             res.remove(lot_id)
@@ -395,7 +399,7 @@ class UserRegistrator(DatabaseDrivenObject):
             f"INSERT INTO EmailVerification (`email`, `password`, `verification_hash`, `request_date`)"
             f"VALUES (?,?,?,?)",
             (email, password_hash, random_hash, reg_date)
-        )        
+        )
         self.conn.commit()
 
         EmailSender.send_email_verification(email, random_hash)
@@ -420,7 +424,7 @@ class UserRegistrator(DatabaseDrivenObject):
             (_, email, date) = self.cursor.fetchone()
         except TypeError:
             raise APIExceptions.EmailValidationError('No such verification code exists, it was already used or was already deleted.')
-        
+
         if (datetime.now() - datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")) > timedelta(hours=24):
             raise APIExceptions.EmailValidationError('Email verification time has passed.')
 
@@ -433,9 +437,9 @@ class UserRegistrator(DatabaseDrivenObject):
         )
 
         self.conn.commit()
-        
+
         EmailSender.send_new_password(email, new_password)
-    
+
     def verify_password_change(self, code):
         self.cursor.execute(
             f"SELECT * FROM PasswordChangeVerification WHERE `verification_hash` = ?",
@@ -468,7 +472,7 @@ class UserRegistrator(DatabaseDrivenObject):
             (_, email, password, date) = self.cursor.fetchone()
         except TypeError:
             raise APIExceptions.EmailValidationError('No such verification code exists, it was already used or was already deleted.')
-        
+
         if (datetime.now() - datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")) > timedelta(hours=24):
             raise APIExceptions.EmailValidationError('Email verification time has passed.')
 
@@ -572,7 +576,7 @@ class UserRegistrator(DatabaseDrivenObject):
                     (code, )
                 )
 
-        
+
         self.logger.info(
             'Clearing complete. Removed %s unused codes.',
             codes

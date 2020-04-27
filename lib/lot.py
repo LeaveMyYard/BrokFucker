@@ -1,13 +1,14 @@
 from lib.database_handler import DatabaseDrivenObject
 from PIL import Image
 from werkzeug.utils import secure_filename
-from flask import Flask, abort, jsonify, request, make_response
+from flask import request
 from lib.util.hash import sha256
 from lib.settings import Settings
 from typing import Dict, Tuple
 from datetime import datetime
 import lib.util.exceptions as APIExceptions
 import os
+import ast
 from lib.user import User
 
 class Lot(DatabaseDrivenObject):
@@ -19,7 +20,7 @@ class Lot(DatabaseDrivenObject):
     def serialize_lot(lot_data: Tuple):
         lot = Lot(lot_data[0])
         user = User(lot_data[3])
-        
+
         res = {
             'id': lot_data[0],
             'date': lot_data[1],
@@ -34,14 +35,14 @@ class Lot(DatabaseDrivenObject):
             'security': lot_data[8],
             'percentage': lot_data[9],
             'form': lot_data[10],
-            'security_checked': eval(lot_data[11]),
+            'security_checked': ast.literal_eval(lot_data[11]),
             'guarantee_percentage': lot_data[12],
-            'confirmed': eval(lot_data[13]),
+            'confirmed': ast.literal_eval(lot_data[13]),
             'commentary': lot_data[15],
             'photos': lot.get_photos(),
             'taken': lot.check_taken()
         }
-        
+
         if lot.removed_by_moderator():
             res['remove_reason'] = lot.get_remove_reason()
 
@@ -72,7 +73,7 @@ class Lot(DatabaseDrivenObject):
         )
 
         return self.cursor.fetchone() is not None
-    
+
     def get_remove_reason(self):
         self.cursor.execute(
             f"SELECT `reason` FROM LotVerificationDeclines WHERE `id` = ?",
@@ -101,7 +102,7 @@ class Lot(DatabaseDrivenObject):
             'lot_id': self.lot_id,
             'photos': [f'{request.host_url}image/lot/{photo}.jpg' for photo in self.get_photos_list()]
         }
-    
+
     def exists(self, lot_id):
         self.cursor.execute(
             f"SELECT * FROM Lots WHERE `id` = ?",
@@ -209,7 +210,7 @@ class Lot(DatabaseDrivenObject):
 
     def can_user_edit(self, user):
         return self.get_lot_creator() == user.email
-        
+
     def add_photo(self, image):
         self.unapprove()
 
@@ -389,7 +390,7 @@ class LotListGatherer(DatabaseDrivenObject):
                 for v in value:
                     if v not in show_only[key]:
                         raise APIExceptions.LotFiltrationError(f"{v} is not available for {key} group. Available values are: {', '.join(show_only[key])}")
-            
+
             if result_filter['show_only'] == {}:
                 result_filter['show_only'] = None
         else:
@@ -470,24 +471,24 @@ class LotListGatherer(DatabaseDrivenObject):
         return res_list
 
 class UsersLotListGatherer(LotListGatherer):
-    def __init__(self, user, lot_filter = {}):
+    def __init__(self, user, lot_filter={}):
         super().__init__(lot_filter=lot_filter)
         self.user = user
 
     def get_favorites(self):
         self.cursor.execute(
             f"SELECT `favorite_lots` FROM UsersLots WHERE `email` = ?" +
-            self._format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True), 
+            self._format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True),
             (self.user, )
         )
-        
+
         res: list = eval(self.cursor.fetchone()[0])
 
         return [Lot(lot_id).get_lot_data() for lot_id in reversed(res)]
 
     def get_personal(self):
         self.cursor.execute(
-            "SELECT * FROM Lots " 
+            "SELECT * FROM Lots "
             "WHERE `user` = ? AND `deleted` = 'False' "
             "AND `id` NOT IN ConfirmedLots "
             "AND `id` NOT IN FinishedLots" +
@@ -519,7 +520,7 @@ class UsersLotListGatherer(LotListGatherer):
 
     def get_personal_deleted(self):
         self.cursor.execute(
-            f"SELECT * FROM Lots WHERE `user` = ? and `deleted` = 'True'" + 
+            f"SELECT * FROM Lots WHERE `user` = ? and `deleted` = 'True'" +
             self._format_sql_lot_filter_string(self.lot_filter, where_is_already_used=True),
             (self.user.email, )
         )
