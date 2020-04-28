@@ -1,28 +1,47 @@
-from flask_httpauth import HTTPBasicAuth
-from flask import Flask, abort, jsonify, request, make_response
-from lib.util.exceptions import EmailValidationError
-from lib.util.hash import sha256, generage_random_hash
-from lib.settings import Settings
-from werkzeug.utils import secure_filename
-from PIL import Image
-from os import path, remove
-from lib.util.enums import SubscriptionTypes
-import sqlite3
+'''
+    В этом модуле находятся все инструменты управления пользователями.
+    Доступны два класса: User и UserRegistration.
+'''
 
-from lib.database_handler import DatabaseDrivenObject
-import lib.util.exceptions as APIExceptions
+import ast
 import hashlib
-from datetime import datetime, timedelta
-from lib.email_sender import EmailSender
+import sqlite3
+from os import remove
 from threading import Timer
+from datetime import datetime, timedelta
+
+from PIL import Image
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.utils import secure_filename
+from flask import jsonify, request, make_response
+
+import lib.util.exceptions as APIExceptions
+from lib.settings import Settings
+from lib.email_sender import EmailSender
+from lib.util.enums import SubscriptionTypes
+from lib.database_handler import DatabaseDrivenObject
+from lib.util.hash import sha256, generage_random_hash
 
 class User(DatabaseDrivenObject):
+    '''
+        Класс User представляет собой существующего пользователя.
+        Возможно использование конструктора и почты,
+        для получения объекта пользователя, или же
+        User.current() для получения объекта текущего
+        пользователя (того, который сделал запрос, если передались
+        данные пользователя).
+    '''
+
     auth = HTTPBasicAuth()
     login_required = auth.login_required
 
     @staticmethod
     @auth.verify_password
     def verify_user_password(email, password):
+        '''
+            Вызывается при проверке данных пользователя.
+        '''
+
         try:
             user = User(email)
         except APIExceptions.UserError:
@@ -33,15 +52,29 @@ class User(DatabaseDrivenObject):
     @staticmethod
     @auth.error_handler
     def unauthorized():
-        return make_response(jsonify({'code': -1002, 'msg': 'You are not authorized to execute this request.'}), 403)
+        '''
+            Ответ в случае, если данные не верны.
+        '''
+
+        return make_response(
+            jsonify({
+                'code': -1002,
+                'msg': 'You are not authorized to execute this request.'
+            }), 403
+        )
 
     @classmethod
     def current(cls):
+        '''
+            Возвращает текущего пользователя, который сделал запрос.
+            (Если передались данные)
+        '''
+
         return cls(cls.auth.username())
 
     def __init__(self, email: str):
         super().__init__()
-        
+
         self.email = email
 
         if not self.exists():
@@ -63,7 +96,7 @@ class User(DatabaseDrivenObject):
 
     def exists(self) -> bool:
         '''
-            Returns True if user with corresponding email exists, False otherwise
+            Проверяет, существует ли данный аккаунт.
         '''
 
         self.cursor.execute(
@@ -71,10 +104,14 @@ class User(DatabaseDrivenObject):
             (self.email, )
         )
         res = self.cursor.fetchall()
-        
+
         return res != []
 
     def restore_account(self):
+        '''
+            Отправляет письмо с подтвреждением восстановления аккаунта.
+        '''
+
         if self.email == 'admin':
             raise APIExceptions.AccountRestoreError('Restoring the admin account is not possible.')
 
@@ -140,23 +177,34 @@ class User(DatabaseDrivenObject):
 
         if self.email != 'admin':
             EmailSender.send_password_change_verification(self.email, random_hash)
-            self.logger.debug(f'New password confirmation with code `{random_hash}` was sent to `{self.email}`')
+            self.logger.debug(
+                'New password confirmation with code `%s` was sent to `%s`',
+                random_hash,
+                self.email
+            )
         else:
-            self.logger.warning(f'New password change requested for admin with code `{random_hash}`.')
-            self.logger.warning(f'Go to "{request.host_url}{Settings.get_new_password_verification_link_base()}?code={random_hash}" to confirm it.')
+            self.logger.warning(
+                'New password change requested for admin with code `%s`.',
+                random_hash)
+            self.logger.warning(
+                'Go to "%s%s?code=%s" to confirm it.',
+                request.host_url,
+                Settings.get_new_password_verification_link_base(),
+                random_hash
+            )
 
     def create_lot(
-        self,
-        name,
-        amount,
-        currency,
-        term,
-        return_way,
-        security,
-        percentage,
-        form,
-        commentary
-    ):
+            self,
+            name,
+            amount,
+            currency,
+            term,
+            return_way,
+            security,
+            percentage,
+            form,
+            commentary
+        ):
         date = datetime.now()
         self.cursor.execute(
             f"INSERT INTO Lots (`date`, `name`, `user`, `amount`, `currency`, `term`, `return_way`, `security`, `percentage`, `form`, `security_checked`, `guarantee_percentage`, `confirmed`, `commentary`)"
@@ -174,8 +222,8 @@ class User(DatabaseDrivenObject):
             f"SELECT `user_lots` FROM UsersLots WHERE `email` = ?",
             (self.email, )
         )
-        
-        res: list = eval(self.cursor.fetchone()[0])
+
+        res: list = ast.literal_eval(self.cursor.fetchone()[0])
         if lot_id in res:
             res.add(lot_id)
 
@@ -186,7 +234,10 @@ class User(DatabaseDrivenObject):
 
         self.conn.commit()
 
-        self.logger.info(f'New lot with id `{lot_id}` was created')
+        self.logger.info(
+            'New lot with id `%s` was created',
+            lot_id
+        )
 
         return lot_id
 
@@ -196,7 +247,7 @@ class User(DatabaseDrivenObject):
             (self.email, )
         )
 
-        res: list = eval(self.cursor.fetchone()[0])
+        res: list = ast.literal_eval(self.cursor.fetchone()[0])
         if lot_id not in res:
             res.append(lot_id)
 
@@ -211,8 +262,8 @@ class User(DatabaseDrivenObject):
             f"SELECT `favorite_lots` FROM UsersLots WHERE `email` = ?",
             (self.email, )
         )
-        
-        res: list = eval(self.cursor.fetchone()[0])
+
+        res: list = ast.literal_eval(self.cursor.fetchone()[0])
         if lot_id in res:
             res.remove(lot_id)
 
@@ -255,7 +306,7 @@ class User(DatabaseDrivenObject):
 
         try:
             open(file_location)
-        except:
+        except OSError:
             return f'{request.host_url}image/user/default.jpg'
         else:
             return f'{request.host_url}image/user/{photo_hash}.jpg'
@@ -282,21 +333,21 @@ class User(DatabaseDrivenObject):
     def has_phone_number(self):
         return self.get_data()['phone_number'] is not None
 
-    def subscribe_to_lot(self, lot_id: int, type: str, message: str) -> bool:
-        type = SubscriptionTypes[type]
+    def subscribe_to_lot(self, lot_id: int, sub_type: str, message: str) -> bool:
+        sub_type = SubscriptionTypes[sub_type]
 
-        if type == SubscriptionTypes.PhoneCall and not self.has_phone_number():
+        if sub_type == SubscriptionTypes.PhoneCall and not self.has_phone_number():
             raise APIExceptions.UserHasNoPhoneNumber(self.email)
 
         id_hash = sha256(f'{self.email}_{lot_id}')
         try:
             self.cursor.execute(
                 f"INSERT INTO SubscriptionRequests (`id`, `user`, `lot`, `type`, `message`) VALUES (?,?,?,?,?)",
-                (id_hash, user, lot_id, type.value, message)
+                (id_hash, self.email, lot_id, type.value, message)
             )
             self.conn.commit()
             return True
-        except:
+        except sqlite3.Error:
             return False
 
     def unsubscribe_from_lot(self, lot_id):
@@ -348,11 +399,15 @@ class UserRegistrator(DatabaseDrivenObject):
             f"INSERT INTO EmailVerification (`email`, `password`, `verification_hash`, `request_date`)"
             f"VALUES (?,?,?,?)",
             (email, password_hash, random_hash, reg_date)
-        )        
+        )
         self.conn.commit()
 
         EmailSender.send_email_verification(email, random_hash)
-        self.logger.debug(f'New email with confirmation code `{random_hash}` was sent to `{email}`')
+        self.logger.debug(
+            'New email with confirmation code `%s` was sent to `%s`',
+            random_hash,
+            email
+        )
 
     def verify_account_restore(self, code):
         '''
@@ -369,7 +424,7 @@ class UserRegistrator(DatabaseDrivenObject):
             (_, email, date) = self.cursor.fetchone()
         except TypeError:
             raise APIExceptions.EmailValidationError('No such verification code exists, it was already used or was already deleted.')
-        
+
         if (datetime.now() - datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")) > timedelta(hours=24):
             raise APIExceptions.EmailValidationError('Email verification time has passed.')
 
@@ -382,9 +437,9 @@ class UserRegistrator(DatabaseDrivenObject):
         )
 
         self.conn.commit()
-        
+
         EmailSender.send_new_password(email, new_password)
-    
+
     def verify_password_change(self, code):
         self.cursor.execute(
             f"SELECT * FROM PasswordChangeVerification WHERE `verification_hash` = ?",
@@ -417,7 +472,7 @@ class UserRegistrator(DatabaseDrivenObject):
             (_, email, password, date) = self.cursor.fetchone()
         except TypeError:
             raise APIExceptions.EmailValidationError('No such verification code exists, it was already used or was already deleted.')
-        
+
         if (datetime.now() - datetime.strptime(date, "%Y-%m-%d %H:%M:%S.%f")) > timedelta(hours=24):
             raise APIExceptions.EmailValidationError('Email verification time has passed.')
 
@@ -429,8 +484,11 @@ class UserRegistrator(DatabaseDrivenObject):
             raise APIExceptions.EmailValidationError('Email is already in use.')
 
         self.delete_email_confirmation_code(code)
-        
-        self.logger.debug(f'New user `{email}` has successfuly confirmed his email and created an account')
+
+        self.logger.debug(
+            'New user `%s` has successfuly confirmed his email and created an account',
+            email
+        )
         self.create(email, password)
 
     def delete_email_confirmation_code(self, code: str):
@@ -456,11 +514,18 @@ class UserRegistrator(DatabaseDrivenObject):
         )
         self.conn.commit()
 
-        self.logger.info(f'New user `{email}` was added.')
+        self.logger.info(
+            'New user `%s` was added.',
+            email
+        )
 
     def run_verification_code_clearer(self, run_each: timedelta, duration_to_delete: timedelta):
         self.logger.debug('Starting verification codes clearer.')
-        self.logger.debug(f'Will run each {run_each} and remove codes that exist more then {duration_to_delete}')
+        self.logger.debug(
+            'Will run each %s and remove codes that exist more then %s',
+            run_each,
+            duration_to_delete
+        )
 
         def __run_timer():
             self.__clear_unused_codes(duration_to_delete)
@@ -511,6 +576,9 @@ class UserRegistrator(DatabaseDrivenObject):
                     (code, )
                 )
 
-        
-        self.logger.info(f'Clearing complete. Removed {codes} unused codes.')
+
+        self.logger.info(
+            'Clearing complete. Removed %s unused codes.',
+            codes
+        )
         self.conn.commit()

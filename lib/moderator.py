@@ -1,8 +1,15 @@
-from flask import Flask, abort, jsonify, request, make_response
+'''
+    Модуль содержит в себе класс Moderator
+'''
+
 import lib.util.exceptions as APIExceptions
 from lib.user import User, HTTPBasicAuth
 
 class Moderator(User):
+    '''
+        Модератор, подкласс пользователя, у которого большее количество
+        возможных запросов.
+    '''
     auth = HTTPBasicAuth()
     auth.error_handler(User.unauthorized)
 
