@@ -2,6 +2,7 @@ from lib.database_handler import DatabaseHandler
 from flask import Flask, abort, jsonify, request, make_response
 from lib.util.hash import sha256
 
+
 class Lot:
     @staticmethod
     def approve(lot_id: int):
@@ -52,7 +53,7 @@ class Lot:
     def get_photos(lot_id):
         database = DatabaseHandler()
         return database.get_lot_photos(lot_id)
-        
+
     @staticmethod
     def add_photo(image, lot_id):
         database = DatabaseHandler()

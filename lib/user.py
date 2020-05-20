@@ -1,13 +1,11 @@
+from os import path, remove
+
+from flask import Flask, abort, jsonify, make_response, request
 from flask_httpauth import HTTPBasicAuth
 from lib.database_handler import DatabaseHandler
-from flask import Flask, abort, jsonify, request, make_response
-from lib.util.exceptions import EmailValidationError
-from lib.util.hash import sha256
-from lib.settings import Settings
-from werkzeug.utils import secure_filename
-from PIL import Image
-from os import path, remove
 from lib.util.enums import SubscriptionTypes
+from lib.util.exceptions import EmailValidationError
+
 
 class User:
     auth = HTTPBasicAuth()
@@ -23,7 +21,15 @@ class User:
     @staticmethod
     @auth.error_handler
     def unauthorized():
-        return make_response(jsonify({'code': -1002, 'msg': 'You are not authorized to execute this request.'}), 403)
+        return make_response(
+            jsonify(
+                {
+                    "code": -1002,
+                    "msg": "You are not authorized to execute this request.",
+                }
+            ),
+            403,
+        )
 
     @staticmethod
     def begin_email_verification(email, password):
@@ -37,14 +43,14 @@ class User:
             link = database.verify_email_confirmation(code)
         except EmailValidationError as e:
             database.delete_email_confirmation_code(code)
-            if e.link is None: 
+            if e.link is None:
                 raise
             else:
                 return f'<head><meta http-equiv="refresh" content="1;URL={request.host_url}{e.link}?msg={e.args[0].replace(" ", "_")}" /></head>'
 
         database.delete_email_confirmation_code(code)
         if link is None:
-            return jsonify({'msg': 'Email was succesfully confirmed.'})
+            return jsonify({"msg": "Email was succesfully confirmed."})
         else:
             return f'<head><meta http-equiv="refresh" content="1;URL={request.host_url}{link}" /></head>'
 
@@ -66,15 +72,7 @@ class User:
 
     @staticmethod
     def create_lot(
-        name,
-        amount,
-        currency,
-        term,
-        return_way,
-        security,
-        percentage,
-        form,
-        commentary
+        name, amount, currency, term, return_way, security, percentage, form, commentary
     ):
         database = DatabaseHandler()
         return database.create_new_lot(
@@ -87,7 +85,7 @@ class User:
             security,
             percentage,
             form,
-            commentary
+            commentary,
         )
 
     @staticmethod
@@ -133,7 +131,9 @@ class User:
     @staticmethod
     def subscribe_to_lot(lot_id: int, type: str, message: str) -> bool:
         database = DatabaseHandler()
-        return database.subscribe_user_to_lot(User.email(), lot_id, SubscriptionTypes[type], message)
+        return database.subscribe_user_to_lot(
+            User.email(), lot_id, SubscriptionTypes[type], message
+        )
 
     @staticmethod
     def unsubscribe_from_lot(lot_id):

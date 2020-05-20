@@ -2,6 +2,7 @@ from flask_httpauth import HTTPBasicAuth
 from lib.database_handler import DatabaseHandler
 from flask import Flask, abort, jsonify, request, make_response
 
+
 class Moderator:
     auth = HTTPBasicAuth()
     login_required = auth.login_required
@@ -16,4 +17,12 @@ class Moderator:
     @staticmethod
     @auth.error_handler
     def unauthorized():
-        return make_response(jsonify({'code': -1002, 'msg': 'You are not authorized to execute this request.'}), 403)
+        return make_response(
+            jsonify(
+                {
+                    "code": -1002,
+                    "msg": "You are not authorized to execute this request.",
+                }
+            ),
+            403,
+        )
