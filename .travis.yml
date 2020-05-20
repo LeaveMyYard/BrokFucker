@@ -1,4 +1,9 @@
 language: python
+install:
+  - pip install -r requirements.txt
+  - pip install coverage
+  - pip install codecov
 script:
-  - python -m pip install coverage
+  - python -m codecov
+  - python -m codecov --token="7c48981d-9537-4aa5-8de7-e1d234af3eb9"
   - python -m coverage run unittests.py
