@@ -2,6 +2,7 @@
 
   [![Build Status](https://travis-ci.com/ONUGames/BrokFucker.svg?token=7B7re6XpffyYqKAR9Tk8&branch=production)](https://travis-ci.com/ONUGames/BrokFucker)
   [![License: Unlicense](https://img.shields.io/badge/license-Unlicense-blue.svg)](http://unlicense.org/)
+  [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
   Сервер BrokFucker состоит из двух частей: Rest API и Web Application.
 
