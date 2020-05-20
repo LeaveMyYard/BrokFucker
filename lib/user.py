@@ -529,8 +529,9 @@ class UserRegistrator(DatabaseDrivenObject):
 
         def __run_timer():
             self.__clear_unused_codes(duration_to_delete)
-            t = Timer(run_each.total_seconds(), __run_timer)
-            t.start()
+            self.__verification_timer = Timer(run_each.total_seconds(), __run_timer)
+            self.__verification_timer.setDaemon(True)
+            self.__verification_timer.start()
 
         __run_timer()
 
