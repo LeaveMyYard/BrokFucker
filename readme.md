@@ -1,6 +1,6 @@
 # **BrokFucker**
 
-  https://travis-ci.com/ONUGames/BrokFucker.svg?token=7B7re6XpffyYqKAR9Tk8&branch=production
+  ![Build](https://travis-ci.com/ONUGames/BrokFucker.svg?token=7B7re6XpffyYqKAR9Tk8&branch=production)
 
   Сервер BrokFucker состоит из двух частей: Rest API и Web Application.
 
